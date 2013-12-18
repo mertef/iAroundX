@@ -1,0 +1,27 @@
+/* 
+  Localizable.strings
+  DLAccessory
+
+  Created by Zhang Mertef on 12/2/13.
+  Copyright (c) 2013 Zhang Mertef. All rights reserved.
+*/
+"k_send_file_tile"="Nearby Devices";
+"k_connected_service" = "Connected Devices";
+"k_disconnected_service" = "Scanned Devices";
+"k_sending_file" = "Sending File";
+"k_sending_file_finished" = "Sending file finished!";
+"k_receiving_file" = "Receiving file!";
+"k_receiving_file_finished" = "Receiving file finished!";
+"k_connecting"="connecting...";
+"k_send_data_reliable" = "Send data reliable";
+"k_send_data_unreliable" = "Send data unreliable";
+"k_connect_to_device"="Connect to Device!";
+"k_already_connect_to_device"="Already Connect to Device!";
+"k_cancel" = "Cancel";
+"k_ok" = "OK";
+"k_rename_file" = "Give a File Name";
+"k_file_name_required" = "File name shoud not be empty";
+"k_warnning" = "Warnning!";
+"k_file_exists" = "File has already exits!";
+"k_file_replace" = "Replace!";
+"k_save_file_failure" = "Save file failure!";

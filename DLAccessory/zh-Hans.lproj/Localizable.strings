@@ -1,0 +1,27 @@
+/* 
+  Localizable.strings
+  DLAccessory
+
+  Created by Zhang Mertef on 12/2/13.
+  Copyright (c) 2013 Zhang Mertef. All rights reserved.
+*/
+"k_send_file_tile"="附近";
+"k_connected_service" = "连接的调和";
+"k_disconnected_service" = "发现的调和";
+"k_sending_file" = "发送中";
+"k_sending_file_finished" = "发送完成!";
+"k_receiving_file" = "接收中!";
+"k_receiving_file_finished" = "接收完成!";
+"k_connecting"="连接中...";
+"k_send_data_reliable" = "链接稳定";
+"k_send_data_unreliable" = "链接不稳定";
+"k_connect_to_device"="连接调和!";
+"k_already_connect_to_device"="已经连接上了!";
+"k_cancel" = "取消";
+"k_ok" = "确定";
+"k_rename_file" = "保存文件名字";
+"k_file_name_required" = "文件名字不能为空";
+"k_warnning" = "警告!";
+"k_file_exists" = "文件已经存在!";
+"k_file_replace" = "替换!";
+"k_save_file_failure" = "保存文件失败!";
