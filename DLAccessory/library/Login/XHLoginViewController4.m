@@ -22,12 +22,26 @@
     }
     return self;
 }
-
+-(void)viewWillLayoutSubviews {
+    [super viewWillLayoutSubviews];
+    self.view.autoresizesSubviews = YES;
+    
+    self.view.frame = CGRectMake(44.0f, 0.0f, CGRectGetWidth(self.view.bounds) - 44.0f, CGRectGetHeight(self.view.bounds));
+    _usernameField.frame = CGRectMake(0, 220,  CGRectGetWidth(self.view.bounds), 41);
+    _passwordField.frame = CGRectMake(0, 260,  CGRectGetWidth(self.view.bounds), 41);
+    _loginButton.frame = CGRectMake(0, 301,  CGRectGetWidth(self.view.bounds), 62);
+    _forgotButton.frame = CGRectMake(25, 382, 271, 19);
+    _titleLabel.frame = CGRectMake(43, 97, 234, 60);
+    _infoView.frame = CGRectMake(0, 165,  CGRectGetWidth(self.view.bounds), 55);
+    _headerImageView.frame = CGRectMake(0, 0,  CGRectGetWidth(self.view.bounds), 165);
+    _headerImageView.contentMode = UIViewContentModeScaleAspectFill;
+    _headerImageView.clipsToBounds = YES;
+    _overlayView.frame = CGRectMake(0, 0,  CGRectGetWidth(self.view.bounds), 165);
+}
 - (void)viewDidLoad
 {
     [super viewDidLoad];
 	self.edgesForExtendedLayout = UIRectEdgeNone;
-    NSLog(@"view frame %@", NSStringFromCGRect(self.view.frame));
     UIColor* mainColor = [UIColor colorWithRed:249.0/255 green:223.0/255 blue:244.0/255 alpha:1.0f];
     UIColor* darkColor = [UIColor colorWithRed:62.0/255 green:28.0/255 blue:55.0/255 alpha:1.0f];
     
@@ -36,7 +50,7 @@
     
     self.view.backgroundColor = mainColor;
     
-    _usernameField = [[UITextField alloc] initWithFrame:CGRectMake(0, 220, 320, 41)];
+    _usernameField = [[UITextField alloc] initWithFrame:CGRectMake(0, 220,  CGRectGetWidth(self.view.bounds), 41)];
     _usernameField.backgroundColor = [UIColor whiteColor];
     _usernameField.placeholder = @"Email Address";
     _usernameField.font = [UIFont fontWithName:fontName size:16.0f];
@@ -48,7 +62,7 @@
     _usernameField.leftView = leftView;
     
     
-    _passwordField = [[UITextField alloc] initWithFrame:CGRectMake(0, 260, 320, 41)];
+    _passwordField = [[UITextField alloc] initWithFrame:CGRectMake(0, 260,  CGRectGetWidth(self.view.bounds), 41)];
     _passwordField.backgroundColor = [UIColor whiteColor];
     _passwordField.placeholder = @"Password";
     _passwordField.font = [UIFont fontWithName:fontName size:16.0f];
@@ -60,7 +74,7 @@
     _passwordField.leftViewMode = UITextFieldViewModeAlways;
     _passwordField.leftView = leftView2;
     
-    _loginButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 301, 320, 62)];
+    _loginButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 301,  CGRectGetWidth(self.view.bounds), 62)];
     _loginButton.backgroundColor = darkColor;
     _loginButton.titleLabel.font = [UIFont fontWithName:boldFontName size:20.0f];
     [_loginButton setTitle:@"SIGN UP HERE" forState:UIControlStateNormal];
@@ -85,15 +99,15 @@
     _infoLabel.font =  [UIFont fontWithName:boldFontName size:14.0f];
     _infoLabel.text = @"Welcome back, please login below";
     
-    _infoView = [[UIView alloc] initWithFrame:CGRectMake(0, 165, 320, 55)];
+    _infoView = [[UIView alloc] initWithFrame:CGRectMake(0, 165,  CGRectGetWidth(self.view.bounds), 55)];
     _infoView.backgroundColor = [UIColor colorWithWhite:0.95 alpha:1.0];
     
     
-    _headerImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 320, 165)];
-    _headerImageView.image = [UIImage imageNamed:@"running.jpg"];
+    _headerImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0,  CGRectGetWidth(self.view.bounds), 165)];
+    _headerImageView.image = [UIImage imageNamed:@"test.jpg"];
     _headerImageView.contentMode = UIViewContentModeScaleAspectFill;
     
-    _overlayView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 165)];
+    _overlayView = [[UIView alloc] initWithFrame:CGRectMake(0, 0,  CGRectGetWidth(self.view.bounds), 165)];
     _overlayView.backgroundColor = [UIColor colorWithWhite:0.0f alpha:0.3f];
     
     [self.view addSubview:self.loginButton];

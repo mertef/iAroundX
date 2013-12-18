@@ -33,12 +33,12 @@
     UINavigationController* cCenterNavCt = [[UINavigationController alloc] initWithRootViewController:_ccMpViewCtrl];
 
     
-//    XHLoginViewController4* ctLoginVc = [[XHLoginViewController4 alloc] init];
+    XHLoginViewController4* ctLoginVc = [[XHLoginViewController4 alloc] init];
     
-//    DLFolderViewViewCtrl* ccFolderVc = [[DLFolderViewViewCtrl alloc] init];
+    DLFolderViewViewCtrl* ccFolderVc = [[DLFolderViewViewCtrl alloc] init];
 
-//    IIViewDeckController* ctDeckVc = [[IIViewDeckController alloc] initWithCenterViewController: cCenterNavCt leftViewController:ccFolderVc rightViewController:ctLoginVc];
-    self.window.rootViewController = cCenterNavCt;
+    IIViewDeckController* ctDeckVc = [[IIViewDeckController alloc] initWithCenterViewController: cCenterNavCt leftViewController:ccFolderVc rightViewController:ctLoginVc];
+    self.window.rootViewController = ctDeckVc;
     
     [self.window makeKeyAndVisible];
 //    [self testAnchorView];
