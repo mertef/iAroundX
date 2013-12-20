@@ -13,9 +13,7 @@
 #import "DLMCConfig.h"
 #import "DLPerson.h"
 #import "DLAudio.h"
-#import "IIViewDeckController.h"
-#import "IISideController.h"
-#import "IIWrapController.h"
+
 #import "XHLoginViewController4.h"
 #import "DLFolderViewViewCtrl.h"
 @implementation DLAppDelegate
@@ -24,21 +22,24 @@
 {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     // Override point for customization after application launch.
-    self.window.backgroundColor = [UIColor whiteColor];
-    
+    self.window.backgroundColor = [UIColor clearColor];
 //    [self testAudioView];
     
     
     _ccMpViewCtrl = [[DLMPViewCtrl alloc] init];
-    UINavigationController* cCenterNavCt = [[UINavigationController alloc] initWithRootViewController:_ccMpViewCtrl];
+    UINavigationController* cCenterNavCt = [[UINavigationController alloc] init];
+    [cCenterNavCt.navigationBar setBarStyle:UIBarStyleBlack];
+    [cCenterNavCt.navigationBar setBarTintColor:[UIColor orangeColor]];
+    [cCenterNavCt pushViewController:_ccMpViewCtrl animated:YES];
+    cCenterNavCt.navigationBar.backgroundColor = [UIColor whiteColor];
 
     
-    XHLoginViewController4* ctLoginVc = [[XHLoginViewController4 alloc] init];
+//    XHLoginViewController4* ctLoginVc = [[XHLoginViewController4 alloc] init];
     
-    DLFolderViewViewCtrl* ccFolderVc = [[DLFolderViewViewCtrl alloc] init];
+  //  DLFolderViewViewCtrl* ccFolderVc = [[DLFolderViewViewCtrl alloc] init];
 
-    IIViewDeckController* ctDeckVc = [[IIViewDeckController alloc] initWithCenterViewController: cCenterNavCt leftViewController:ccFolderVc rightViewController:ctLoginVc];
-    self.window.rootViewController = ctDeckVc;
+//    IIViewDeckController* ctDeckVc = [[IIViewDeckController alloc] initWithCenterViewController: cCenterNavCt leftViewController:ccFolderVc rightViewController:ctLoginVc];
+    self.window.rootViewController = cCenterNavCt;
     
     [self.window makeKeyAndVisible];
 //    [self testAnchorView];
@@ -46,6 +47,7 @@
     */
 //    [self testARC];
 //    [self testExternalAccessory];
+//    [self testBlock];
     return YES;
 }
 
@@ -129,5 +131,10 @@
     DLAudio* ccAudio = [[DLAudio alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.window.bounds) * 0.7f, 60.0f)];
     [ccAudio startAnimation];
     [self.window addSubview:ccAudio];
+}
+-(void)testBlock {
+    ^{
+        NSLog(@"hello World!");
+    }();
 }
 @end

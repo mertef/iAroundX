@@ -41,9 +41,6 @@
 		0BDA3ECA186177C400DCBAFC /* mic_center_normal@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 0BDA3EC6186177C400DCBAFC /* mic_center_normal@2x.png */; };
 		0BDA3ECB186177C400DCBAFC /* mic_h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 0BDA3EC7186177C400DCBAFC /* mic_h@2x.png */; };
 		0BDA3ECC186177C400DCBAFC /* mic_n@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 0BDA3EC8186177C400DCBAFC /* mic_n@2x.png */; };
-		0BDA3ED418619FB900DCBAFC /* IISideController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BDA3ECF18619FB900DCBAFC /* IISideController.m */; };
-		0BDA3ED518619FB900DCBAFC /* IIViewDeckController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BDA3ED118619FB900DCBAFC /* IIViewDeckController.m */; };
-		0BDA3ED618619FB900DCBAFC /* IIWrapController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BDA3ED318619FB900DCBAFC /* IIWrapController.m */; };
 		0BDA3EED1861A17F00DCBAFC /* check.png in Resources */ = {isa = PBXBuildFile; fileRef = 0BDA3EDA1861A17F00DCBAFC /* check.png */; };
 		0BDA3EEE1861A17F00DCBAFC /* check@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 0BDA3EDB1861A17F00DCBAFC /* check@2x.png */; };
 		0BDA3EEF1861A17F00DCBAFC /* lock.png in Resources */ = {isa = PBXBuildFile; fileRef = 0BDA3EDD1861A17F00DCBAFC /* lock.png */; };
@@ -138,12 +135,6 @@
 		0BDA3EC6186177C400DCBAFC /* mic_center_normal@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "mic_center_normal@2x.png"; sourceTree = "<group>"; };
 		0BDA3EC7186177C400DCBAFC /* mic_h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "mic_h@2x.png"; sourceTree = "<group>"; };
 		0BDA3EC8186177C400DCBAFC /* mic_n@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "mic_n@2x.png"; sourceTree = "<group>"; };
-		0BDA3ECE18619FB900DCBAFC /* IISideController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IISideController.h; sourceTree = "<group>"; };
-		0BDA3ECF18619FB900DCBAFC /* IISideController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IISideController.m; sourceTree = "<group>"; };
-		0BDA3ED018619FB900DCBAFC /* IIViewDeckController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IIViewDeckController.h; sourceTree = "<group>"; };
-		0BDA3ED118619FB900DCBAFC /* IIViewDeckController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IIViewDeckController.m; sourceTree = "<group>"; };
-		0BDA3ED218619FB900DCBAFC /* IIWrapController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IIWrapController.h; sourceTree = "<group>"; };
-		0BDA3ED318619FB900DCBAFC /* IIWrapController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IIWrapController.m; sourceTree = "<group>"; };
 		0BDA3EDA1861A17F00DCBAFC /* check.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = check.png; sourceTree = "<group>"; };
 		0BDA3EDB1861A17F00DCBAFC /* check@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "check@2x.png"; sourceTree = "<group>"; };
 		0BDA3EDD1861A17F00DCBAFC /* lock.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = lock.png; sourceTree = "<group>"; };
@@ -222,7 +213,6 @@
 			isa = PBXGroup;
 			children = (
 				0BDA3ED71861A12D00DCBAFC /* Login */,
-				0BDA3ECD18619FB900DCBAFC /* ViewDeck */,
 				0BC04973185EDFF300F13240 /* CanvasLibrary */,
 				0BC0496D185ED8F300F13240 /* PulsingHalo */,
 				0B9CDCCD185168F200D470B4 /* ProgressHUD */,
@@ -274,19 +264,6 @@
 				0BC04985185EDFF300F13240 /* UITextView+TCCustomFont.m */,
 			);
 			path = CanvasLibrary;
-			sourceTree = "<group>";
-		};
-		0BDA3ECD18619FB900DCBAFC /* ViewDeck */ = {
-			isa = PBXGroup;
-			children = (
-				0BDA3ECE18619FB900DCBAFC /* IISideController.h */,
-				0BDA3ECF18619FB900DCBAFC /* IISideController.m */,
-				0BDA3ED018619FB900DCBAFC /* IIViewDeckController.h */,
-				0BDA3ED118619FB900DCBAFC /* IIViewDeckController.m */,
-				0BDA3ED218619FB900DCBAFC /* IIWrapController.h */,
-				0BDA3ED318619FB900DCBAFC /* IIWrapController.m */,
-			);
-			path = ViewDeck;
 			sourceTree = "<group>";
 		};
 		0BDA3ED71861A12D00DCBAFC /* Login */ = {
@@ -582,15 +559,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0BDA3ED418619FB900DCBAFC /* IISideController.m in Sources */,
 				0BC04970185ED8F300F13240 /* PulsingHaloLayer.m in Sources */,
 				0BC0498C185EDFF400F13240 /* UITextField+PlaceholderColor.m in Sources */,
 				0BC0498E185EDFF400F13240 /* UITextView+TCCustomFont.m in Sources */,
 				0BDA3EF51861A17F00DCBAFC /* XHLoginViewController1.m in Sources */,
-				0BDA3ED518619FB900DCBAFC /* IIViewDeckController.m in Sources */,
 				0BDA3EF71861A17F00DCBAFC /* XHLoginViewController3.m in Sources */,
 				0BDA3EF41861A17F00DCBAFC /* XHBaseLoginViewController.m in Sources */,
-				0BDA3ED618619FB900DCBAFC /* IIWrapController.m in Sources */,
 				0BC0498D185EDFF400F13240 /* UITextField+TCCustomFont.m in Sources */,
 				0BC04988185EDFF400F13240 /* CSBlurView.m in Sources */,
 				0BC04987185EDFF400F13240 /* CSAnimationView.m in Sources */,

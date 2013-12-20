@@ -74,7 +74,10 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    self.edgesForExtendedLayout = UIRectEdgeNone;
+ 
+    [self setNeedsStatusBarAppearanceUpdate];
+    
+    self.edgesForExtendedLayout = UIRectEdgeAll;
     
 
     
