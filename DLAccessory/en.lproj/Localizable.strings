@@ -25,3 +25,6 @@
 "k_file_exists" = "File has already exits!";
 "k_file_replace" = "Replace!";
 "k_save_file_failure" = "Save file failure!";
+"k_error_camera" = "Error, Camera";
+"k_error_camera_not_availale" = "Camera is not supported!";
+

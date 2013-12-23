@@ -22,26 +22,43 @@
     }
     return self;
 }
+-(UIStatusBarStyle)preferredStatusBarStyle {
+    return UIStatusBarStyleLightContent;
+}
+
+- (void)dealloc
+{
+  self.navigationController.navigationBar.translucent = NO;
+}
 -(void)viewWillLayoutSubviews {
     [super viewWillLayoutSubviews];
     self.view.autoresizesSubviews = YES;
     
-    self.view.frame = CGRectMake(44.0f, 0.0f, CGRectGetWidth(self.view.bounds) - 44.0f, CGRectGetHeight(self.view.bounds));
-    _usernameField.frame = CGRectMake(0, 220,  CGRectGetWidth(self.view.bounds), 41);
-    _passwordField.frame = CGRectMake(0, 260,  CGRectGetWidth(self.view.bounds), 41);
-    _loginButton.frame = CGRectMake(0, 301,  CGRectGetWidth(self.view.bounds), 62);
-    _forgotButton.frame = CGRectMake(25, 382, 271, 19);
-    _titleLabel.frame = CGRectMake(43, 97, 234, 60);
-    _infoView.frame = CGRectMake(0, 165,  CGRectGetWidth(self.view.bounds), 55);
-    _headerImageView.frame = CGRectMake(0, 0,  CGRectGetWidth(self.view.bounds), 165);
+    _overlayView.frame = CGRectMake(0, 0,  CGRectGetWidth(self.view.bounds), 300.0f);
+
+    _headerImageView.frame = CGRectMake(0, 0,  CGRectGetWidth(self.view.bounds), 300.0f);
     _headerImageView.contentMode = UIViewContentModeScaleAspectFill;
     _headerImageView.clipsToBounds = YES;
-    _overlayView.frame = CGRectMake(0, 0,  CGRectGetWidth(self.view.bounds), 165);
+    
+    _usernameField.frame = CGRectMake(0, CGRectGetMaxY(_headerImageView.frame),  CGRectGetWidth(self.view.bounds), 41);
+    _passwordField.frame = CGRectMake(0, CGRectGetMaxY(_usernameField.frame),  CGRectGetWidth(self.view.bounds), 41);
+    _loginButton.frame = CGRectMake(0, CGRectGetMaxY(_passwordField.frame),  CGRectGetWidth(self.view.bounds), 62);
+    _forgotButton.frame = CGRectMake(25, CGRectGetMaxY(_loginButton.frame), 271, 19);
+    _titleLabel.frame = CGRectMake(43, CGRectGetMaxY(_forgotButton.frame), 234, 60);
+    
+}
+
+-(void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+
 }
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	self.edgesForExtendedLayout = UIRectEdgeNone;
+
+    
+    
+	self.edgesForExtendedLayout = UIRectEdgeAll;
     UIColor* mainColor = [UIColor colorWithRed:249.0/255 green:223.0/255 blue:244.0/255 alpha:1.0f];
     UIColor* darkColor = [UIColor colorWithRed:62.0/255 green:28.0/255 blue:55.0/255 alpha:1.0f];
     
@@ -92,33 +109,21 @@
     _titleLabel.textColor =  [UIColor whiteColor];
     _titleLabel.font =  [UIFont fontWithName:boldFontName size:24.0f];
     _titleLabel.text = @"GOOD TO SEE YOU";
+
     
-    _infoLabel = [[UILabel alloc] initWithFrame:CGRectMake(43, 20, 234, 21)];
-    _infoLabel.backgroundColor = [UIColor clearColor];
-    _infoLabel.textColor =  [UIColor darkGrayColor];
-    _infoLabel.font =  [UIFont fontWithName:boldFontName size:14.0f];
-    _infoLabel.text = @"Welcome back, please login below";
-    
-    _infoView = [[UIView alloc] initWithFrame:CGRectMake(0, 165,  CGRectGetWidth(self.view.bounds), 55)];
-    _infoView.backgroundColor = [UIColor colorWithWhite:0.95 alpha:1.0];
     
     
     _headerImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0,  CGRectGetWidth(self.view.bounds), 165)];
     _headerImageView.image = [UIImage imageNamed:@"test.jpg"];
     _headerImageView.contentMode = UIViewContentModeScaleAspectFill;
     
-    _overlayView = [[UIView alloc] initWithFrame:CGRectMake(0, 0,  CGRectGetWidth(self.view.bounds), 165)];
-    _overlayView.backgroundColor = [UIColor colorWithWhite:0.0f alpha:0.3f];
     
+    [self.view addSubview:self.headerImageView];
     [self.view addSubview:self.loginButton];
     [self.view addSubview:self.forgotButton];
     [self.view addSubview:self.usernameField];
     [self.view addSubview:self.passwordField];
-    [_infoView addSubview:self.infoLabel];
-    [self.view addSubview:self.infoView];
-    [_overlayView addSubview:self.titleLabel];
-    [_overlayView addSubview:self.headerImageView];
-    [self.view addSubview:self.overlayView];
+
 }
 
 - (void)didReceiveMemoryWarning

@@ -17,6 +17,9 @@
 #import <MobileCoreServices/MobileCoreServices.h>
 #import "PulsingHaloLayer.h"
 #import "DLFolderViewViewCtrl.h"
+#import "XHLoginViewController4.h"
+#import "DLFolderViewViewCtrl.h"
+
 @interface DLMPViewCtrl ()
 
 @end
@@ -122,7 +125,23 @@
     _ctHaloLayer.position = self.cviewTableHeader.center;
     [self.cviewTableHeader.layer addSublayer:_ctHaloLayer];
     
+    _cbtnLogin = [UIButton buttonWithType:UIButtonTypeCustom];
+    UIImage* cimage = [UIImage imageNamed:@"people"];
+    [_cbtnLogin setImage:cimage forState:UIControlStateNormal];
+    _cbtnLogin.frame = CGRectMake(CGRectGetWidth(self.cviewTableHeader.frame) - 10.0f - cimage.size.width, (CGRectGetHeight(self.cviewTableHeader.frame) - cimage.size.height) * 0.5f, cimage.size.width, cimage.size.height);
+    [_cbtnLogin addTarget:self action:@selector(actionLogin:) forControlEvents:UIControlEventTouchUpInside];
+    [self.cviewTableHeader addSubview:_cbtnLogin];
+    
+    _cbtnFolder = [UIButton buttonWithType:UIButtonTypeCustom];
+    
     [self.cviewTableHeader addSubview:self.cimageViewBtnScan];
+    UIImage* cimageFolder = [UIImage imageNamed:@"folder"];
+    [_cbtnFolder setImage:cimageFolder forState:UIControlStateNormal];
+    _cbtnFolder.frame = CGRectMake(10.0f, (CGRectGetHeight(self.cviewTableHeader.frame) - cimageFolder.size.height) * 0.5f, cimageFolder.size.width, cimageFolder.size.height);
+    [_cbtnFolder addTarget:self action:@selector(actionShowFolderManager:) forControlEvents:UIControlEventTouchUpInside];
+
+    [self.cviewTableHeader addSubview:_cbtnFolder];
+    
 
     
     self.ctProgressHud = [[MBProgressHUD alloc] initWithView:self.view];
@@ -145,6 +164,14 @@
 //    [self.view addGestureRecognizer:cSwipeGes];
     
 
+}
+-(void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [self.navigationController.navigationBar setBarStyle:UIBarStyleBlack];
+    [self.navigationController.navigationBar setBarTintColor:[UIColor orangeColor]];
+
+    [self setNeedsStatusBarAppearanceUpdate];
+    [self.navigationController.navigationBar setNeedsDisplay];
 }
 - (void)dealloc
 {
@@ -474,6 +501,13 @@
     DLItemTableViewCell* ccItemCell = (DLItemTableViewCell*)acTableviewCell;
     self.cdicSelectedPeer = ccItemCell.cdicInfo;
     NSLog(@"gallery selected %@", ccItemCell.cdicInfo);
+    
+    if( ![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary] ) {
+        UIAlertView* cAlertMsg = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"k_error_camera", nil) message:NSLocalizedString(@"k_error_camera_not_availale", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"k_ok", nil) otherButtonTitles:nil, nil];
+        [cAlertMsg show];
+        return;
+    }
+    
     UIImagePickerController* cImagePickerCtrl = [[UIImagePickerController alloc] init];
     cImagePickerCtrl.mediaTypes = @[((__bridge NSString*)kUTTypeImage)];
     cImagePickerCtrl.delegate = self;
@@ -485,6 +519,24 @@
 -(void)didCameraSelected:(UITableViewCell*)acTableviewCell {
     DLItemTableViewCell* ccItemCell = (DLItemTableViewCell*)acTableviewCell;
     NSLog(@"gallery selected %@", ccItemCell.cdicInfo);
+    self.cdicSelectedPeer = ccItemCell.cdicInfo;
+    
+    
+    if( ![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera] || ![UIImagePickerController isCameraDeviceAvailable:UIImagePickerControllerCameraDeviceRear] ) {
+        UIAlertView* cAlertMsg = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"k_error_camera", nil) message:NSLocalizedString(@"k_error_camera_not_availale", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"k_ok", nil) otherButtonTitles:nil, nil];
+        [cAlertMsg show];
+        return;
+    }
+    
+    UIImagePickerController* cImagePickerCtr = [[UIImagePickerController alloc] init];
+    cImagePickerCtr.mediaTypes = @[(__bridge NSString*)kUTTypeImage];
+    cImagePickerCtr.sourceType = UIImagePickerControllerSourceTypeCamera;
+    cImagePickerCtr.allowsEditing = YES;
+    cImagePickerCtr.showsCameraControls = YES;
+    cImagePickerCtr.delegate = self;
+    [self presentViewController:cImagePickerCtr animated:YES completion:^(void){
+    }];
+    
 
 }
 
@@ -666,6 +718,15 @@
     ccFolderViewCtrl.transitioningDelegate = self;
     [self presentViewController:ccFolderViewCtrl animated:YES completion:nil];
     
+}
+
+-(void)actionLogin:(id)aidSender {
+    XHLoginViewController4* ctLoginViewCtrl = [[XHLoginViewController4 alloc] init];
+    [self.navigationController pushViewController:ctLoginViewCtrl animated:YES];
+}
+-(void)actionShowFolderManager:(id)aidSender {
+    DLFolderViewViewCtrl* ccFolderViewCtrl = [[DLFolderViewViewCtrl alloc] init];
+    [self.navigationController pushViewController:ccFolderViewCtrl animated:YES];
 }
 
 - (id <UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController *)presented presentingController:(UIViewController *)presenting sourceController:(UIViewController *)source {

@@ -23,9 +23,8 @@
 
 @property (nonatomic, strong) UIImageView * headerImageView;
 
-@property (nonatomic, strong) UIView * infoView;
 
-@property (nonatomic, strong) UILabel * infoLabel;
 
 @property (nonatomic, strong) UIView * overlayView;
+
 @end

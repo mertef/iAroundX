@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0B04A058186429E10005697F /* folder@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 0B04A056186429E10005697F /* folder@2x.png */; };
+		0B04A059186429E10005697F /* people@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 0B04A057186429E10005697F /* people@2x.png */; };
 		0B3731EF18556BC2000CBB8C /* DLPerson.m in Sources */ = {isa = PBXBuildFile; fileRef = 0B3731EE18556BC2000CBB8C /* DLPerson.m */; };
 		0B6152421856E76F00C9145B /* DLTableCellPopoutView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0B6152411856E76F00C9145B /* DLTableCellPopoutView.m */; };
 		0B7C923E18502B8100452712 /* action@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 0B7C923D18502B8100452712 /* action@2x.png */; };
@@ -36,6 +38,8 @@
 		0BC0498D185EDFF400F13240 /* UITextField+TCCustomFont.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BC04983185EDFF300F13240 /* UITextField+TCCustomFont.m */; };
 		0BC0498E185EDFF400F13240 /* UITextView+TCCustomFont.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BC04985185EDFF300F13240 /* UITextView+TCCustomFont.m */; };
 		0BC04992185F08B800F13240 /* bg_pop_out@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 0BC04991185F08B800F13240 /* bg_pop_out@2x.png */; };
+		0BC9F7E51868376E00B91CC1 /* DLChatTableViewCtrl.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BC9F7E41868376E00B91CC1 /* DLChatTableViewCtrl.m */; };
+		0BC9F7E81868382200B91CC1 /* DLTableCellChat.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BC9F7E71868382200B91CC1 /* DLTableCellChat.m */; };
 		0BDA3EC41861537F00DCBAFC /* DLAudio.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BDA3EC31861537F00DCBAFC /* DLAudio.m */; };
 		0BDA3EC9186177C400DCBAFC /* mic_center_active@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 0BDA3EC5186177C400DCBAFC /* mic_center_active@2x.png */; };
 		0BDA3ECA186177C400DCBAFC /* mic_center_normal@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 0BDA3EC6186177C400DCBAFC /* mic_center_normal@2x.png */; };
@@ -84,6 +88,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0B04A056186429E10005697F /* folder@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "folder@2x.png"; sourceTree = "<group>"; };
+		0B04A057186429E10005697F /* people@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "people@2x.png"; sourceTree = "<group>"; };
 		0B3731ED18556BC2000CBB8C /* DLPerson.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLPerson.h; sourceTree = "<group>"; };
 		0B3731EE18556BC2000CBB8C /* DLPerson.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLPerson.m; sourceTree = "<group>"; };
 		0B6152401856E76F00C9145B /* DLTableCellPopoutView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLTableCellPopoutView.h; sourceTree = "<group>"; };
@@ -129,6 +135,10 @@
 		0BC04984185EDFF300F13240 /* UITextView+TCCustomFont.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UITextView+TCCustomFont.h"; sourceTree = "<group>"; };
 		0BC04985185EDFF300F13240 /* UITextView+TCCustomFont.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UITextView+TCCustomFont.m"; sourceTree = "<group>"; };
 		0BC04991185F08B800F13240 /* bg_pop_out@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "bg_pop_out@2x.png"; sourceTree = "<group>"; };
+		0BC9F7E31868376E00B91CC1 /* DLChatTableViewCtrl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLChatTableViewCtrl.h; sourceTree = "<group>"; };
+		0BC9F7E41868376E00B91CC1 /* DLChatTableViewCtrl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLChatTableViewCtrl.m; sourceTree = "<group>"; };
+		0BC9F7E61868382200B91CC1 /* DLTableCellChat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLTableCellChat.h; sourceTree = "<group>"; };
+		0BC9F7E71868382200B91CC1 /* DLTableCellChat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLTableCellChat.m; sourceTree = "<group>"; };
 		0BDA3EC21861537F00DCBAFC /* DLAudio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLAudio.h; sourceTree = "<group>"; };
 		0BDA3EC31861537F00DCBAFC /* DLAudio.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLAudio.m; sourceTree = "<group>"; };
 		0BDA3EC5186177C400DCBAFC /* mic_center_active@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "mic_center_active@2x.png"; sourceTree = "<group>"; };
@@ -366,6 +376,10 @@
 				0BE8AD18184C39A7007EDE88 /* Supporting Files */,
 				0BE8AD44184C59AA007EDE88 /* DLMPViewCtrl.h */,
 				0BE8AD45184C59AA007EDE88 /* DLMPViewCtrl.m */,
+				0BC9F7E61868382200B91CC1 /* DLTableCellChat.h */,
+				0BC9F7E71868382200B91CC1 /* DLTableCellChat.m */,
+				0BC9F7E31868376E00B91CC1 /* DLChatTableViewCtrl.h */,
+				0BC9F7E41868376E00B91CC1 /* DLChatTableViewCtrl.m */,
 				0BBCF13918601F5F0026AC90 /* DLFolderViewViewCtrl.h */,
 				0BBCF13A18601F5F0026AC90 /* DLFolderViewViewCtrl.m */,
 				0BE8AD47184C5B30007EDE88 /* DLMCConfig.h */,
@@ -416,6 +430,8 @@
 		0BE8AD50184C86EC007EDE88 /* res */ = {
 			isa = PBXGroup;
 			children = (
+				0B04A056186429E10005697F /* folder@2x.png */,
+				0B04A057186429E10005697F /* people@2x.png */,
 				0BDA3EC5186177C400DCBAFC /* mic_center_active@2x.png */,
 				0BDA3EC6186177C400DCBAFC /* mic_center_normal@2x.png */,
 				0BDA3EC7186177C400DCBAFC /* mic_h@2x.png */,
@@ -515,7 +531,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				0BDA3ECA186177C400DCBAFC /* mic_center_normal@2x.png in Resources */,
+				0B04A059186429E10005697F /* people@2x.png in Resources */,
 				0BDA3EF01861A17F00DCBAFC /* lock@2x.png in Resources */,
+				0B04A058186429E10005697F /* folder@2x.png in Resources */,
 				0BC04969185ECCCF00F13240 /* chat@2x.png in Resources */,
 				0BDA3EF31861A17F00DCBAFC /* running.jpg in Resources */,
 				0BE8AD1C184C39A7007EDE88 /* InfoPlist.strings in Resources */,
@@ -562,6 +580,7 @@
 				0BC04970185ED8F300F13240 /* PulsingHaloLayer.m in Sources */,
 				0BC0498C185EDFF400F13240 /* UITextField+PlaceholderColor.m in Sources */,
 				0BC0498E185EDFF400F13240 /* UITextView+TCCustomFont.m in Sources */,
+				0BC9F7E51868376E00B91CC1 /* DLChatTableViewCtrl.m in Sources */,
 				0BDA3EF51861A17F00DCBAFC /* XHLoginViewController1.m in Sources */,
 				0BDA3EF71861A17F00DCBAFC /* XHLoginViewController3.m in Sources */,
 				0BDA3EF41861A17F00DCBAFC /* XHBaseLoginViewController.m in Sources */,
@@ -582,6 +601,7 @@
 				0BE8AD46184C59AA007EDE88 /* DLMPViewCtrl.m in Sources */,
 				0BE8AD1E184C39A7007EDE88 /* main.m in Sources */,
 				0B3731EF18556BC2000CBB8C /* DLPerson.m in Sources */,
+				0BC9F7E81868382200B91CC1 /* DLTableCellChat.m in Sources */,
 				0BE8AD55184C8BAB007EDE88 /* DLImageViewCtrl.m in Sources */,
 				0B7C924118502BB800452712 /* DLItemTableViewCell.m in Sources */,
 				0B9CDCD518516A7E00D470B4 /* MBProgressHUD.m in Sources */,

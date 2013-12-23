@@ -25,3 +25,6 @@
 "k_file_exists" = "文件已经存在!";
 "k_file_replace" = "替换!";
 "k_save_file_failure" = "保存文件失败!";
+"k_error_camera" = "相机不能用";
+"k_error_camera_not_availale" = "您的调和不支持相机!";
+

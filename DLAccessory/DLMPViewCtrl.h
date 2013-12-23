@@ -37,12 +37,14 @@
 @property(strong, nonatomic) NSData* cdataCapturedImage;
 @property(strong, nonatomic) NSDictionary* cdicSelectedPeer;
 @property(copy, nonatomic) NSString* cstrSavedFilePath;
+@property(strong, nonatomic) UIButton* cbtnLogin, * cbtnFolder;
 -(void)actionStartBrowserNearbyUsers:(id)aidSender;
 -(void)actionDismissServiceBrowser:(id)aidsender;
 -(void)actionSwipe:(UISwipeGestureRecognizer*)aswipeGes;
 
 -(void)pushFolderViewCtrl;
-
+-(void)actionLogin:(id)aidSender;
+-(void)actionShowFolderManager:(id)aidSender;
 @end
 
 @interface DLInteractiveTransitioner : NSObject<UIViewControllerAnimatedTransitioning>

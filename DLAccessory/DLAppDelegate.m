@@ -28,10 +28,12 @@
     
     _ccMpViewCtrl = [[DLMPViewCtrl alloc] init];
     UINavigationController* cCenterNavCt = [[UINavigationController alloc] init];
+    
+    cCenterNavCt.navigationBar.translucent = YES; // Setting this slides the view up, underneath the nav bar (otherwise it'll appear black)
+    cCenterNavCt.navigationBar.tintColor = [UIColor whiteColor];
+    
     [cCenterNavCt.navigationBar setBarStyle:UIBarStyleBlack];
-    [cCenterNavCt.navigationBar setBarTintColor:[UIColor orangeColor]];
     [cCenterNavCt pushViewController:_ccMpViewCtrl animated:YES];
-    cCenterNavCt.navigationBar.backgroundColor = [UIColor whiteColor];
 
     
 //    XHLoginViewController4* ctLoginVc = [[XHLoginViewController4 alloc] init];

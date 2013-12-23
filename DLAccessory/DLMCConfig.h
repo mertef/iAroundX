@@ -22,4 +22,12 @@
 #define k_poput_height 60.0f
 
 #define k_colore_blue [UIColor colorWithRed:0.2627 green:0.3804 blue:0.8000 alpha:1.0f]
+
+
+#define k_chat_from @""
+#define k_chat_msg  @""
+#define k_chat_date @""
+#define k_chat_from_header_icon @""
+
+#define k_people_icon_default @"people_icon_default"
 #endif
