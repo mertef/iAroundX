@@ -9,6 +9,9 @@
 #import <UIKit/UIKit.h>
 #import <MultipeerConnectivity/MultipeerConnectivity.h>
 #import "DLItemTableViewCell.h"
+#import "DLViewChatInput.h"
+
+
 
 @class MBProgressHUD;
 @class PulsingHaloLayer;

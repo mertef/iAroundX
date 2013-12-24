@@ -7,11 +7,17 @@
 //
 
 #import <UIKit/UIKit.h>
-
-@interface DLChatTableViewCtrl : UIViewController<UITableViewDelegate, UITableViewDataSource>{
+#import "DLViewChatInput.h"
+@class MCSession;
+@interface DLChatTableViewCtrl : UIViewController<UITableViewDelegate, UITableViewDataSource, DLViewChatInputProto>{
     
 }
+@property(strong, nonatomic) UITableView* ctableViewChat;
 @property(strong, nonatomic) NSMutableArray* cmutarrChatList;
 @property(strong, nonatomic) NSDictionary* cdicPeerInfoTo;
+@property(strong, nonatomic) NSDictionary* cdicPeerInfoFrom;
+
+@property(strong, nonatomic) DLViewChatInput* ccViewChatInput;
+@property(strong, nonatomic) MCSession* cMulPeerSession;
 
 @end

@@ -27,4 +27,13 @@
 "k_save_file_failure" = "保存文件失败!";
 "k_error_camera" = "相机不能用";
 "k_error_camera_not_availale" = "您的调和不支持相机!";
+"k_chat_room" = "私密空间";
+"k_send" = "发送";
+"k_session_error" = "连接会话失败";
+"k_error_session_msg" = "会话过期了，重新连接吧!";
+"k_my_friend"="周边";
+"k_conversation" = "会话";
+
+
+
 

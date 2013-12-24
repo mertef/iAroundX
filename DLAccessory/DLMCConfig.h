@@ -30,4 +30,21 @@
 #define k_chat_from_header_icon @""
 
 #define k_people_icon_default @"people_icon_default"
+
+
+
+typedef NS_ENUM(int32_t, T_PACKAGE_TYPE) {
+    enum_package_type_short_msg = 0x300,
+    enum_package_type_image,
+    enum_package_type_audio,
+    enum_package_type_video,
+    enum_package_type_stream
+};
+typedef struct {
+       u_int32_t _u_l_package_type;
+       u_int32_t _u_l_package_size;
+       u_int32_t _u_l_package_length;
+       u_int32_t _u_l_current_offset;
+}T_PACKAGE_HEADER;
+
 #endif

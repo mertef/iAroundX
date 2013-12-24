@@ -16,6 +16,8 @@
 
 #import "XHLoginViewController4.h"
 #import "DLFolderViewViewCtrl.h"
+#import "DLConversationListTableViewCtrl.h"
+
 @implementation DLAppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
@@ -24,9 +26,10 @@
     // Override point for customization after application launch.
     self.window.backgroundColor = [UIColor clearColor];
 //    [self testAudioView];
-    
+//    [self testByte];
     
     _ccMpViewCtrl = [[DLMPViewCtrl alloc] init];
+    
     UINavigationController* cCenterNavCt = [[UINavigationController alloc] init];
     
     cCenterNavCt.navigationBar.translucent = YES; // Setting this slides the view up, underneath the nav bar (otherwise it'll appear black)
@@ -35,13 +38,18 @@
     [cCenterNavCt.navigationBar setBarStyle:UIBarStyleBlack];
     [cCenterNavCt pushViewController:_ccMpViewCtrl animated:YES];
 
+    DLConversationListTableViewCtrl* ccConversationListViewCtrl = [[DLConversationListTableViewCtrl alloc] init];
+    UINavigationController* ccConversationNavCtrl = [[UINavigationController alloc] initWithRootViewController:ccConversationListViewCtrl];
     
+    UITabBarController* cTabbarViewCtrl = [[UITabBarController alloc] init];
+
+    cTabbarViewCtrl.viewControllers = @[cCenterNavCt, ccConversationNavCtrl];
 //    XHLoginViewController4* ctLoginVc = [[XHLoginViewController4 alloc] init];
     
   //  DLFolderViewViewCtrl* ccFolderVc = [[DLFolderViewViewCtrl alloc] init];
 
 //    IIViewDeckController* ctDeckVc = [[IIViewDeckController alloc] initWithCenterViewController: cCenterNavCt leftViewController:ccFolderVc rightViewController:ctLoginVc];
-    self.window.rootViewController = cCenterNavCt;
+    self.window.rootViewController = cTabbarViewCtrl;
     
     [self.window makeKeyAndVisible];
 //    [self testAnchorView];
@@ -138,5 +146,30 @@
     ^{
         NSLog(@"hello World!");
     }();
+}
+typedef struct{
+    u_long _u_l_0;
+    u_long _u_l_1;
+}T_X;
+-(void)testByte {
+    
+    T_X tt;
+    tt._u_l_0 = 100;
+    tt._u_l_1 = 1000;
+    printf("raw_data has %lu elements\n", sizeof(tt)/sizeof(u_long));
+    NSString* cstrX = @"Hello World";
+    
+    NSData *data = [NSData dataWithBytes:&tt length:sizeof(tt)];
+    printf("data has %ld bytes\n", (u_long)[data length]);
+    NSMutableData* cmutData = [NSMutableData data];
+    [cmutData appendData:data];
+    [cmutData appendData:[cstrX dataUsingEncoding:NSUTF8StringEncoding]];
+    T_X* ptx = malloc(sizeof(T_X));
+    [data getBytes:ptx length:sizeof(T_X)];
+    NSLog(@"x0 is %ld  %ld", ptx->_u_l_0, ptx->_u_l_1);
+    NSData* cdataString = [cmutData subdataWithRange:NSMakeRange(sizeof(T_X), [[cstrX dataUsingEncoding:NSUTF8StringEncoding] length])];
+    NSString* cstrTest = [[NSString alloc] initWithData:cdataString encoding:NSUTF8StringEncoding];
+    NSLog(@"====%@", cstrTest);
+
 }
 @end

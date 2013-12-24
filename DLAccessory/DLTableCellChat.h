@@ -16,5 +16,6 @@
 @property(strong, nonatomic) NSDictionary* cdicInfo;
 @property(copy, nonatomic) NSString* cstrPeerFrom;
 -(void)feedDictionaryInfo:(NSDictionary*)acdicInfo;
++(CGFloat)HeightForCell:(NSDictionary*)acdicInfo;
 
 @end

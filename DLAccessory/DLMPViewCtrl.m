@@ -19,6 +19,7 @@
 #import "DLFolderViewViewCtrl.h"
 #import "XHLoginViewController4.h"
 #import "DLFolderViewViewCtrl.h"
+#import "DLChatTableViewCtrl.h"
 
 @interface DLMPViewCtrl ()
 
@@ -81,8 +82,9 @@
     [self setNeedsStatusBarAppearanceUpdate];
     
     self.edgesForExtendedLayout = UIRectEdgeAll;
+    UITabBarItem* cItem = [[UITabBarItem alloc] initWithTitle:NSLocalizedString(@"k_my_friend", nil) image:[UIImage imageNamed:@"connections-h"] selectedImage:[UIImage imageNamed:@"connections"]];
+    self.tabBarItem = cItem;
     
-
     
     self.cTableServiceList = [[UITableView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.view.frame), CGRectGetHeight(self.view.frame)) style:UITableViewStylePlain];
     [self.view addSubview:_cTableServiceList];
@@ -244,8 +246,29 @@
 
 // Received data from remote peer
 - (void)session:(MCSession *)session didReceiveData:(NSData *)data fromPeer:(MCPeerID *)peerID {
-    NSLog(@"did receive data");
-    [self.cmutData appendData:data];
+    NSLog(@"did receive data data lenght is %lu  package header %lu", (u_long)[data length], sizeof(T_PACKAGE_HEADER));
+    
+    u_long ulPackageHeaderSize = (u_long)sizeof(T_PACKAGE_HEADER);
+    if ([data length] < ulPackageHeaderSize) {
+        return;
+    }
+
+    T_PACKAGE_HEADER* puPackage = malloc(sizeof(T_PACKAGE_HEADER));
+     NSData* cdataHeader = [data subdataWithRange:NSMakeRange(0, sizeof(T_PACKAGE_HEADER))];
+    [cdataHeader getBytes:puPackage];
+    
+    
+    if (puPackage->_u_l_package_type == enum_package_type_short_msg) {
+        NSData* cdataMsg = [data subdataWithRange:NSMakeRange(sizeof(T_PACKAGE_HEADER), puPackage->_u_l_package_length)];
+        [self.cmutData appendData:cdataMsg];
+    }
+    
+    if (puPackage->_u_l_package_size == (puPackage->_u_l_package_length + puPackage->_u_l_current_offset)) {
+        NSString* cstrMsg = [[NSString alloc] initWithData:self.cmutData encoding:NSUTF8StringEncoding];
+        NSLog(@"received short msg from %@ : %@", [peerID displayName], cstrMsg);
+    }
+    free(puPackage);puPackage = NULL;
+
 }
 
 // Received a byte stream from remote peer
@@ -543,6 +566,14 @@
 -(void)didChatSelected:(UITableViewCell*)acTableviewCell {
     DLItemTableViewCell* ccItemCell = (DLItemTableViewCell*)acTableviewCell;
     NSLog(@"gallery selected %@", ccItemCell.cdicInfo);
+    
+    DLChatTableViewCtrl* ccChatViewCtrl = [[DLChatTableViewCtrl alloc] init];
+    ccChatViewCtrl.cdicPeerInfoFrom = @{k_peer_id:self.cpeerId, k_peer_id_name:[self.cpeerId displayName]};
+    ccChatViewCtrl.cdicPeerInfoTo = ccItemCell.cdicInfo;
+
+    ccChatViewCtrl.cMulPeerSession = _csession;
+    [self.navigationController pushViewController:ccChatViewCtrl animated:YES];
+    
 
 }
 
@@ -740,6 +771,8 @@
     return ccInteractiveTr;
 
 }
+
+
 
 
 #pragma mark - transition coordinator

@@ -27,4 +27,11 @@
 "k_save_file_failure" = "Save file failure!";
 "k_error_camera" = "Error, Camera";
 "k_error_camera_not_availale" = "Camera is not supported!";
+"k_chat_room" = "Private Chat";
+"k_send" = "Send";
+"k_session_error" = "Connection Session invliad";
+"k_error_session_msg" = "Session timeout, please reconnect your private partener!";
+"k_my_friend"="Around Me";
+"k_conversation" = "Conversations";
+
 
