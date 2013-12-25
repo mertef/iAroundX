@@ -33,6 +33,8 @@
 "k_error_session_msg" = "会话过期了，重新连接吧!";
 "k_my_friend"="周边";
 "k_conversation" = "会话";
+"k_conversation_title" = "消息列表";
+
 
 
 

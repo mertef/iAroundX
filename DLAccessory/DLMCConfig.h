@@ -24,13 +24,18 @@
 #define k_colore_blue [UIColor colorWithRed:0.2627 green:0.3804 blue:0.8000 alpha:1.0f]
 
 
-#define k_chat_from @""
-#define k_chat_msg  @""
-#define k_chat_date @""
-#define k_chat_from_header_icon @""
+#define k_chat_from @"chat_from"
+#define k_chat_from_name @"chat_from_name"
+#define k_chat_list @"k_chat_list"
+#define k_chat_to @"chat_to"
+
+#define k_chat_msg  @"chat_msg"
+#define k_chat_msg_type @"msg_type"
+#define k_chat_date @"chat_date"
+#define k_chat_from_header_icon @"chat_from_header_icon"
 
 #define k_people_icon_default @"people_icon_default"
-
+#define k_noti_chat_msg @"chat_msg_item"
 
 
 typedef NS_ENUM(int32_t, T_PACKAGE_TYPE) {

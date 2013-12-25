@@ -8,6 +8,10 @@
 
 #import <UIKit/UIKit.h>
 
-@interface DLConversationListTableViewCtrl : UIViewController
+@interface DLConversationListTableViewCtrl : UIViewController<UITableViewDataSource, UITableViewDelegate>
+@property(strong, nonatomic) NSMutableArray* cmutarrConversations;
+@property(strong, nonatomic) UITableView* ctableView;
+
+-(void)actionNotiMsgReceive:(NSNotification*)acNoti;
 
 @end

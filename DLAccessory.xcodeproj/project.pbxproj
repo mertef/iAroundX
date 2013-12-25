@@ -10,6 +10,7 @@
 		0B04A058186429E10005697F /* folder@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 0B04A056186429E10005697F /* folder@2x.png */; };
 		0B04A059186429E10005697F /* people@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 0B04A057186429E10005697F /* people@2x.png */; };
 		0B3731EF18556BC2000CBB8C /* DLPerson.m in Sources */ = {isa = PBXBuildFile; fileRef = 0B3731EE18556BC2000CBB8C /* DLPerson.m */; };
+		0B48B88F186AD19400FE6C44 /* DLViewIndicator.m in Sources */ = {isa = PBXBuildFile; fileRef = 0B48B88E186AD19400FE6C44 /* DLViewIndicator.m */; };
 		0B6152421856E76F00C9145B /* DLTableCellPopoutView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0B6152411856E76F00C9145B /* DLTableCellPopoutView.m */; };
 		0B7C923E18502B8100452712 /* action@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 0B7C923D18502B8100452712 /* action@2x.png */; };
 		0B7C924118502BB800452712 /* DLItemTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 0B7C924018502BB800452712 /* DLItemTableViewCell.m */; };
@@ -64,6 +65,8 @@
 		0BDA3EF61861A17F00DCBAFC /* XHLoginViewController2.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BDA3EE81861A17F00DCBAFC /* XHLoginViewController2.m */; };
 		0BDA3EF71861A17F00DCBAFC /* XHLoginViewController3.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BDA3EEA1861A17F00DCBAFC /* XHLoginViewController3.m */; };
 		0BDA3EF81861A17F00DCBAFC /* XHLoginViewController4.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BDA3EEC1861A17F00DCBAFC /* XHLoginViewController4.m */; };
+		0BDD5777186A8C8500EFE4DF /* DLNavigationCtrl.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BDD5776186A8C8500EFE4DF /* DLNavigationCtrl.m */; };
+		0BDD577A186AB86900EFE4DF /* DLTableViewCellConversation.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BDD5779186AB86900EFE4DF /* DLTableViewCellConversation.m */; };
 		0BE8AD12184C39A7007EDE88 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0BE8AD11184C39A7007EDE88 /* Foundation.framework */; };
 		0BE8AD14184C39A7007EDE88 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0BE8AD13184C39A7007EDE88 /* CoreGraphics.framework */; };
 		0BE8AD16184C39A7007EDE88 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0BE8AD15184C39A7007EDE88 /* UIKit.framework */; };
@@ -99,6 +102,8 @@
 		0B04A057186429E10005697F /* people@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "people@2x.png"; sourceTree = "<group>"; };
 		0B3731ED18556BC2000CBB8C /* DLPerson.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLPerson.h; sourceTree = "<group>"; };
 		0B3731EE18556BC2000CBB8C /* DLPerson.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLPerson.m; sourceTree = "<group>"; };
+		0B48B88D186AD19400FE6C44 /* DLViewIndicator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLViewIndicator.h; sourceTree = "<group>"; };
+		0B48B88E186AD19400FE6C44 /* DLViewIndicator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLViewIndicator.m; sourceTree = "<group>"; };
 		0B6152401856E76F00C9145B /* DLTableCellPopoutView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLTableCellPopoutView.h; sourceTree = "<group>"; };
 		0B6152411856E76F00C9145B /* DLTableCellPopoutView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLTableCellPopoutView.m; sourceTree = "<group>"; };
 		0B7C923D18502B8100452712 /* action@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "action@2x.png"; sourceTree = "<group>"; };
@@ -178,6 +183,10 @@
 		0BDA3EEA1861A17F00DCBAFC /* XHLoginViewController3.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XHLoginViewController3.m; sourceTree = "<group>"; };
 		0BDA3EEB1861A17F00DCBAFC /* XHLoginViewController4.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XHLoginViewController4.h; sourceTree = "<group>"; };
 		0BDA3EEC1861A17F00DCBAFC /* XHLoginViewController4.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XHLoginViewController4.m; sourceTree = "<group>"; };
+		0BDD5775186A8C8500EFE4DF /* DLNavigationCtrl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLNavigationCtrl.h; sourceTree = "<group>"; };
+		0BDD5776186A8C8500EFE4DF /* DLNavigationCtrl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLNavigationCtrl.m; sourceTree = "<group>"; };
+		0BDD5778186AB86900EFE4DF /* DLTableViewCellConversation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLTableViewCellConversation.h; sourceTree = "<group>"; };
+		0BDD5779186AB86900EFE4DF /* DLTableViewCellConversation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLTableViewCellConversation.m; sourceTree = "<group>"; };
 		0BE8AD0E184C39A7007EDE88 /* DLAccessory.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DLAccessory.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0BE8AD11184C39A7007EDE88 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		0BE8AD13184C39A7007EDE88 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -392,8 +401,14 @@
 				0BE8AD18184C39A7007EDE88 /* Supporting Files */,
 				0BE8AD44184C59AA007EDE88 /* DLMPViewCtrl.h */,
 				0BE8AD45184C59AA007EDE88 /* DLMPViewCtrl.m */,
+				0BDD5778186AB86900EFE4DF /* DLTableViewCellConversation.h */,
+				0BDD5779186AB86900EFE4DF /* DLTableViewCellConversation.m */,
+				0B48B88D186AD19400FE6C44 /* DLViewIndicator.h */,
+				0B48B88E186AD19400FE6C44 /* DLViewIndicator.m */,
 				0BB65FD718698B8900C60CB0 /* DLConversationListTableViewCtrl.h */,
 				0BB65FD818698B8900C60CB0 /* DLConversationListTableViewCtrl.m */,
+				0BDD5775186A8C8500EFE4DF /* DLNavigationCtrl.h */,
+				0BDD5776186A8C8500EFE4DF /* DLNavigationCtrl.m */,
 				0BC9F7E61868382200B91CC1 /* DLTableCellChat.h */,
 				0BC9F7E71868382200B91CC1 /* DLTableCellChat.m */,
 				0BC9F7E31868376E00B91CC1 /* DLChatTableViewCtrl.h */,
@@ -613,6 +628,7 @@
 				0BC9F7E51868376E00B91CC1 /* DLChatTableViewCtrl.m in Sources */,
 				0BDA3EF51861A17F00DCBAFC /* XHLoginViewController1.m in Sources */,
 				0BDA3EF71861A17F00DCBAFC /* XHLoginViewController3.m in Sources */,
+				0BDD577A186AB86900EFE4DF /* DLTableViewCellConversation.m in Sources */,
 				0BDA3EF41861A17F00DCBAFC /* XHBaseLoginViewController.m in Sources */,
 				0BC0498D185EDFF400F13240 /* UITextField+TCCustomFont.m in Sources */,
 				0BC04988185EDFF400F13240 /* CSBlurView.m in Sources */,
@@ -627,6 +643,8 @@
 				0BC04986185EDFF400F13240 /* CSAnimation.m in Sources */,
 				0BC04989185EDFF400F13240 /* CSNavigationController.m in Sources */,
 				0BDA3EC41861537F00DCBAFC /* DLAudio.m in Sources */,
+				0B48B88F186AD19400FE6C44 /* DLViewIndicator.m in Sources */,
+				0BDD5777186A8C8500EFE4DF /* DLNavigationCtrl.m in Sources */,
 				0B9CDCD2185168F200D470B4 /* ProgressHUD.m in Sources */,
 				0BB65FD918698B8900C60CB0 /* DLConversationListTableViewCtrl.m in Sources */,
 				0BE8AD22184C39A7007EDE88 /* DLAppDelegate.m in Sources */,

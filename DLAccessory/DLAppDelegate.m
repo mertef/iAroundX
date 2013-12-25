@@ -17,47 +17,33 @@
 #import "XHLoginViewController4.h"
 #import "DLFolderViewViewCtrl.h"
 #import "DLConversationListTableViewCtrl.h"
-
+#import "DLNavigationCtrl.h"
 @implementation DLAppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-    // Override point for customization after application launch.
     self.window.backgroundColor = [UIColor clearColor];
-//    [self testAudioView];
-//    [self testByte];
-    
+
     _ccMpViewCtrl = [[DLMPViewCtrl alloc] init];
     
-    UINavigationController* cCenterNavCt = [[UINavigationController alloc] init];
-    
-    cCenterNavCt.navigationBar.translucent = YES; // Setting this slides the view up, underneath the nav bar (otherwise it'll appear black)
-    cCenterNavCt.navigationBar.tintColor = [UIColor whiteColor];
-    
-    [cCenterNavCt.navigationBar setBarStyle:UIBarStyleBlack];
+    UINavigationController* cCenterNavCt = [[DLNavigationCtrl alloc] init];
     [cCenterNavCt pushViewController:_ccMpViewCtrl animated:YES];
 
     DLConversationListTableViewCtrl* ccConversationListViewCtrl = [[DLConversationListTableViewCtrl alloc] init];
-    UINavigationController* ccConversationNavCtrl = [[UINavigationController alloc] initWithRootViewController:ccConversationListViewCtrl];
+    UINavigationController* ccConversationNavCtrl = [[DLNavigationCtrl alloc] init];
+    [ccConversationNavCtrl pushViewController:ccConversationListViewCtrl animated:YES];
+    
+    UITabBarItem* cItem = [[UITabBarItem alloc] initWithTitle:NSLocalizedString(@"k_conversation", nil) image:[[UIImage imageNamed:@"conversation"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] selectedImage:[[UIImage imageNamed:@"conversation-h"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]];
+    
+    ccConversationNavCtrl.tabBarItem = cItem;
     
     UITabBarController* cTabbarViewCtrl = [[UITabBarController alloc] init];
 
     cTabbarViewCtrl.viewControllers = @[cCenterNavCt, ccConversationNavCtrl];
-//    XHLoginViewController4* ctLoginVc = [[XHLoginViewController4 alloc] init];
-    
-  //  DLFolderViewViewCtrl* ccFolderVc = [[DLFolderViewViewCtrl alloc] init];
-
-//    IIViewDeckController* ctDeckVc = [[IIViewDeckController alloc] initWithCenterViewController: cCenterNavCt leftViewController:ccFolderVc rightViewController:ctLoginVc];
     self.window.rootViewController = cTabbarViewCtrl;
     
     [self.window makeKeyAndVisible];
-//    [self testAnchorView];
-    /*
-    */
-//    [self testARC];
-//    [self testExternalAccessory];
-//    [self testBlock];
     return YES;
 }
 

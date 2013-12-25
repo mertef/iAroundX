@@ -82,7 +82,15 @@
     [self setNeedsStatusBarAppearanceUpdate];
     
     self.edgesForExtendedLayout = UIRectEdgeAll;
-    UITabBarItem* cItem = [[UITabBarItem alloc] initWithTitle:NSLocalizedString(@"k_my_friend", nil) image:[UIImage imageNamed:@"connections-h"] selectedImage:[UIImage imageNamed:@"connections"]];
+    UIImage* cimageNormal = [UIImage imageNamed:@"connections-h"];
+    cimageNormal = [cimageNormal imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
+    
+    
+    UIImage* cimageSelected = [UIImage imageNamed:@"connections"];
+    cimageSelected = [cimageSelected imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
+    
+    UITabBarItem* cItem = [[UITabBarItem alloc] initWithTitle:NSLocalizedString(@"k_my_friend", nil) image:cimageNormal selectedImage:cimageSelected];
+    
     self.tabBarItem = cItem;
     
     
@@ -157,7 +165,6 @@
     
 	// Do any additional setup after loading the view.
     self.navigationItem.title = NSLocalizedString(@"k_send_file_tile", nil);
-    self.navigationController.navigationBar.titleTextAttributes  = @{NSFontAttributeName:[UIFont fontWithName:@"Palatino-Roman" size:18.0], NSTextEffectAttributeName: NSTextEffectLetterpressStyle, NSForegroundColorAttributeName:k_colore_blue};
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemPlay target:self action:@selector(actionStartBrowserNearbyUsers:)];
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemPause target:self action:@selector(actionDismissServiceBrowser:)];
     self.navigationItem.leftBarButtonItem.enabled = NO;
@@ -266,6 +273,15 @@
     if (puPackage->_u_l_package_size == (puPackage->_u_l_package_length + puPackage->_u_l_current_offset)) {
         NSString* cstrMsg = [[NSString alloc] initWithData:self.cmutData encoding:NSUTF8StringEncoding];
         NSLog(@"received short msg from %@ : %@", [peerID displayName], cstrMsg);
+        NSDictionary* cdicChatItem = @{k_chat_from:peerID,
+                                       k_chat_to:self.cpeerId,
+                                       k_chat_msg:cstrMsg,
+                                       k_chat_msg_type:@(puPackage->_u_l_package_type)
+                                       };
+        [[NSNotificationCenter defaultCenter] postNotificationName:k_noti_chat_msg object:nil userInfo:cdicChatItem];
+        
+        [self.cmutData setLength:0];
+        
     }
     free(puPackage);puPackage = NULL;
 

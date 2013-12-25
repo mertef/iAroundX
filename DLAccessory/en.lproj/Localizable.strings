@@ -33,5 +33,6 @@
 "k_error_session_msg" = "Session timeout, please reconnect your private partener!";
 "k_my_friend"="Around Me";
 "k_conversation" = "Conversations";
+"k_conversation_title" = "Conversations";
 
 
