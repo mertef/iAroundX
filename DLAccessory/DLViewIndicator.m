@@ -8,6 +8,8 @@
 
 #import "DLViewIndicator.h"
 #import <QuartzCore/QuartzCore.h>
+#import "DLMCConfig.h"
+
 @implementation DLViewIndicator
 
 - (id)initWithFrame:(CGRect)frame
@@ -36,11 +38,12 @@
     CGContextSetFillColorWithColor(rCtx, [UIColor greenColor].CGColor);
     CGContextFillRect(rCtx, rect);
     CGColorSpaceRef rColorSpace = CGColorSpaceCreateDeviceRGB();
+   
+
+    const CGFloat farrLocations[3] = {0.7f,0.8f};
+    CGGradientRef rGradient = CGGradientCreateWithColors(rColorSpace, (__bridge CFArrayRef)@[(__bridge id)[UIColor redColor].CGColor, (__bridge id)k_colore_gradient_green.CGColor], farrLocations);
     
-    const CGFloat farrLocations[3] = {0.5f,0.8f,0.9f};
-    CGGradientRef rGradient = CGGradientCreateWithColors(rColorSpace, (__bridge CFArrayRef)@[[UIColor greenColor], [UIColor blueColor], [UIColor orangeColor]], farrLocations);
-    
-    CGContextDrawRadialGradient(rCtx, rGradient, self.center, 0.0f, self.center, CGRectGetWidth(rect), kCGGradientDrawsBeforeStartLocation);
+    CGContextDrawRadialGradient(rCtx, rGradient, CGPointMake(CGRectGetMidX(rect), CGRectGetMidY(rect)), 0.0f, CGPointMake(CGRectGetMidX(rect), CGRectGetMidY(rect)), CGRectGetWidth(rect) * 0.5f, kCGGradientDrawsBeforeStartLocation);
     CGColorSpaceRelease(rColorSpace);rColorSpace = nil;
     CGGradientRelease(rGradient); rGradient = nil;
     if ([self.cnumberIndicator intValue] > 99) {
@@ -48,12 +51,12 @@
     }
     CGRect sRectBound = [cstrNumber boundingRectWithSize:CGSizeMake(CGRectGetWidth(rect), CGRectGetHeight(rect)) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{
                                                                                                                                                                             NSForegroundColorAttributeName:[UIColor whiteColor],
-                                                                                                                                                                            NSFontAttributeName:[UIFont preferredFontForTextStyle:UIFontTextStyleHeadline]
+                                                                                                                                                                            NSFontAttributeName:[UIFont preferredFontForTextStyle:UIFontTextStyleFootnote]
                                                                                                                                                                             
                                                                                                                                                                             } context:nil];
     [cstrNumber drawAtPoint:CGPointMake((CGRectGetWidth(rect) - CGRectGetWidth(sRectBound)) * 0.5f, (CGRectGetHeight(rect) - CGRectGetHeight(sRectBound)) * 0.5f) withAttributes:@{
                                                                                                                                                                                  NSForegroundColorAttributeName:[UIColor whiteColor],
-                                                                                                                                                                                 NSFontAttributeName:[UIFont preferredFontForTextStyle:UIFontTextStyleHeadline]}];
+                                                                                                                                                                                 NSFontAttributeName:[UIFont preferredFontForTextStyle:UIFontTextStyleFootnote]}];
                                                                                                                                                                                  
                                                                                                                                                                                  
 }

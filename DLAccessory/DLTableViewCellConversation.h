@@ -13,6 +13,7 @@
 @property(strong, nonatomic) UILabel* clableName, * clableMsgHint;
 @property(strong, nonatomic) NSDictionary* cdicInfo;
 @property(strong, nonatomic) DLViewIndicator* ccViewIndicator;
+@property(strong, nonatomic) UIView* cviewSeparator;
 -(void)feedInfo:(NSDictionary*)acdic;
 
 @end

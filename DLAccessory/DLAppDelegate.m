@@ -18,6 +18,7 @@
 #import "DLFolderViewViewCtrl.h"
 #import "DLConversationListTableViewCtrl.h"
 #import "DLNavigationCtrl.h"
+
 @implementation DLAppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
@@ -30,13 +31,13 @@
     UINavigationController* cCenterNavCt = [[DLNavigationCtrl alloc] init];
     [cCenterNavCt pushViewController:_ccMpViewCtrl animated:YES];
 
-    DLConversationListTableViewCtrl* ccConversationListViewCtrl = [[DLConversationListTableViewCtrl alloc] init];
+    self.ccTableViewCtrlConverstaion = [[DLConversationListTableViewCtrl alloc] init];
     UINavigationController* ccConversationNavCtrl = [[DLNavigationCtrl alloc] init];
-    [ccConversationNavCtrl pushViewController:ccConversationListViewCtrl animated:YES];
+    [ccConversationNavCtrl pushViewController:_ccTableViewCtrlConverstaion animated:YES];
     
-    UITabBarItem* cItem = [[UITabBarItem alloc] initWithTitle:NSLocalizedString(@"k_conversation", nil) image:[[UIImage imageNamed:@"conversation"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] selectedImage:[[UIImage imageNamed:@"conversation-h"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]];
+    self.ctabbarItemConverstaion = [[UITabBarItem alloc] initWithTitle:NSLocalizedString(@"k_conversation", nil) image:[[UIImage imageNamed:@"conversation"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] selectedImage:[[UIImage imageNamed:@"conversation-h"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]];
     
-    ccConversationNavCtrl.tabBarItem = cItem;
+    ccConversationNavCtrl.tabBarItem = self.ctabbarItemConverstaion;
     
     UITabBarController* cTabbarViewCtrl = [[UITabBarController alloc] init];
 
@@ -44,9 +45,39 @@
     self.window.rootViewController = cTabbarViewCtrl;
     
     [self.window makeKeyAndVisible];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(actionNotiMsgReceive:) name:k_noti_chat_msg_decrease object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(actionNotiMsgReceive:) name:k_noti_chat_msg_increase object:nil];
+
+
     return YES;
 }
+-(void)actionNotiMsgReceive:(NSNotification*)acNoti {
+    
+    dispatch_async(dispatch_get_main_queue(), ^(void){
+        if (!self.ccTableViewCtrlConverstaion.cSession){
+            self.ccTableViewCtrlConverstaion.cSession = self.ccMpViewCtrl.csession;
+            self.ccTableViewCtrlConverstaion.cpeerIdFrom = self.ccMpViewCtrl.cpeerId;
+        }
+        if ([acNoti.name isEqualToString:k_noti_chat_msg_increase]) {
+            if (!self.ctabbarItemConverstaion.badgeValue) {
+                self.ctabbarItemConverstaion.badgeValue = @"1";
+            }else {
+                self.ctabbarItemConverstaion.badgeValue = [NSString stringWithFormat:@"%d", [self.ctabbarItemConverstaion.badgeValue intValue] + 1];
+            }
+        }else if([acNoti.name isEqualToString:k_noti_chat_msg_decrease]){
+            NSNumber* cnumberValue = [[acNoti userInfo] objectForKey:k_msg_cout];
+            NSUInteger iNumberMsgCount = [self.ctabbarItemConverstaion.badgeValue integerValue] - [cnumberValue integerValue];
+            if (!iNumberMsgCount) {
+                self.ctabbarItemConverstaion.badgeValue = nil;
+            }else {
+               self.ctabbarItemConverstaion.badgeValue = [NSString stringWithFormat:@"%lu", (unsigned long)iNumberMsgCount];
+            }
+        }
+        
 
+    });
+}
 - (void)applicationWillResignActive:(UIApplication *)application
 {
     // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.

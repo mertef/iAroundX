@@ -9,12 +9,18 @@
 #import <UIKit/UIKit.h>
 
 @class DLMPViewCtrl;
+@class DLConversationListTableViewCtrl;
 @interface DLAppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
 @property(strong, nonatomic) UINavigationController* cNaviCtrl;
 @property(strong, nonatomic) DLMPViewCtrl* ccMpViewCtrl;
 @property(strong, nonatomic) UIImageView* cimageviewBg;
+@property(strong, nonatomic) UITabBarItem* ctabbarItemConverstaion;
+@property(strong, nonatomic) DLConversationListTableViewCtrl* ccTableViewCtrlConverstaion;
+
+-(void)actionNotiMsgReceive:(NSNotification*)acNoti;
+
 
 
 @end

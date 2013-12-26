@@ -19,5 +19,6 @@
 
 @property(strong, nonatomic) DLViewChatInput* ccViewChatInput;
 @property(strong, nonatomic) MCSession* cMulPeerSession;
+-(void)feedChatList:(NSArray*)acarrList;
 
 @end

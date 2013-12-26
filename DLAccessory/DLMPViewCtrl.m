@@ -184,7 +184,10 @@
 }
 - (void)dealloc
 {
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     [self actionDismissServiceBrowser:nil];
+    
 }
 - (void)didReceiveMemoryWarning
 {
@@ -276,9 +279,12 @@
         NSDictionary* cdicChatItem = @{k_chat_from:peerID,
                                        k_chat_to:self.cpeerId,
                                        k_chat_msg:cstrMsg,
-                                       k_chat_msg_type:@(puPackage->_u_l_package_type)
+                                       k_chat_msg_type:@(puPackage->_u_l_package_type),
+                                       k_chat_date: @([[NSDate date] timeIntervalSince1970])
                                        };
+        [[NSNotificationCenter defaultCenter] postNotificationName:k_noti_chat_msg_increase object:nil userInfo:cdicChatItem];
         [[NSNotificationCenter defaultCenter] postNotificationName:k_noti_chat_msg object:nil userInfo:cdicChatItem];
+
         
         [self.cmutData setLength:0];
         

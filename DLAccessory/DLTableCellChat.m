@@ -8,7 +8,8 @@
 
 #import "DLTableCellChat.h"
 #import "DLMCConfig.h"
-static NSDateFormatter* g_cdataFormater;
+#import "Common.h"
+#import <MultipeerConnectivity/MultipeerConnectivity.h>
 
 @implementation DLTableCellChat
 
@@ -26,6 +27,7 @@ static NSDateFormatter* g_cdataFormater;
         _clableMsg = [[UILabel alloc] init];
         _clableMsg.numberOfLines = 0;
         _clableMsg.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+        _clableMsg.lineBreakMode = NSLineBreakByCharWrapping;
         
         [_cimageViewBg addSubview:_clableMsg];
         
@@ -35,9 +37,7 @@ static NSDateFormatter* g_cdataFormater;
         _clableDate.font = [UIFont preferredFontForTextStyle:UIFontTextStyleFootnote];
         [self.contentView addSubview:_clableDate];
         
-        if (!g_cdataFormater) {
-            g_cdataFormater = [[NSDateFormatter alloc] init];
-        }
+        
 
 
         
@@ -51,21 +51,27 @@ static NSDateFormatter* g_cdataFormater;
     CGFloat fHeight = CGRectGetHeight(self.contentView.bounds);
     CGFloat fWidth = CGRectGetWidth(self.contentView.bounds);
     
-    NSString* cstrFrom = self.cdicInfo[k_chat_from];
+    MCPeerID* cPeerIdFrom = [self.cdicInfo objectForKey:k_chat_from];
+    
+    NSString* cstrFrom = [cPeerIdFrom displayName];
     CGSize sSizeImage = _cimageViewIcon.image.size;
 
     NSString* cstrMsg = self.cdicInfo[k_chat_msg];
     
-    CGRect srectBoundMsg = [cstrMsg boundingRectWithSize:CGSizeMake(200.0f, MAXFLOAT) options:NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName: [UIFont preferredFontForTextStyle:UIFontTextStyleBody]} context:nil];
+    CGRect srectBoundMsg = [cstrMsg boundingRectWithSize:CGSizeMake(200.0f, MAXFLOAT) options:NSStringDrawingUsesFontLeading | NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName: _clableMsg.font} context:nil];
     
     if ([cstrFrom isEqualToString:self.cstrPeerFrom]) { //image icon is in left
         _cimageViewIcon.frame = CGRectMake(4.0f, 4.0f + (fHeight - fYOffset - sSizeImage.height) * 0.5f, sSizeImage.width, sSizeImage.height);
         _cimageViewBg.frame = CGRectMake(CGRectGetMaxX(_cimageViewIcon.frame) + 2.0f, 4.0f, srectBoundMsg.size.width, srectBoundMsg.size.height);
+        _clableMsg.textAlignment = NSTextAlignmentLeft;
         
     }else { //image icon is in right
         _cimageViewIcon.frame = CGRectMake(fWidth - 4.0f - sSizeImage.width, 4.0f + (fHeight - fYOffset - sSizeImage.height) * 0.5f, sSizeImage.width, sSizeImage.height);
         _cimageViewBg.frame = CGRectMake(CGRectGetMinX(_cimageViewIcon.frame) -2.0f - srectBoundMsg.size.width, 4.0f, srectBoundMsg.size.width, srectBoundMsg.size.height);
+        _clableMsg.textAlignment = NSTextAlignmentRight;
     }
+    _clableMsg.frame = _cimageViewBg.bounds;
+    
     _clableDate.frame = CGRectMake(CGRectGetMinX(_cimageViewBg.frame), CGRectGetMaxY(_cimageViewBg.frame) + 2.0f, 100.0f, 20.0f);
     
     
@@ -94,7 +100,7 @@ static NSDateFormatter* g_cdataFormater;
     _clableMsg.text = cstrMsg;
     
     
-    _clableDate.text = [g_cdataFormater stringFromDate:[NSDate dateWithTimeIntervalSince1970:[cnumberDate doubleValue]]];
+    _clableDate.text = [Common FormatDateLong:[cnumberDate doubleValue]];
     
     
     
@@ -104,7 +110,7 @@ static NSDateFormatter* g_cdataFormater;
     CGFloat fHeight = 20.0f + 8.0f;
     NSString* cstrMsg = acdicInfo[k_chat_msg];
 
-    CGRect srectBoundMsg = [cstrMsg boundingRectWithSize:CGSizeMake(200.0f, MAXFLOAT) options:NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName: [UIFont preferredFontForTextStyle:UIFontTextStyleBody]} context:nil];
+    CGRect srectBoundMsg = [cstrMsg boundingRectWithSize:CGSizeMake(200.0f, MAXFLOAT) options:NSStringDrawingUsesFontLeading | NSStringDrawingUsesLineFragmentOrigin  attributes:@{NSFontAttributeName: [UIFont preferredFontForTextStyle:UIFontTextStyleBody]} context:nil];
     fHeight += CGRectGetHeight(srectBoundMsg);
     
     

@@ -8,10 +8,13 @@
 
 #import <UIKit/UIKit.h>
 
+@class MCSession;
+@class MCPeerID;
 @interface DLConversationListTableViewCtrl : UIViewController<UITableViewDataSource, UITableViewDelegate>
 @property(strong, nonatomic) NSMutableArray* cmutarrConversations;
 @property(strong, nonatomic) UITableView* ctableView;
-
+@property(strong, nonatomic) MCSession* cSession;
+@property(strong, nonatomic) MCPeerID* cpeerIdFrom;
 -(void)actionNotiMsgReceive:(NSNotification*)acNoti;
 
 @end

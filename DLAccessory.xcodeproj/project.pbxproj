@@ -48,6 +48,13 @@
 		0BC04992185F08B800F13240 /* bg_pop_out@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 0BC04991185F08B800F13240 /* bg_pop_out@2x.png */; };
 		0BC9F7E51868376E00B91CC1 /* DLChatTableViewCtrl.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BC9F7E41868376E00B91CC1 /* DLChatTableViewCtrl.m */; };
 		0BC9F7E81868382200B91CC1 /* DLTableCellChat.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BC9F7E71868382200B91CC1 /* DLTableCellChat.m */; };
+		0BD9D415186C1D8400315607 /* Common.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BD9D414186C1D8400315607 /* Common.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		0BD9D424186C1E4300315607 /* NSObject+SBJSON.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BD9D419186C1E4300315607 /* NSObject+SBJSON.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		0BD9D425186C1E4300315607 /* NSString+SBJSON.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BD9D41B186C1E4300315607 /* NSString+SBJSON.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		0BD9D426186C1E4300315607 /* SBJSON.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BD9D41D186C1E4300315607 /* SBJSON.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		0BD9D427186C1E4300315607 /* SBJsonBase.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BD9D41F186C1E4300315607 /* SBJsonBase.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		0BD9D428186C1E4300315607 /* SBJsonParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BD9D421186C1E4300315607 /* SBJsonParser.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		0BD9D429186C1E4300315607 /* SBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BD9D423186C1E4300315607 /* SBJsonWriter.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		0BDA3EC41861537F00DCBAFC /* DLAudio.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BDA3EC31861537F00DCBAFC /* DLAudio.m */; };
 		0BDA3EC9186177C400DCBAFC /* mic_center_active@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 0BDA3EC5186177C400DCBAFC /* mic_center_active@2x.png */; };
 		0BDA3ECA186177C400DCBAFC /* mic_center_normal@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 0BDA3EC6186177C400DCBAFC /* mic_center_normal@2x.png */; };
@@ -160,6 +167,21 @@
 		0BC9F7E41868376E00B91CC1 /* DLChatTableViewCtrl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLChatTableViewCtrl.m; sourceTree = "<group>"; };
 		0BC9F7E61868382200B91CC1 /* DLTableCellChat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLTableCellChat.h; sourceTree = "<group>"; };
 		0BC9F7E71868382200B91CC1 /* DLTableCellChat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLTableCellChat.m; sourceTree = "<group>"; };
+		0BD9D413186C1D8400315607 /* Common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Common.h; sourceTree = "<group>"; };
+		0BD9D414186C1D8400315607 /* Common.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Common.m; sourceTree = "<group>"; };
+		0BD9D417186C1E4300315607 /* JSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSON.h; sourceTree = "<group>"; };
+		0BD9D418186C1E4300315607 /* NSObject+SBJSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+SBJSON.h"; sourceTree = "<group>"; };
+		0BD9D419186C1E4300315607 /* NSObject+SBJSON.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+SBJSON.m"; sourceTree = "<group>"; };
+		0BD9D41A186C1E4300315607 /* NSString+SBJSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+SBJSON.h"; sourceTree = "<group>"; };
+		0BD9D41B186C1E4300315607 /* NSString+SBJSON.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+SBJSON.m"; sourceTree = "<group>"; };
+		0BD9D41C186C1E4300315607 /* SBJSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBJSON.h; sourceTree = "<group>"; };
+		0BD9D41D186C1E4300315607 /* SBJSON.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SBJSON.m; sourceTree = "<group>"; };
+		0BD9D41E186C1E4300315607 /* SBJsonBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBJsonBase.h; sourceTree = "<group>"; };
+		0BD9D41F186C1E4300315607 /* SBJsonBase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SBJsonBase.m; sourceTree = "<group>"; };
+		0BD9D420186C1E4300315607 /* SBJsonParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBJsonParser.h; sourceTree = "<group>"; };
+		0BD9D421186C1E4300315607 /* SBJsonParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SBJsonParser.m; sourceTree = "<group>"; };
+		0BD9D422186C1E4300315607 /* SBJsonWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBJsonWriter.h; sourceTree = "<group>"; };
+		0BD9D423186C1E4300315607 /* SBJsonWriter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SBJsonWriter.m; sourceTree = "<group>"; };
 		0BDA3EC21861537F00DCBAFC /* DLAudio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLAudio.h; sourceTree = "<group>"; };
 		0BDA3EC31861537F00DCBAFC /* DLAudio.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLAudio.m; sourceTree = "<group>"; };
 		0BDA3EC5186177C400DCBAFC /* mic_center_active@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "mic_center_active@2x.png"; sourceTree = "<group>"; };
@@ -247,6 +269,8 @@
 		0B7C9244185080F600452712 /* library */ = {
 			isa = PBXGroup;
 			children = (
+				0BD9D416186C1E4300315607 /* JSON */,
+				0BD9D412186C1D8400315607 /* common */,
 				0BDA3ED71861A12D00DCBAFC /* Login */,
 				0BC04973185EDFF300F13240 /* CanvasLibrary */,
 				0BC0496D185ED8F300F13240 /* PulsingHalo */,
@@ -299,6 +323,35 @@
 				0BC04985185EDFF300F13240 /* UITextView+TCCustomFont.m */,
 			);
 			path = CanvasLibrary;
+			sourceTree = "<group>";
+		};
+		0BD9D412186C1D8400315607 /* common */ = {
+			isa = PBXGroup;
+			children = (
+				0BD9D413186C1D8400315607 /* Common.h */,
+				0BD9D414186C1D8400315607 /* Common.m */,
+			);
+			path = common;
+			sourceTree = "<group>";
+		};
+		0BD9D416186C1E4300315607 /* JSON */ = {
+			isa = PBXGroup;
+			children = (
+				0BD9D417186C1E4300315607 /* JSON.h */,
+				0BD9D418186C1E4300315607 /* NSObject+SBJSON.h */,
+				0BD9D419186C1E4300315607 /* NSObject+SBJSON.m */,
+				0BD9D41A186C1E4300315607 /* NSString+SBJSON.h */,
+				0BD9D41B186C1E4300315607 /* NSString+SBJSON.m */,
+				0BD9D41C186C1E4300315607 /* SBJSON.h */,
+				0BD9D41D186C1E4300315607 /* SBJSON.m */,
+				0BD9D41E186C1E4300315607 /* SBJsonBase.h */,
+				0BD9D41F186C1E4300315607 /* SBJsonBase.m */,
+				0BD9D420186C1E4300315607 /* SBJsonParser.h */,
+				0BD9D421186C1E4300315607 /* SBJsonParser.m */,
+				0BD9D422186C1E4300315607 /* SBJsonWriter.h */,
+				0BD9D423186C1E4300315607 /* SBJsonWriter.m */,
+			);
+			path = JSON;
 			sourceTree = "<group>";
 		};
 		0BDA3ED71861A12D00DCBAFC /* Login */ = {
@@ -631,7 +684,9 @@
 				0BDD577A186AB86900EFE4DF /* DLTableViewCellConversation.m in Sources */,
 				0BDA3EF41861A17F00DCBAFC /* XHBaseLoginViewController.m in Sources */,
 				0BC0498D185EDFF400F13240 /* UITextField+TCCustomFont.m in Sources */,
+				0BD9D426186C1E4300315607 /* SBJSON.m in Sources */,
 				0BC04988185EDFF400F13240 /* CSBlurView.m in Sources */,
+				0BD9D425186C1E4300315607 /* NSString+SBJSON.m in Sources */,
 				0BC04987185EDFF400F13240 /* CSAnimationView.m in Sources */,
 				0BDA3EF81861A17F00DCBAFC /* XHLoginViewController4.m in Sources */,
 				0BDA3EF61861A17F00DCBAFC /* XHLoginViewController2.m in Sources */,
@@ -640,13 +695,18 @@
 				0BBCF13B18601F5F0026AC90 /* DLFolderViewViewCtrl.m in Sources */,
 				0BC0498A185EDFF400F13240 /* UIButton+TCCustomFont.m in Sources */,
 				0BB65FD61869239900C60CB0 /* DLViewChatInput.m in Sources */,
+				0BD9D415186C1D8400315607 /* Common.m in Sources */,
+				0BD9D429186C1E4300315607 /* SBJsonWriter.m in Sources */,
 				0BC04986185EDFF400F13240 /* CSAnimation.m in Sources */,
 				0BC04989185EDFF400F13240 /* CSNavigationController.m in Sources */,
 				0BDA3EC41861537F00DCBAFC /* DLAudio.m in Sources */,
 				0B48B88F186AD19400FE6C44 /* DLViewIndicator.m in Sources */,
 				0BDD5777186A8C8500EFE4DF /* DLNavigationCtrl.m in Sources */,
 				0B9CDCD2185168F200D470B4 /* ProgressHUD.m in Sources */,
+				0BD9D427186C1E4300315607 /* SBJsonBase.m in Sources */,
+				0BD9D424186C1E4300315607 /* NSObject+SBJSON.m in Sources */,
 				0BB65FD918698B8900C60CB0 /* DLConversationListTableViewCtrl.m in Sources */,
+				0BD9D428186C1E4300315607 /* SBJsonParser.m in Sources */,
 				0BE8AD22184C39A7007EDE88 /* DLAppDelegate.m in Sources */,
 				0BE8AD46184C59AA007EDE88 /* DLMPViewCtrl.m in Sources */,
 				0BE8AD1E184C39A7007EDE88 /* main.m in Sources */,

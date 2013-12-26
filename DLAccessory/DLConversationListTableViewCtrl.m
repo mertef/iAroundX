@@ -10,11 +10,18 @@
 #import "DLTableViewCellConversation.h"
 #import "DLMCConfig.h"
 #import <MultipeerConnectivity/MultipeerConnectivity.h>
+#import "DLChatTableViewCtrl.h"
+
 @interface DLConversationListTableViewCtrl ()
 
 @end
 
 @implementation DLConversationListTableViewCtrl
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -45,6 +52,7 @@
         [self.cmutarrConversations addObject:cmutDicConversation];
     }
     dispatch_async(dispatch_get_main_queue(), ^(){
+       
         [self.ctableView reloadData];
     });
 }
@@ -63,6 +71,10 @@
     self.ctableView.delegate = self;
     self.ctableView.dataSource = self;
     [self.view addSubview:self.ctableView];
+    self.ctableView.separatorStyle = UITableViewCellSeparatorStyleSingleLineEtched;
+    self.ctableView.separatorColor = k_colore_gradient_blue;
+    self.ctableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.ctableView.bounds), 2.0f)];
+    self.ctableView.tableFooterView.backgroundColor = [UIColor clearColor];
 	// Do any additional setup after loading the view.
 }
 
@@ -72,6 +84,12 @@
     // Dispose of any resources that can be recreated.
 }
 #pragma mark - 
+-(CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    return 80.0f;
+}
+-(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    return 80.0f;
+}
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return [self.cmutarrConversations count];
 }
@@ -88,5 +106,37 @@
     return cCell;
 }
 
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    
+    NSDictionary* cdicItem = [self.cmutarrConversations objectAtIndex:[indexPath row]];
+    NSArray* carrList = [cdicItem objectForKey:k_chat_list];
+    DLChatTableViewCtrl* ccTableViewCtrlChat = [[DLChatTableViewCtrl alloc] init];
+    ccTableViewCtrlChat.cMulPeerSession = self.cSession;
+    [ccTableViewCtrlChat feedChatList:carrList];        
+    [self.navigationController pushViewController:ccTableViewCtrlChat animated:YES];
+    
+}
+
+
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
+    switch (editingStyle) {
+        case UITableViewCellEditingStyleDelete:
+        {
+            [tableView beginUpdates];
+            [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+            NSDictionary* cdicItem = [self.cmutarrConversations objectAtIndex:[indexPath row]];
+            NSArray* carrList = [cdicItem objectForKey:k_chat_list];
+            NSUInteger iUnreadMsgCount = [carrList count];
+            [[NSNotificationCenter defaultCenter] postNotificationName:k_noti_chat_msg_decrease object:nil userInfo:@{k_msg_cout:@(iUnreadMsgCount)}];
+                                      
+            [self.cmutarrConversations removeObject:[self.cmutarrConversations objectAtIndex:[indexPath row]]];
+            [tableView endUpdates];
+        }
+            break;
+            
+        default:
+            break;
+    }
+}
 
 @end

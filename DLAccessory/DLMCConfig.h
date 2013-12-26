@@ -24,6 +24,11 @@
 #define k_colore_blue [UIColor colorWithRed:0.2627 green:0.3804 blue:0.8000 alpha:1.0f]
 
 
+#define k_colore_orange  [UIColor colorWithRed:1.0000 green:0.7020 blue:0.4000 alpha:1.0f]
+#define k_colore_gradient_green [UIColor colorWithRed:0.7373 green:0.9765 blue:0.2471 alpha:1.0f]
+#define k_colore_gradient_pink [UIColor colorWithRed:0.9412 green:0.0941 blue:0.4588 alpha:1.0f]
+#define k_colore_gradient_blue  [UIColor colorWithRed:0.3608 green:0.6353 blue:0.9451 alpha:1.0f]
+
 #define k_chat_from @"chat_from"
 #define k_chat_from_name @"chat_from_name"
 #define k_chat_list @"k_chat_list"
@@ -36,6 +41,9 @@
 
 #define k_people_icon_default @"people_icon_default"
 #define k_noti_chat_msg @"chat_msg_item"
+#define k_noti_chat_msg_increase @"chat_msg_item_increase"
+#define k_noti_chat_msg_decrease @"chat_msg_item_decrease"
+#define k_msg_cout @"msg_count"
 
 
 typedef NS_ENUM(int32_t, T_PACKAGE_TYPE) {
