@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "DLViewChatInput.h"
 @class MCSession;
+@class DLViewMore;
 @interface DLChatTableViewCtrl : UIViewController<UITableViewDelegate, UITableViewDataSource, DLViewChatInputProto>{
     
 }
@@ -19,6 +20,12 @@
 
 @property(strong, nonatomic) DLViewChatInput* ccViewChatInput;
 @property(strong, nonatomic) MCSession* cMulPeerSession;
+@property(strong, nonatomic) DLViewMore* ccViewMore;
+@property(assign, nonatomic) BOOL bIsInputMode;
 -(void)feedChatList:(NSArray*)acarrList;
+
+-(void)dismissKeyBoard:(UITapGestureRecognizer*)acTapGes;
+
+-(void)scrollChatToBottom;
 
 @end

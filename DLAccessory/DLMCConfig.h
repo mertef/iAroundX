@@ -44,7 +44,10 @@
 #define k_noti_chat_msg_increase @"chat_msg_item_increase"
 #define k_noti_chat_msg_decrease @"chat_msg_item_decrease"
 #define k_msg_cout @"msg_count"
-
+#define k_height_input 46.0f
+#define k_text_input_height 36.0f
+#define k_text_input_content_height 38.0f
+#define k_height_keyboard 216.0f
 
 typedef NS_ENUM(int32_t, T_PACKAGE_TYPE) {
     enum_package_type_short_msg = 0x300,

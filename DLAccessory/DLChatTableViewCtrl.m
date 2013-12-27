@@ -10,6 +10,7 @@
 #import "DLTableCellChat.h"
 #import "DLMCConfig.h"
 #import <MultipeerConnectivity/MultipeerConnectivity.h>
+#import "DLViewMore.h"
 
 @interface DLChatTableViewCtrl ()
 
@@ -24,6 +25,7 @@
         // Custom initialization
         self.cmutarrChatList = [[NSMutableArray alloc] init];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(actionNotiNewMsgArrived:) name:k_noti_chat_msg object:nil];
+        self.self.bIsInputMode = YES;
     }
     return self;
 }
@@ -37,29 +39,80 @@
             [self.cmutarrChatList addObject:cdicUserInfo];
             dispatch_async(dispatch_get_main_queue(), ^(void){
                 [self.ctableViewChat reloadData];
+                [self scrollChatToBottom];
             });
         }
     }
 }
 - (void)dealloc
 {
+    
+    [self.ccViewChatInput.ctextViewInput removeObserver:self forKeyPath:@"contentSize" context:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 -(void)didKeyBoardAppear:(NSNotification*)acNotifi {
+    self.bIsInputMode = YES;
     NSDictionary* cdicInfo = acNotifi.userInfo;
+    NSValue* cvalueFrameEnd = [cdicInfo objectForKey:UIKeyboardFrameEndUserInfoKey];
+    CGRect srectFrameEnd = [cvalueFrameEnd CGRectValue];   
     
+    if(CGRectGetMaxY(self.ccViewChatInput.frame) - CGRectGetMinY(srectFrameEnd) < 0) {
+        return;
+    }
+    [UIView animateWithDuration:0.5f animations:^(void){
+        self.ctableViewChat.frame = CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.view.bounds), CGRectGetHeight(self.view.bounds) - CGRectGetHeight(srectFrameEnd) - CGRectGetHeight(self.ccViewChatInput.frame));
+        CGRect srectFrameInput = self.ccViewChatInput.frame;
+        srectFrameInput.origin.y = CGRectGetMinY(srectFrameEnd) - CGRectGetHeight(srectFrameInput);
+        self.ccViewChatInput.frame = srectFrameInput;
+    } completion:^(BOOL abFinished){
+        [self scrollChatToBottom];
+    }];
+    
+   
 }
 
 -(void)didKeyBoardHide:(NSNotification*)acNotifi {
-    NSDictionary* cdicInfo = acNotifi.userInfo;
+//    NSDictionary* cdicInfo = acNotifi.userInfo;
+//    NSValue* cvalueFrameEnd = [cdicInfo objectForKey:UIKeyboardFrameEndUserInfoKey];
+//    CGRect srectFrameEnd = [cvalueFrameEnd CGRectValue];
+    if (self.bIsInputMode) {
+        
+        CGFloat fHeight = CGRectGetHeight(self.view.bounds) - CGRectGetMaxY(self.ccViewChatInput.frame);
+        if( fHeight > k_height_keyboard) {
+            return;
+        }
+        
+        [UIView animateWithDuration:0.5f animations:^(void){
+            self.ctableViewChat.frame = CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.view.bounds), CGRectGetHeight(self.view.bounds) - CGRectGetHeight(self.ccViewChatInput.frame));
+            CGRect srectFrameInput = self.ccViewChatInput.frame;
+            srectFrameInput.origin.y = CGRectGetHeight(self.view.bounds) - CGRectGetHeight(srectFrameInput);
+            self.ccViewChatInput.frame = srectFrameInput;
+        }];
+    }
+    
     
 }
 
 
 -(void)didKeyBoardFrameChange:(NSNotification*)acNotifi {
-    NSDictionary* cdicInfo = acNotifi.userInfo;
-    
+    if (self.ccViewChatInput.ctextViewInput.isFirstResponder) {
+        self.bIsInputMode = YES;
+        NSDictionary* cdicInfo = acNotifi.userInfo;
+        NSValue* cvalueFrameEnd = [cdicInfo objectForKey:UIKeyboardFrameEndUserInfoKey];
+        CGRect srectFrameEnd = [cvalueFrameEnd CGRectValue];
+        [UIView animateWithDuration:0.5f animations:^(void){
+            self.ctableViewChat.frame = CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.view.bounds), CGRectGetHeight(self.view.bounds) - CGRectGetHeight(srectFrameEnd) - CGRectGetHeight(self.ccViewChatInput.frame));
+            CGRect srectFrameInput = self.ccViewChatInput.frame;
+            srectFrameInput.origin.y = CGRectGetMinY(srectFrameEnd) - CGRectGetHeight(srectFrameInput);
+            self.ccViewChatInput.frame = srectFrameInput;
+
+        } completion:^(BOOL abFinished){
+        }];
+
+    }else {
+        self.bIsInputMode = NO;
+    }
 }
 
 -(void)viewWillDisappear:(BOOL)animated {
@@ -75,8 +128,8 @@
     [super viewDidLoad];
     self.tabBarController.tabBar.hidden = YES;
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didKeyBoardAppear:) name:UIKeyboardDidShowNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didKeyBoardHide:) name:UIKeyboardDidHideNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didKeyBoardAppear:) name:UIKeyboardWillShowNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didKeyBoardHide:) name:UIKeyboardWillHideNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didKeyBoardFrameChange:) name:UIKeyboardDidChangeFrameNotification object:nil];
 
     
@@ -84,13 +137,17 @@
     self.view.backgroundColor = [UIColor whiteColor];
     self.edgesForExtendedLayout = UIRectEdgeAll;
     self.extendedLayoutIncludesOpaqueBars = NO;
-    _ctableViewChat = [[UITableView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.view.bounds), CGRectGetHeight(self.view.bounds) - 40.0f)];
+    _ctableViewChat = [[UITableView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.view.bounds),CGRectGetHeight(self.view.bounds) - k_height_input)];
     _ctableViewChat.delegate =self;
     _ctableViewChat.dataSource = self;
+    UITapGestureRecognizer* ctapGes = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyBoard:)];
+    [self.ctableViewChat addGestureRecognizer:ctapGes];
+    
     [self.view addSubview:_ctableViewChat];
     
-    _ccViewChatInput = [[DLViewChatInput alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(_ctableViewChat.frame), CGRectGetWidth(self.view.bounds), 40.0f)];
+    self.ccViewChatInput = [[DLViewChatInput alloc] initWithFrame:CGRectMake(0.0f,  CGRectGetHeight(self.view.bounds) - k_height_input, CGRectGetWidth(self.view.bounds),k_height_input)];
     _ccViewChatInput.idProtoViewChat = self;
+    [_ccViewChatInput.ctextViewInput addObserver:self forKeyPath:@"contentSize" options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:nil];
     [self.view addSubview:_ccViewChatInput];
     
      UIView* cviewBg = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.view.bounds), 20.0f)];
@@ -98,7 +155,39 @@
     self.ctableViewChat.tableFooterView = cviewBg;
 	// Do any additional setup after loading the view.
 }
+-(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
+    if ([keyPath isEqualToString:@"contentSize"]) {
+        NSValue* cValueSizeNew = [change objectForKey:NSKeyValueChangeNewKey];
+        NSValue* cValueSizeOld = [change objectForKey:NSKeyValueChangeOldKey];
 
+        CGSize sSize = [cValueSizeNew CGSizeValue];
+        CGSize sSizeOld = [cValueSizeOld CGSizeValue];
+        
+        
+        if (sSizeOld.height == sSize.height) {
+            return;
+        }
+
+        NSLog(@"the input size is %@", NSStringFromCGSize(sSize));
+        CGRect srectFrame = self.ccViewChatInput.frame;
+        
+
+        if (sSize.height == 60.0f) {
+                self.ccViewChatInput.frame = CGRectMake(srectFrame.origin.x, srectFrame.origin.y + srectFrame.size.height - sSize.height - 8.0f, srectFrame.size.width, 60.0f + 8.0f);
+
+        }else if(sSize.height == 82.0f){
+                self.ccViewChatInput.frame = CGRectMake(srectFrame.origin.x, srectFrame.origin.y + srectFrame.size.height - sSize.height - 8.0f, srectFrame.size.width, 82 + 8.0f);
+
+        }else if(sSize.height == 38.0f) {
+                self.ccViewChatInput.frame = CGRectMake(srectFrame.origin.x, srectFrame.origin.y + srectFrame.size.height - sSize.height - 8.0f, srectFrame.size.width, 38 + 8.0f);
+
+        }
+        
+       
+        return;
+    }
+    [super observeValueForKeyPath:keyPath ofObject:object change:change context:nil];
+}
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
@@ -125,6 +214,7 @@
         DLTableCellChat* ccCellChat = (DLTableCellChat*)cell;
         ccCellChat.cstrPeerFrom = [self.cdicPeerInfoFrom objectForKey:k_peer_id_name];
     }
+    
     DLTableCellChat* ccCellChat = (DLTableCellChat*)cell;
     [ccCellChat feedDictionaryInfo:[self.cmutarrChatList objectAtIndex:[indexPath row]]];
     return cell;
@@ -157,12 +247,64 @@
             UIAlertView* calertMsg = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"k_session_error", nil) message:NSLocalizedString(@"k_error_session_msg", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"k_cancel", nil) otherButtonTitles:nil, nil];
             [calertMsg show];
         }else {
+            [accViewChatInput ctextViewInput].text = @"";
             NSDate* cdateNow = [NSDate date];
             NSMutableDictionary* cmutdicItem = [[NSMutableDictionary alloc] initWithObjectsAndKeys:self.cdicPeerInfoTo[k_peer_id], k_chat_to, self.cdicPeerInfoFrom[k_peer_id], k_chat_from, cstrText, k_chat_msg, [NSNumber numberWithDouble:[cdateNow timeIntervalSince1970]], k_chat_date,nil];
             [self.cmutarrChatList addObject:cmutdicItem];
             [self.ctableViewChat reloadData];
-            
+            [self scrollChatToBottom];
         }
+    }
+}
+
+-(void)didMorePressed:(DLViewChatInput*)accViewChatInput{
+    
+    if (!self.ccViewMore) {
+        self.ccViewMore = [[DLViewMore alloc] initWithFrame: CGRectMake(0.0f, CGRectGetHeight(self.view.bounds), CGRectGetWidth(self.view.bounds), k_height_keyboard)];
+        
+//        NSLog(@"view more init %@", NSStringFromCGRect(self.ccViewMore.frame));
+
+    }
+    
+    self.bIsInputMode = !self.bIsInputMode;
+    if (self.bIsInputMode) {
+        [self.ccViewChatInput.ctextViewInput becomeFirstResponder];
+
+        [UIView animateWithDuration:0.2 animations:^(void){
+            self.ccViewMore.frame = CGRectMake(0.0f, CGRectGetHeight(self.view.bounds), CGRectGetWidth(self.view.bounds), k_height_keyboard);
+        } completion:^(BOOL abFinished){
+            if (abFinished) {
+                [self.ccViewMore removeFromSuperview];
+            }
+        }];
+    }else {
+        if ([self.ccViewChatInput.ctextViewInput isFirstResponder]) {
+            [self.ccViewChatInput.ctextViewInput resignFirstResponder];
+        }
+        [self.view addSubview:self.ccViewMore];
+        [self.view bringSubviewToFront:self.ccViewMore];
+
+        CGFloat fHeight = CGRectGetHeight(self.view.bounds) - CGRectGetMaxY(self.ccViewChatInput.frame);
+        if ( fHeight <  k_height_keyboard) {
+            [UIView animateWithDuration:0.5f animations:^(void){
+                self.ctableViewChat.frame = CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.view.bounds), CGRectGetHeight(self.view.bounds) - k_height_keyboard - CGRectGetHeight(self.ccViewChatInput.frame));
+                CGRect srectFrameInput = self.ccViewChatInput.frame;
+                srectFrameInput.origin.y =  CGRectGetHeight(self.view.bounds) - k_height_keyboard - CGRectGetHeight(srectFrameInput);
+                self.ccViewChatInput.frame = srectFrameInput;
+                self.ccViewMore.frame = CGRectMake(0.0f, CGRectGetHeight(self.view.bounds) - k_height_keyboard, CGRectGetWidth(self.view.bounds), k_height_keyboard);
+
+            } completion:^(BOOL abFinished){
+                [self scrollChatToBottom];
+            }];
+        }else {
+            [UIView animateWithDuration:0.2 animations:^(void){
+                
+                 self.ccViewMore.frame = CGRectMake(0.0f, CGRectGetHeight(self.view.bounds) - k_height_keyboard, CGRectGetWidth(self.view.bounds), k_height_keyboard);
+//                NSLog(@"view more %@", NSStringFromCGRect(self.ccViewMore.frame));
+            }];
+        }
+        
+        
     }
 }
 
@@ -179,5 +321,30 @@
     [self.cmutarrChatList addObjectsFromArray:acarrList];
 }
 
+-(void)dismissKeyBoard:(UITapGestureRecognizer*)acTapGes {
+    
+    if (self.ccViewChatInput.ctextViewInput.isFirstResponder) {
+        [self.ccViewChatInput.ctextViewInput resignFirstResponder];
+    }else {
+        [UIView animateWithDuration:0.5f animations:^(void){
+            self.ctableViewChat.frame = CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.view.bounds), CGRectGetHeight(self.view.bounds) - CGRectGetHeight(self.ccViewChatInput.frame));
+            CGRect srectFrameInput = self.ccViewChatInput.frame;
+            srectFrameInput.origin.y = CGRectGetHeight(self.view.bounds) - CGRectGetHeight(srectFrameInput);
+            self.ccViewChatInput.frame = srectFrameInput;
+            self.ccViewMore.frame = CGRectMake(0.0f, CGRectGetHeight(self.view.bounds), CGRectGetWidth(self.view.bounds), k_height_keyboard);
+
+        }];
+    }
+    
+    
+    
+}
+-(void)scrollChatToBottom {
+    if ([self.cmutarrChatList count] > 3) {
+        NSIndexPath* cIndexPath = [NSIndexPath indexPathForRow: [self.cmutarrChatList count] - 1 inSection: 0];
+        [self.ctableViewChat scrollToRowAtIndexPath: cIndexPath atScrollPosition: UITableViewScrollPositionBottom animated: YES];
+    }
+    
+}
 
 @end
