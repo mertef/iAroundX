@@ -198,7 +198,10 @@
     
     
     CGRect srectFrameNew = CGRectMake(srectFrameOrigin.origin.x, CGRectGetMaxY(srectFrameOrigin) - (accViewChatInput.sRectBoundContent.size.height + sEdgeInset.top + sEdgeInset.bottom + 8.0f + sEdgeInsetContent.top + sEdgeInsetContent.bottom), srectFrameOrigin.size.width, accViewChatInput.sRectBoundContent.size.height + sEdgeInset.top + sEdgeInset.bottom + 8.0f + sEdgeInsetContent.top + sEdgeInsetContent.bottom);
-                
+    
+    if (srectFrameNew.size.height == srectFrameOrigin.size.height) {
+        return;
+    }
     self.ccViewChatInput.frame = srectFrameNew;
 }
 

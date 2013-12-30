@@ -120,15 +120,17 @@
     if (self.sRectBoundContent.size.height == srectNew.size.height) {
         return;
     }
-    NSLog(@"%@", NSStringFromCGRect(srectNew));
+
 
     self.sRectBoundContent = srectNew;
     CGFloat fMaxHeight =  _fMaxNumberOfLines * (_ctextViewInput.font.lineHeight);
-    NSLog(@"fheight is %f", fMaxHeight);
     if (srectNew.size.height  > fMaxHeight) {
         [_ctextViewInput setContentOffset:CGPointMake(0.0f, srectNew.size.height  - fMaxHeight)];
+        _ctextViewInput.showsVerticalScrollIndicator = YES;
         return;
     }else {
+        _ctextViewInput.showsVerticalScrollIndicator = NO;
+
         [NSObject cancelPreviousPerformRequestsWithTarget:self.idProtoViewChat selector:@selector(didTextFrameChange:) object:self];
         if ([self.idProtoViewChat respondsToSelector:@selector(didTextFrameChange:)]) {
             [self.idProtoViewChat performSelector:@selector(didTextFrameChange:) withObject:self];
