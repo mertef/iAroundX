@@ -343,8 +343,8 @@
 				0BC9F7E41868376E00B91CC1 /* DLChatTableViewCtrl.m */,
 				0BDA3EC21861537F00DCBAFC /* DLAudio.h */,
 				0BDA3EC31861537F00DCBAFC /* DLAudio.m */,
-				0BB65FD51869239900C60CB0 /* DLViewChatInput.m */,
 				0BB65FD41869239900C60CB0 /* DLViewChatInput.h */,
+				0BB65FD51869239900C60CB0 /* DLViewChatInput.m */,
 			);
 			name = chat;
 			sourceTree = "<group>";
