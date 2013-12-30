@@ -47,7 +47,6 @@
 - (void)dealloc
 {
     
-    [self.ccViewChatInput.ctextViewInput removeObserver:self forKeyPath:@"contentSize" context:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
@@ -153,7 +152,7 @@
     
     self.ccViewChatInput = [[DLViewChatInput alloc] initWithFrame:CGRectMake(0.0f,  CGRectGetHeight(self.view.bounds) - k_height_input, CGRectGetWidth(self.view.bounds),k_height_input)];
     _ccViewChatInput.idProtoViewChat = self;
-    [_ccViewChatInput.ctextViewInput addObserver:self forKeyPath:@"contentSize" options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:nil];
+//    [_ccViewChatInput.ctextViewInput addObserver:self forKeyPath:@"sRectBoundContent" options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:nil];
     [self.view addSubview:_ccViewChatInput];
     
      UIView* cviewBg = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.view.bounds), 20.0f)];
@@ -162,38 +161,47 @@
 	// Do any additional setup after loading the view.
 }
 -(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
-    if ([keyPath isEqualToString:@"contentSize"]) {
+    if ([keyPath isEqualToString:@"sRectBoundContent"]) {
         NSValue* cValueSizeNew = [change objectForKey:NSKeyValueChangeNewKey];
         NSValue* cValueSizeOld = [change objectForKey:NSKeyValueChangeOldKey];
 
-        CGSize sSize = [cValueSizeNew CGSizeValue];
-        CGSize sSizeOld = [cValueSizeOld CGSizeValue];
+        CGRect srectInputFrameOrigin = [cValueSizeOld CGRectValue];
+        CGRect srectInputFrameNew = [cValueSizeNew CGRectValue];
         
-        
-        if (sSizeOld.height == sSize.height) {
+        UIEdgeInsets sEdgeInset = [self.ccViewChatInput.ctextViewInput textContainerInset];
+
+      
+        if (srectInputFrameOrigin.size.height == srectInputFrameNew.size.height) {
             return;
         }
 
-        NSLog(@"the input size is %@", NSStringFromCGSize(sSize));
-        CGRect srectFrame = self.ccViewChatInput.frame;
+       srectInputFrameNew.size = CGSizeMake(srectInputFrameNew.size.width + sEdgeInset.left + sEdgeInset.right, srectInputFrameNew.size.height + sEdgeInset.top + sEdgeInset.bottom);
+        
+        NSLog(@"the input size is %@", NSStringFromCGRect(srectInputFrameNew));
         
 
-        if (sSize.height == 60.0f) {
-                self.ccViewChatInput.frame = CGRectMake(srectFrame.origin.x, srectFrame.origin.y + srectFrame.size.height - sSize.height - 8.0f, srectFrame.size.width, 60.0f + 8.0f);
+        self.ccViewChatInput.frame = CGRectMake(srectInputFrameOrigin.origin.x, srectInputFrameOrigin.origin.y + srectInputFrameOrigin.size.height - srectInputFrameNew.size.height - 8.0f, srectInputFrameNew.size.width, srectInputFrameNew.size.height + 8.0f);
 
-        }else if(sSize.height == 82.0f){
-                self.ccViewChatInput.frame = CGRectMake(srectFrame.origin.x, srectFrame.origin.y + srectFrame.size.height - sSize.height - 8.0f, srectFrame.size.width, 82 + 8.0f);
-
-        }else if(sSize.height == 38.0f) {
-                self.ccViewChatInput.frame = CGRectMake(srectFrame.origin.x, srectFrame.origin.y + srectFrame.size.height - sSize.height - 8.0f, srectFrame.size.width, 38 + 8.0f);
-
-        }
-        
        
         return;
     }
     [super observeValueForKeyPath:keyPath ofObject:object change:change context:nil];
 }
+
+-(void)didTextFrameChange:(DLViewChatInput*)accViewChatInput {
+    
+    CGRect srectFrameOrigin = accViewChatInput.frame;
+    
+    UIEdgeInsets sEdgeInset = [self.ccViewChatInput.ctextViewInput textContainerInset];
+    UIEdgeInsets sEdgeInsetContent = [self.ccViewChatInput.ctextViewInput contentInset];
+
+    
+    
+    CGRect srectFrameNew = CGRectMake(srectFrameOrigin.origin.x, CGRectGetMaxY(srectFrameOrigin) - (accViewChatInput.sRectBoundContent.size.height + sEdgeInset.top + sEdgeInset.bottom + 8.0f + sEdgeInsetContent.top + sEdgeInsetContent.bottom), srectFrameOrigin.size.width, accViewChatInput.sRectBoundContent.size.height + sEdgeInset.top + sEdgeInset.bottom + 8.0f + sEdgeInsetContent.top + sEdgeInsetContent.bottom);
+                
+    self.ccViewChatInput.frame = srectFrameNew;
+}
+
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];

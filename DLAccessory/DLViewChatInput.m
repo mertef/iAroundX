@@ -9,6 +9,9 @@
 #import "DLViewChatInput.h"
 #import "DLMCConfig.h"
 #import "DLAudio.h"
+@interface DLViewChatInput()
+-(void)computeContentBound;
+@end;
 
 @implementation DLViewChatInput
 
@@ -17,16 +20,21 @@
     self = [super initWithFrame:frame];
     if (self) {
         // Initialization code
-        _ctextViewInput = [[UITextView alloc] initWithFrame:CGRectMake(4.0f + 66.0f, CGRectGetHeight(self.frame) - k_text_input_height - 4.0f, CGRectGetWidth(self.bounds) - 66.0f * 2.0f,k_text_input_height)];
+
+        _ctextViewInput = [[UITextView alloc] init];
         _ctextViewInput.layer.cornerRadius = 4.0f;
+        _ctextViewInput.textContainerInset = UIEdgeInsetsMake(2.0f, 2.0f, 2.0f, 2.0f);
         _ctextViewInput.layer.borderColor = [UIColor orangeColor].CGColor;
-        _ctextViewInput.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+        _ctextViewInput.font = [[UIFont preferredFontForTextStyle:UIFontTextStyleBody] fontWithSize:20.0f];
         _ctextViewInput.layer.borderWidth = 1.0f;
         _ctextViewInput.returnKeyType = UIReturnKeySend;
         _ctextViewInput.delegate =self;
         
+        CGFloat fHeight = _ctextViewInput.textContainerInset.top + _ctextViewInput.textContainerInset.bottom + _ctextViewInput.font.lineHeight;
+        
+        _ctextViewInput.frame = CGRectMake(4.0f + 66.0f, 4.0f + (CGRectGetHeight(self.frame) - fHeight  - 8.0f) * 0.5f, CGRectGetWidth(self.bounds) - 66.0f * 2.0f,fHeight);
+        self.sRectBoundContent = CGRectMake(0.0f, 0.0f, CGRectGetWidth(_ctextViewInput.bounds), _ctextViewInput.font.lineHeight);
         [self addSubview:_ctextViewInput];
-        NSLog(@"line height is %f", _ctextViewInput.font.lineHeight);
         self.backgroundColor = [UIColor darkGrayColor];
         
         self.cbtnSend = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -36,7 +44,8 @@
         [_cbtnSend addTarget:self action:@selector(actionMore:) forControlEvents:UIControlEventTouchUpInside];
         [self addSubview:_cbtnSend];
         
-        
+        _fMaxNumberOfLines = 3.0f;
+        _uMaxNubmerOfCharacter = 1024;
         self.ccAudio = [[DLAudio alloc] initWithFrame:CGRectMake(4.0f, CGRectGetHeight(self.frame) - k_text_input_height - 4.0f,CGRectGetWidth(self.frame) - CGRectGetMaxX(_ctextViewInput.frame) - 6.0f, k_text_input_height)];
       
         [self addSubview:_ccAudio];
@@ -46,20 +55,20 @@
 }
 -(void)layoutSubviews {
     
-    [super layoutSubviews];
-    CGSize sSizeContent = _ctextViewInput.contentSize;
+    [super layoutSubviews];    
     
-    if (sSizeContent.height == 60.0f) {
-        _ctextViewInput.frame = CGRectMake(4.0f + 66.0f, CGRectGetHeight(self.frame) - 60.0f - 4.0f, CGRectGetWidth(self.bounds) - 66.0f * 2.0f, 60.0f);
-        [_ctextViewInput layoutIfNeeded];
-    }else if(sSizeContent.height == 82.0f){
-        _ctextViewInput.frame = CGRectMake(4.0f+ 66.0f, CGRectGetHeight(self.frame) - 82.0f - 4.0f, CGRectGetWidth(self.bounds) - 66.0f * 2.0f, 82.0f);
-        [_ctextViewInput layoutIfNeeded];
-    }else if(sSizeContent.height == 38.0f) {
-        _ctextViewInput.frame = CGRectMake(4.0f+ 66.0f, CGRectGetHeight(self.frame) - 38.0f - 4.0f, CGRectGetWidth(self.bounds) - 66.0f * 2.0f, 38.0f);
-        [_ctextViewInput layoutIfNeeded];
+    CGFloat fHeight = 0.0f;
+    if (self.sRectBoundContent.size.height == 0.0f) {
+        fHeight = _ctextViewInput.font.lineHeight + _ctextViewInput.textContainerInset.top + _ctextViewInput.textContainerInset.bottom;
+    }else {
+        fHeight  = self.sRectBoundContent.size.height + _ctextViewInput.textContainerInset.top + _ctextViewInput.textContainerInset.bottom;
     }
-    self.cbtnSend.frame = CGRectMake(CGRectGetMaxX(_ctextViewInput.frame) + 3.0f, CGRectGetHeight(self.frame) - k_text_input_height - 4.0f ,CGRectGetWidth(self.frame) - CGRectGetMaxX(_ctextViewInput.frame) - 6.0f, k_text_input_height);
+
+    if (self.sRectBoundContent.size.height <= 3.0f * _fMaxNumberOfLines * (_ctextViewInput.font.lineHeight + _ctextViewInput.textContainerInset.top + _ctextViewInput.textContainerInset.bottom)) {
+       _ctextViewInput.frame = CGRectMake(4.0f+ 66.0f, 4.0f + (CGRectGetHeight(self.frame) -fHeight - 8.0f) * 0.5f, CGRectGetWidth(self.bounds) - 66.0f * 2.0f, fHeight);
+        
+        self.cbtnSend.frame = CGRectMake(CGRectGetMaxX(_ctextViewInput.frame) + 3.0f, CGRectGetHeight(self.frame) - k_text_input_height - 4.0f ,CGRectGetWidth(self.frame) - CGRectGetMaxX(_ctextViewInput.frame) - 6.0f, k_text_input_height);
+    }
 }
 /*
 // Only override drawRect: if you perform custom drawing.
@@ -85,11 +94,48 @@
 
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
     
+    BOOL bShouldChange = YES;
     if([text isEqualToString:@"\n"]) {
         [self performSelector:@selector(actionSendMsg:) withObject:nil afterDelay:0.0f];
         return NO;
     }
-    
-    return YES;
+    if ([textView.text length] > self.uMaxNubmerOfCharacter) {
+        bShouldChange = NO;
+    }
+    if (bShouldChange) {
+        [self computeContentBound];
+    }
+    return bShouldChange;
 }
+-(void)computeContentBound {
+    NSString* cstrText = [_ctextViewInput text];
+    UIEdgeInsets sEdgeInset = [_ctextViewInput textContainerInset];
+    NSMutableParagraphStyle* cmutParagrahStyle = [[NSMutableParagraphStyle alloc] init];
+    cmutParagrahStyle.lineBreakMode = NSLineBreakByWordWrapping;
+    
+    UIEdgeInsets sEdgeInsetContent = _ctextViewInput.textContainerInset;
+
+    CGRect srectNew =  [cstrText boundingRectWithSize:CGSizeMake(CGRectGetWidth(_ctextViewInput.frame) - sEdgeInset.left - sEdgeInset.right - sEdgeInsetContent.left - sEdgeInsetContent.right - _ctextViewInput.textContainer.lineFragmentPadding * 2, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName: _ctextViewInput.font, NSParagraphStyleAttributeName: cmutParagrahStyle} context:nil];
+    
+    if (self.sRectBoundContent.size.height == srectNew.size.height) {
+        return;
+    }
+    NSLog(@"%@", NSStringFromCGRect(srectNew));
+
+    self.sRectBoundContent = srectNew;
+    CGFloat fMaxHeight =  _fMaxNumberOfLines * (_ctextViewInput.font.lineHeight);
+    NSLog(@"fheight is %f", fMaxHeight);
+    if (srectNew.size.height  > fMaxHeight) {
+        [_ctextViewInput setContentOffset:CGPointMake(0.0f, srectNew.size.height  - fMaxHeight)];
+        return;
+    }else {
+        [NSObject cancelPreviousPerformRequestsWithTarget:self.idProtoViewChat selector:@selector(didTextFrameChange:) object:self];
+        if ([self.idProtoViewChat respondsToSelector:@selector(didTextFrameChange:)]) {
+            [self.idProtoViewChat performSelector:@selector(didTextFrameChange:) withObject:self];
+        }
+    }
+    
+    
+}
+
 @end
