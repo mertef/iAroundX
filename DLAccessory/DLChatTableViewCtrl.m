@@ -65,6 +65,9 @@
         CGRect srectFrameInput = self.ccViewChatInput.frame;
         srectFrameInput.origin.y = CGRectGetMinY(srectFrameEnd) - CGRectGetHeight(srectFrameInput);
         self.ccViewChatInput.frame = srectFrameInput;
+        CGRect srectMore = self.ccViewMore.frame;
+        srectMore.origin.y = CGRectGetHeight(self.view.bounds);
+        self.ccViewMore.frame = srectMore;
     } completion:^(BOOL abFinished){
         [self scrollChatToBottom];
     }];
@@ -88,6 +91,9 @@
             CGRect srectFrameInput = self.ccViewChatInput.frame;
             srectFrameInput.origin.y = CGRectGetHeight(self.view.bounds) - CGRectGetHeight(srectFrameInput);
             self.ccViewChatInput.frame = srectFrameInput;
+            CGRect srectMore = self.ccViewMore.frame;
+            srectMore.origin.y = CGRectGetHeight(self.view.bounds);
+            self.ccViewMore.frame = srectMore;
         }];
     }
     
@@ -261,12 +267,13 @@
     
     if (!self.ccViewMore) {
         self.ccViewMore = [[DLViewMore alloc] initWithFrame: CGRectMake(0.0f, CGRectGetHeight(self.view.bounds), CGRectGetWidth(self.view.bounds), k_height_keyboard)];
-        
-//        NSLog(@"view more init %@", NSStringFromCGRect(self.ccViewMore.frame));
-
     }
-    
+    CGFloat fHeight = CGRectGetHeight(self.view.bounds) - CGRectGetMaxY(self.ccViewChatInput.frame);
+
     self.bIsInputMode = !self.bIsInputMode;
+    if (fHeight < k_height_keyboard) {
+        self.bIsInputMode = NO;
+    }
     if (self.bIsInputMode) {
         [self.ccViewChatInput.ctextViewInput becomeFirstResponder];
 
@@ -284,7 +291,6 @@
         [self.view addSubview:self.ccViewMore];
         [self.view bringSubviewToFront:self.ccViewMore];
 
-        CGFloat fHeight = CGRectGetHeight(self.view.bounds) - CGRectGetMaxY(self.ccViewChatInput.frame);
         if ( fHeight <  k_height_keyboard) {
             [UIView animateWithDuration:0.5f animations:^(void){
                 self.ctableViewChat.frame = CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.view.bounds), CGRectGetHeight(self.view.bounds) - k_height_keyboard - CGRectGetHeight(self.ccViewChatInput.frame));
