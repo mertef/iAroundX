@@ -195,14 +195,29 @@
     UIEdgeInsets sEdgeInset = [self.ccViewChatInput.ctextViewInput textContainerInset];
     UIEdgeInsets sEdgeInsetContent = [self.ccViewChatInput.ctextViewInput contentInset];
 
+    CGRect srectBound = accViewChatInput.sRectBoundContent;
+    srectBound.size.height = ceilf(srectBound.size.height);
+    if ( srectBound.size.height < k_height_input) {
+        srectBound.size.height = k_height_input - (sEdgeInset.top + sEdgeInset.bottom + 8.0f + sEdgeInsetContent.top + sEdgeInsetContent.bottom);
+    }
+    srectBound.size.width = ceilf(srectBound.size.width);
+    srectBound.origin.x = ceilf(srectBound.origin.x);
+    srectBound.origin.y = ceilf(srectBound.origin.y);
     
     
-    CGRect srectFrameNew = CGRectMake(srectFrameOrigin.origin.x, CGRectGetMaxY(srectFrameOrigin) - (accViewChatInput.sRectBoundContent.size.height + sEdgeInset.top + sEdgeInset.bottom + 8.0f + sEdgeInsetContent.top + sEdgeInsetContent.bottom), srectFrameOrigin.size.width, accViewChatInput.sRectBoundContent.size.height + sEdgeInset.top + sEdgeInset.bottom + 8.0f + sEdgeInsetContent.top + sEdgeInsetContent.bottom);
+    CGRect srectFrameNew = CGRectMake(srectFrameOrigin.origin.x, CGRectGetMaxY(srectFrameOrigin) - (CGRectGetHeight(srectBound) + sEdgeInset.top + sEdgeInset.bottom + 8.0f + sEdgeInsetContent.top + sEdgeInsetContent.bottom), srectFrameOrigin.size.width, srectBound.size.height + sEdgeInset.top + sEdgeInset.bottom + 8.0f + sEdgeInsetContent.top + sEdgeInsetContent.bottom);
     
     if (srectFrameNew.size.height == srectFrameOrigin.size.height) {
         return;
     }
+    srectFrameNew.size.height = ceilf(srectFrameNew.size.height);
+    srectFrameNew.size.width = ceilf(srectFrameNew.size.width);
+    srectFrameNew.origin.x = ceilf(srectFrameNew.origin.x);
+    srectFrameNew.origin.y = ceilf(srectFrameNew.origin.y);
+    
+    
     self.ccViewChatInput.frame = srectFrameNew;
+    
 }
 
 - (void)didReceiveMemoryWarning

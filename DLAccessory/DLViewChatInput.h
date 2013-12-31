@@ -14,6 +14,8 @@
 -(void)didSendTextMsg:(DLViewChatInput*)accViewChatInput;
 -(void)didMorePressed:(DLViewChatInput*)accViewChatInput;
 -(void)didTextFrameChange:(DLViewChatInput*)accViewChatInput;
+-(void)didStartRecording:(DLViewChatInput*)accViewChatInput;
+-(void)didStopRecording:(DLViewChatInput*)accViewChatInput;
 @end
 @interface DLViewChatInput : UIView<UITextViewDelegate>
 @property(strong, nonatomic) UITextView* ctextViewInput;
@@ -22,8 +24,10 @@
 @property(assign, nonatomic) CGRect sRectBoundContent;
 @property(assign, nonatomic) CGFloat fMaxNumberOfLines;
 @property(assign, nonatomic) NSUInteger uMaxNubmerOfCharacter;
-
+@property(strong, nonatomic) UIImageView* cimageviewBg;
 @property(weak, nonatomic) id<DLViewChatInputProto> idProtoViewChat;
 -(void)actionSendMsg:(id)aidSender;
 -(void)actionMore:(id)aidSender;
+-(void)actionAudio:(id)asender;
+
 @end

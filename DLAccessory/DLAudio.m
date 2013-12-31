@@ -15,6 +15,7 @@
 @end
 @implementation DLAudio
 
+
 - (id)initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:frame];
@@ -31,6 +32,7 @@
         _cimageviewCenterActive = [[UIImageView alloc] initWithImage:cimageActive];
         [self addSubview:_cimageviewCenterActive];
         self.fProgress = 0.4f;
+        self.backgroundColor = [UIColor clearColor];
         
     }
     return self;
@@ -126,8 +128,12 @@
 }
 
 -(void)startAnimation {
-    
-    _c_timer_update = [NSTimer scheduledTimerWithTimeInterval:.2f target:self selector:@selector(actionTimerUpdate:) userInfo:nil repeats:YES];
+    if ([_c_timer_update isValid]) {
+        [self stopAnimation];
+    }else {
+        _b_should_stop = NO;
+      _c_timer_update = [NSTimer scheduledTimerWithTimeInterval:.2f target:self selector:@selector(actionTimerUpdate:) userInfo:nil repeats:YES];
+    }
     
 }
 -(void)actionTimerUpdate:(NSTimer*)acTimer {
@@ -135,8 +141,10 @@
         if (_b_should_stop) {
             [_c_timer_update invalidate];
             _c_timer_update = nil;
+            self.bIsAnimating = NO;
             return;
         }
+        self.bIsAnimating = YES;
 //        __weak typeof(self) _self = self;
         [UIView animateWithDuration:.2f animations:^(void){
             UIImage* cimageActive = [UIImage imageNamed:@"mic_center_active"];

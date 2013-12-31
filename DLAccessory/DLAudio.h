@@ -14,6 +14,7 @@
 }
 @property(strong, nonatomic) UIImageView* cimageviewBg, * cimageviewCenterNormal, * cimageviewCenterActive;
 @property(assign,readwrite) float fProgress;
+@property(assign, nonatomic) BOOL bIsAnimating;
 -(void)startAnimation;
 -(void)stopAnimation;
 @end
