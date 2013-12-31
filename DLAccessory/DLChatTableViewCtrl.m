@@ -13,6 +13,7 @@
 #import "DLViewMore.h"
 
 @interface DLChatTableViewCtrl ()
+-(void)initAvAudioRecroder;
 
 @end
 
@@ -46,7 +47,7 @@
 }
 - (void)dealloc
 {
-    
+    _c_str_audio_recording_path = nil;
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
@@ -128,9 +129,53 @@
     [super viewWillLayoutSubviews];
     
 }
+
+
+-(void)initAvAudioRecroder {
+    
+    AVAudioSession *audioSession = [AVAudioSession sharedInstance];
+    NSError *err = nil;
+    [audioSession setCategory :AVAudioSessionCategoryPlayAndRecord error:&err];
+    if(err){
+        NSLog(@"audioSession: %@ %ld %@", [err domain], (long)[err code], [[err userInfo] description]);
+        return;
+    }
+    err = nil;
+    int flags = AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation;
+    [audioSession setActive:YES withOptions:flags error:&err];
+    
+    if(err){
+        NSLog(@"audioSession: %@ %ld %@", [err domain], (long)[err code], [[err userInfo] description]);
+        return;
+    }
+    
+    if (!_c_audio_recorder) {
+        NSError* cerror = nil;
+        _c_str_audio_recording_path = [NSHomeDirectory() stringByAppendingFormat:@"/Documents/%@", k_default_recording_path];
+        _c_audio_recorder = [[AVAudioRecorder alloc] initWithURL:[NSURL fileURLWithPath:_c_str_audio_recording_path]
+                                                        settings:@{
+                                                                  AVFormatIDKey: @(kAudioFormatMPEG4AAC),
+                                                                  AVSampleRateKey:@(44100.0),
+                                                                  AVNumberOfChannelsKey:@(2),
+                                                                  AVEncoderAudioQualityKey: @(AVAudioQualityLow),
+                                                                  AVEncoderBitRateKey:@(16)
+                                                                  
+                                                                  }
+                                                           error:&cerror];
+        _c_audio_recorder.delegate = self;
+        if(cerror){
+            UIAlertView* cAlertMsg = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"k_error_audio", nil) message:NSLocalizedString(@"k_audio_disable", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"k_cancel", nil) otherButtonTitles:nil, nil];
+            [cAlertMsg show];
+            cAlertMsg = nil;
+        }
+    }
+   
+}
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    [self initAvAudioRecroder];
+
     self.tabBarController.tabBar.hidden = YES;
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didKeyBoardAppear:) name:UIKeyboardWillShowNotification object:nil];
@@ -145,7 +190,12 @@
     _ctableViewChat = [[UITableView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.view.bounds),CGRectGetHeight(self.view.bounds) - k_height_input)];
     _ctableViewChat.delegate =self;
     _ctableViewChat.dataSource = self;
+    _ctableViewChat.backgroundColor = [UIColor colorWithRed:0.9098 green:0.9098 blue:0.9098 alpha:1.0f];
+    _ctableViewChat.separatorStyle = UITableViewCellSeparatorStyleNone;
+
     UITapGestureRecognizer* ctapGes = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyBoard:)];
+    ctapGes.delegate = self;
+    ctapGes.delaysTouchesEnded = YES;
     [self.ctableViewChat addGestureRecognizer:ctapGes];
     
     [self.view addSubview:_ctableViewChat];
@@ -160,6 +210,10 @@
     self.ctableViewChat.tableFooterView = cviewBg;
 	// Do any additional setup after loading the view.
 }
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
+    return YES;
+}
+
 -(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
     if ([keyPath isEqualToString:@"sRectBoundContent"]) {
         NSValue* cValueSizeNew = [change objectForKey:NSKeyValueChangeNewKey];
@@ -248,6 +302,9 @@
     }
     
     DLTableCellChat* ccCellChat = (DLTableCellChat*)cell;
+    if ([indexPath row] == [self.cmutarrChatList count] - 1) {
+        [ccCellChat play];
+    }
     [ccCellChat feedDictionaryInfo:[self.cmutarrChatList objectAtIndex:[indexPath row]]];
     return cell;
 }
@@ -281,10 +338,14 @@
         }else {
             [accViewChatInput ctextViewInput].text = @"";
             NSDate* cdateNow = [NSDate date];
-            NSMutableDictionary* cmutdicItem = [[NSMutableDictionary alloc] initWithObjectsAndKeys:self.cdicPeerInfoTo[k_peer_id], k_chat_to, self.cdicPeerInfoFrom[k_peer_id], k_chat_from, cstrText, k_chat_msg, [NSNumber numberWithDouble:[cdateNow timeIntervalSince1970]], k_chat_date,nil];
+            NSMutableDictionary* cmutdicItem = [[NSMutableDictionary alloc] initWithObjectsAndKeys:self.cdicPeerInfoTo[k_peer_id], k_chat_to, self.cdicPeerInfoFrom[k_peer_id], k_chat_from, cdataTxt, k_chat_msg, [NSNumber numberWithDouble:[cdateNow timeIntervalSince1970]], k_chat_date, @(enum_package_type_short_msg), k_chat_msg_type, nil];
+            
             [self.cmutarrChatList addObject:cmutdicItem];
-            [self.ctableViewChat reloadData];
-            [self scrollChatToBottom];
+            dispatch_async(dispatch_get_main_queue(), ^(void){
+                [self.ctableViewChat reloadData];
+                [self scrollChatToBottom];
+            });
+          
         }
     }
 }
@@ -378,5 +439,99 @@
     }
     
 }
+
+-(void)didStartRecording:(DLViewChatInput*)accViewChatInput {
+    if ([_c_audio_recorder isRecording]) {
+        [_c_audio_recorder stop];
+    }
+    
+    BOOL abFlag = [_c_audio_recorder prepareToRecord];
+    
+    if(!abFlag) {
+        UIAlertView* cAlertMsg = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"k_error_audio", nil) message:NSLocalizedString(@"k_audio_disable", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"k_cancel", nil) otherButtonTitles:nil, nil];
+        [cAlertMsg show];
+    }
+    abFlag = [_c_audio_recorder record];
+    
+    
+    if(!abFlag) {
+        UIAlertView* cAlertMsg = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"k_error_audio", nil) message:NSLocalizedString(@"k_audio_disable", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"k_cancel", nil) otherButtonTitles:nil, nil];
+        [cAlertMsg show];
+    }
+}
+-(void)didStopRecording:(DLViewChatInput*)accViewChatInput {
+    //send
+    [_c_audio_recorder stop];
+    NSLog(@"---%@", [[_c_audio_recorder url] absoluteString]);
+    NSData* cdataAudio = [[NSData alloc] initWithContentsOfURL:_c_audio_recorder.url];
+
+    NSUInteger uiUsedLength = [cdataAudio length];
+    if (uiUsedLength == 0) {
+        return;
+    }
+    
+    T_PACKAGE_HEADER tPackageHeader;
+    tPackageHeader._u_l_package_type = enum_package_type_audio;
+    tPackageHeader._u_l_package_size = (int32_t)(sizeof(T_PACKAGE_HEADER) + uiUsedLength);
+    tPackageHeader._u_l_package_length = (int32_t)uiUsedLength;
+    tPackageHeader._u_l_current_offset = (int32_t)sizeof(T_PACKAGE_HEADER);
+    
+    NSData* cdataHeader = [NSData dataWithBytes:&tPackageHeader length:sizeof(tPackageHeader)];
+    
+    NSMutableData* cmutDataPackage = [[NSMutableData alloc] init];
+    [cmutDataPackage appendData:cdataHeader];
+    [cmutDataPackage appendData:cdataAudio];
+    NSLog(@"send sizie is %lu", (u_long)[cmutDataPackage length]);
+    
+    NSError* cError = nil;
+    [self.cMulPeerSession sendData:cmutDataPackage toPeers:@[self.cdicPeerInfoTo[k_peer_id]] withMode:MCSessionSendDataReliable error:&cError];
+    if (cError) {
+        UIAlertView* calertMsg = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"k_session_error", nil) message:NSLocalizedString(@"k_error_session_msg", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"k_cancel", nil) otherButtonTitles:nil, nil];
+        [calertMsg show];
+    }else {
+        NSDate* cdateNow = [NSDate date];
+        NSMutableDictionary* cmutdicItem = [[NSMutableDictionary alloc] initWithObjectsAndKeys:self.cdicPeerInfoTo[k_peer_id], k_chat_to, self.cdicPeerInfoFrom[k_peer_id], k_chat_from, cdataAudio, k_chat_msg, [NSNumber numberWithDouble:[cdateNow timeIntervalSince1970]], k_chat_date, @(enum_package_type_audio), k_chat_msg_type,nil];
+        
+        [self.cmutarrChatList addObject:cmutdicItem];
+        
+        dispatch_async(dispatch_get_main_queue(), ^(void){
+            [self.ctableViewChat reloadData];
+            [self scrollChatToBottom];
+        });
+       
+    }
+    
+    
+}
+#pragma mark - audio callback
+/* audioRecorderDidFinishRecording:successfully: is called when a recording has been finished or stopped. This method is NOT called if the recorder is stopped due to an interruption. */
+- (void)audioRecorderDidFinishRecording:(AVAudioRecorder *)recorder successfully:(BOOL)flag {
+    if (flag) {
+        [_c_audio_recorder stop];
+    }
+}
+
+/* if an error occurs while encoding it will be reported to the delegate. */
+- (void)audioRecorderEncodeErrorDidOccur:(AVAudioRecorder *)recorder error:(NSError *)error {
+    UIAlertView* cAlertMsg = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"k_error_audio", nil) message:NSLocalizedString(@"k_audio_disable", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"k_cancel", nil) otherButtonTitles:nil, nil];
+    [cAlertMsg show];
+    NSLog(@"%@", [error description]);
+
+}
+
+
+
+/* audioRecorderBeginInterruption: is called when the audio session has been interrupted while the recorder was recording. The recorded file will be closed. */
+- (void)audioRecorderBeginInterruption:(AVAudioRecorder *)recorder {
+    [recorder pause];
+}
+
+/* audioRecorderEndInterruption:withOptions: is called when the audio session interruption has ended and this recorder had been interrupted while recording. */
+/* Currently the only flag is AVAudioSessionInterruptionFlags_ShouldResume. */
+- (void)audioRecorderEndInterruption:(AVAudioRecorder *)recorder withOptions:(NSUInteger)flags {
+        [recorder record];
+}
+
+
 
 @end

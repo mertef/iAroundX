@@ -7,15 +7,20 @@
 //
 
 #import <UIKit/UIKit.h>
-
-@interface DLTableCellChat : UITableViewCell
+#import <AVFoundation/AVFoundation.h>
+@interface DLTableCellChat : UITableViewCell<AVAudioPlayerDelegate, UIGestureRecognizerDelegate> {
+    AVAudioPlayer* _c_aduio_player;
+}
 @property(strong, nonatomic) UIImageView* cimageViewIcon;
 @property(strong, nonatomic) UIImageView* cimageViewBg;
+@property(strong, nonatomic) UIImageView* cimageViewAudio;
 @property(strong, nonatomic) UILabel* clableMsg;
 @property(strong, nonatomic) UILabel* clableDate;
 @property(strong, nonatomic) NSDictionary* cdicInfo;
 @property(copy, nonatomic) NSString* cstrPeerFrom;
 -(void)feedDictionaryInfo:(NSDictionary*)acdicInfo;
 +(CGFloat)HeightForCell:(NSDictionary*)acdicInfo;
+
+-(void)play;
 
 @end

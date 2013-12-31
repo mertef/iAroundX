@@ -8,10 +8,14 @@
 
 #import <UIKit/UIKit.h>
 #import "DLViewChatInput.h"
+#import <AVFoundation/AVFoundation.h>
+
 @class MCSession;
 @class DLViewMore;
-@interface DLChatTableViewCtrl : UIViewController<UITableViewDelegate, UITableViewDataSource, DLViewChatInputProto>{
-    
+
+@interface DLChatTableViewCtrl : UIViewController<UITableViewDelegate, UITableViewDataSource, DLViewChatInputProto, AVAudioRecorderDelegate, UIGestureRecognizerDelegate>{
+    AVAudioRecorder* _c_audio_recorder;
+    NSString* _c_str_audio_recording_path;
 }
 @property(strong, nonatomic) UITableView* ctableViewChat;
 @property(strong, nonatomic) NSMutableArray* cmutarrChatList;

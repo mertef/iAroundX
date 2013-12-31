@@ -47,7 +47,9 @@
 #define k_height_input 44.0f
 #define k_text_input_height 36.0f
 #define k_height_keyboard 216.0f
+#define k_default_recording_path @"s.aac"
 
+#define k_noti_playing @"noti_playing_item"
 typedef NS_ENUM(int32_t, T_PACKAGE_TYPE) {
     enum_package_type_short_msg = 0x300,
     enum_package_type_image,

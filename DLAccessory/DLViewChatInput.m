@@ -116,6 +116,7 @@
     }
     
     if([text isEqualToString:@"\n"]) {
+        bShouldChange = NO;
         [self performSelector:@selector(actionSendMsg:) withObject:nil afterDelay:0.0f];
     }
     return bShouldChange;

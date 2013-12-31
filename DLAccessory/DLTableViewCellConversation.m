@@ -40,6 +40,11 @@
         
         _ccViewIndicator = [[DLViewIndicator alloc] init];
         [self.contentView addSubview:_ccViewIndicator];
+        
+        _cimageViewMsgType = [[UIImageView alloc] init];
+        _cimageViewMsgType.backgroundColor = [UIColor clearColor];
+        _cimageViewMsgType.contentMode = UIViewContentModeScaleAspectFit;
+        [self.contentView addSubview:_cimageViewMsgType];
 
     }
     return self;
@@ -61,10 +66,34 @@
     
     _cviewSeparator.frame = CGRectMake(CGRectGetMaxX(_clableName.frame) + 4.0f, CGRectGetHeight(self.contentView.frame) * 0.25f, 2.0f, CGRectGetHeight(self.contentView.frame) * 0.5f);
     
-    CGRect srectMsg = CGRectMake(CGRectGetMaxX(_cviewSeparator.frame) + 4.0f,0.0f,CGRectGetWidth(self.contentView.frame) - CGRectGetMaxX(_cviewSeparator.frame) - 32.0f - 8.0f,  CGRectGetHeight(self.contentView.frame) - 4.0f);
-    srectMsg.origin.y = (CGRectGetHeight(self.contentView.frame) - CGRectGetHeight(srectMsg)) * 0.5f;
+    NSDictionary* cdicItem = [self.cdicInfo[k_chat_list] lastObject];
+    NSNumber* cnumberMsgType = [cdicItem objectForKey:k_chat_msg_type];
+    switch ([cnumberMsgType intValue]) {
+        case enum_package_type_audio:
+        {
+            _cimageViewMsgType.frame = CGRectMake(CGRectGetMaxX(_cviewSeparator.frame) + 4.0f, (CGRectGetHeight(self.contentView.frame) - _cimageViewMsgType.image.size.height) * 0.5f, _cimageViewMsgType.image.size.width, _cimageViewMsgType.image.size.height);
+        }
+            break;
+        case enum_package_type_image:
+            break;
+        case enum_package_type_short_msg:
+        {
+            CGRect srectMsg = CGRectMake(CGRectGetMaxX(_cviewSeparator.frame) + 4.0f,0.0f,CGRectGetWidth(self.contentView.frame) - CGRectGetMaxX(_cviewSeparator.frame) - 32.0f - 8.0f,  CGRectGetHeight(self.contentView.frame) - 4.0f);
+            srectMsg.origin.y = (CGRectGetHeight(self.contentView.frame) - CGRectGetHeight(srectMsg)) * 0.5f;
+            
+            _clableMsgHint.frame = srectMsg;
+        }
+            break;
+        case enum_package_type_stream:
+            break;
+        case enum_package_type_video:
+            break;
+        default:
+            break;
+    }
 
-    _clableMsgHint.frame = srectMsg;
+    
+    
 //    NSLog(@"msg hint frame %@", NSStringFromCGRect(srectMsg));
     _ccViewIndicator.frame = CGRectMake(CGRectGetWidth(self.contentView.frame) - 32.0f  - 2.0f, (CGRectGetHeight(self.contentView.frame) - 32.0f) * 0.5f, 32.0f, 32.0f);
     
@@ -72,11 +101,43 @@
 -(void)feedInfo:(NSDictionary*)acdic {
     self.cdicInfo = acdic;
     NSString* cstrPeerName = [acdic objectForKey:k_chat_from_name];
-    NSString* cstrMsg = [[self.cdicInfo[k_chat_list] lastObject] objectForKey:k_chat_msg];
+    _clableName.text = cstrPeerName;
+    _clableName.hidden = YES;
+    NSDictionary* cdicItem = [self.cdicInfo[k_chat_list] lastObject];
+    NSNumber* cnumberMsgType = [cdicItem objectForKey:k_chat_msg_type];
+    _cimageViewMsgType.hidden = YES;
+    switch ([cnumberMsgType intValue]) {
+        case enum_package_type_audio:
+            _cimageViewMsgType.hidden = NO;
+            _cimageViewMsgType.image = [UIImage imageNamed:@"audio"];
+        break;
+        case enum_package_type_image: {
+            _cimageViewMsgType.hidden = NO;
+        }
+        break;
+        case enum_package_type_short_msg:
+        {
+            _cimageViewMsgType.hidden = YES;
+            _clableName.hidden = NO;
+            NSString* cstrMsg =  [[NSString alloc] initWithData:cdicItem[k_chat_msg] encoding:NSUTF8StringEncoding];
+            _clableMsgHint.text = cstrMsg;
+        }
+            break;
+        case enum_package_type_stream: {
+            _cimageViewMsgType.hidden = NO;
+        }
+        break;
+        case enum_package_type_video: {
+            _cimageViewMsgType.hidden = NO;
+        }
+        break;
+        default:
+            break;
+    }
+    
+  
     _ccViewIndicator.cnumberIndicator = @([self.cdicInfo[k_chat_list] count]);
     [_ccViewIndicator setNeedsDisplay];
 
-    _clableName.text = cstrPeerName;
-    _clableMsgHint.text = cstrMsg;
 }
 @end

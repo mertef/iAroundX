@@ -10,8 +10,6 @@
 #import "DLMCConfig.h"
 #import "DLImageViewCtrl.h"
 #import "DLItemTableViewCell.h"
-#import "ProgressHUD.h"
-#import "MBProgressHUD.h"
 #import <QuartzCore/QuartzCore.h>
 #import "DLTableCellPopoutView.h"
 #import <MobileCoreServices/MobileCoreServices.h>
@@ -20,6 +18,7 @@
 #import "XHLoginViewController4.h"
 #import "DLFolderViewViewCtrl.h"
 #import "DLChatTableViewCtrl.h"
+#import "MBProgressHUD.h"
 
 @interface DLMPViewCtrl ()
 
@@ -222,7 +221,7 @@
 // Remote peer changed state
 - (void)session:(MCSession *)session peer:(MCPeerID *)peerID didChangeState:(MCSessionState)state {
     if (self.cpeerIdGoingtoConnect && [peerID isEqual:self.cpeerIdGoingtoConnect]) {
-        [ProgressHUD dismiss];
+      
     }
     NSLog(@"sesion did change state %d", [@(state) intValue]);
     if (state == MCSessionStateConnected) {
@@ -240,12 +239,12 @@
         }
        
     }else if(state == MCSessionStateConnecting) {
-        [ProgressHUD show:NSLocalizedString(@"k_connecting", nil)];
+     
     }else if(state == MCSessionSendDataReliable) {
-        [ProgressHUD show:NSLocalizedString(@"k_send_data_reliable", nil)];
+
 
     }else if(state == MCSessionSendDataUnreliable) {
-        [ProgressHUD show:NSLocalizedString(@"k_send_data_unreliable", nil)];
+       
     }
     
     dispatch_async(dispatch_get_main_queue(), ^(void){
@@ -268,17 +267,24 @@
     [cdataHeader getBytes:puPackage];
     
     
-    if (puPackage->_u_l_package_type == enum_package_type_short_msg) {
+    if (puPackage->_u_l_package_type == enum_package_type_short_msg ||
+        
+        puPackage->_u_l_package_type == enum_package_type_audio ||
+        
+        puPackage->_u_l_package_type == enum_package_type_image) {
         NSData* cdataMsg = [data subdataWithRange:NSMakeRange(sizeof(T_PACKAGE_HEADER), puPackage->_u_l_package_length)];
+        NSLog(@"data size is %lu", (unsigned long)[cdataMsg length]);
         [self.cmutData appendData:cdataMsg];
     }
     
     if (puPackage->_u_l_package_size == (puPackage->_u_l_package_length + puPackage->_u_l_current_offset)) {
-        NSString* cstrMsg = [[NSString alloc] initWithData:self.cmutData encoding:NSUTF8StringEncoding];
-        NSLog(@"received short msg from %@ : %@", [peerID displayName], cstrMsg);
+        if (puPackage->_u_l_package_type == enum_package_type_short_msg) {
+            NSString* cstrMsg = [[NSString alloc] initWithData:self.cmutData  encoding:NSUTF8StringEncoding];
+            NSLog(@"received short msg from %@ : %@", [peerID displayName], cstrMsg);
+        }
         NSDictionary* cdicChatItem = @{k_chat_from:peerID,
                                        k_chat_to:self.cpeerId,
-                                       k_chat_msg:cstrMsg,
+                                       k_chat_msg:[[NSMutableData alloc ] initWithData:self.cmutData],
                                        k_chat_msg_type:@(puPackage->_u_l_package_type),
                                        k_chat_date: @([[NSDate date] timeIntervalSince1970])
                                        };
@@ -673,12 +679,10 @@
             NSArray* carrList = [self.cmutarrRemtoePeerIdsConnected filteredArrayUsingPredicate:cPredicate];
             if ([carrList count] == 0 ) {
                 self.cpeerIdGoingtoConnect = cPeerId;
-                [ProgressHUD show:NSLocalizedString(@"k_connect_to_device", nil)];
+
                 [_cnearbyServiceBrowser invitePeer:cdicPeerItem[k_peer_id] toSession:_csession withContext:nil timeout:30.0f];
             }else {
                 self.cpeerIdGoingtoConnect = nil;
-                [ProgressHUD show:NSLocalizedString(@"k_already_connect_to_device", nil)];
-                [ProgressHUD dismiss];
             }
             
             

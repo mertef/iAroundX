@@ -17,6 +17,8 @@
 {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
+        self.contentView.backgroundColor = [UIColor clearColor];
+        self.backgroundColor = [UIColor clearColor];
         // Initialization code
         _cimageViewIcon = [[UIImageView alloc] init];
         [self.contentView addSubview:_cimageViewIcon];
@@ -28,21 +30,50 @@
         _clableMsg.numberOfLines = 0;
         _clableMsg.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
         _clableMsg.lineBreakMode = NSLineBreakByCharWrapping;
+        _clableMsg.backgroundColor = [UIColor clearColor];
         
         [_cimageViewBg addSubview:_clableMsg];
+        _cimageViewBg.userInteractionEnabled = YES;
         
         
         _clableDate = [[UILabel alloc] init];
         _clableDate.numberOfLines = 1;
-        _clableDate.font = [UIFont preferredFontForTextStyle:UIFontTextStyleFootnote];
+        _clableDate.backgroundColor = [UIColor clearColor];
+        _clableDate.font = [[UIFont preferredFontForTextStyle:UIFontTextStyleFootnote] fontWithSize:12.0f];
+        _clableDate.textColor = [UIColor darkTextColor];
         [self.contentView addSubview:_clableDate];
         
+        _cimageViewAudio = [[UIImageView alloc] init];
+        _cimageViewAudio.contentMode = UIViewContentModeScaleAspectFit;
+        _cimageViewAudio.backgroundColor = [UIColor clearColor];
+        _cimageViewAudio.image = [UIImage imageNamed:@"VoiceNodePlaying"];
+        _cimageViewAudio.animationImages = @[[UIImage imageNamed:@"VoiceNodePlaying001"],[UIImage imageNamed:@"VoiceNodePlaying002"],[UIImage imageNamed:@"VoiceNodePlaying003"] ];
+        _cimageViewAudio.animationDuration = 1.0f;
+        _cimageViewAudio.animationRepeatCount = MAXFLOAT;
+        _cimageViewAudio.userInteractionEnabled = YES;
+
+        UITapGestureRecognizer* cTapGesPlay = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(actionPlay:)];
+        cTapGesPlay.delegate = self;
+        [_cimageViewBg addGestureRecognizer:cTapGesPlay];
         
+        [_cimageViewBg addSubview:_cimageViewAudio];
+        _cimageViewAudio.hidden = YES;
 
-
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(actionNotiPlaying:) name:k_noti_playing object:nil];
         
     }
     return self;
+}
+
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
+    return YES;
+}
+
+
+- (void)dealloc
+{
+    _c_aduio_player = nil;
 }
 -(void)layoutSubviews {
     [super layoutSubviews];
@@ -55,10 +86,19 @@
     
     NSString* cstrFrom = [cPeerIdFrom displayName];
     CGSize sSizeImage = _cimageViewIcon.image.size;
-
-    NSString* cstrMsg = self.cdicInfo[k_chat_msg];
+    CGRect srectBoundMsg = CGRectZero;
     
-    CGRect srectBoundMsg = [cstrMsg boundingRectWithSize:CGSizeMake(200.0f, MAXFLOAT) options:NSStringDrawingUsesFontLeading | NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName: _clableMsg.font} context:nil];
+    NSNumber* cnumberMsgType = self.cdicInfo[k_chat_msg_type];
+    if ([cnumberMsgType intValue] == enum_package_type_short_msg) {
+        NSString* cstrMsg = [[NSString alloc] initWithData:self.cdicInfo[k_chat_msg] encoding:NSUTF8StringEncoding];
+
+        srectBoundMsg = [cstrMsg boundingRectWithSize:CGSizeMake(200.0f, MAXFLOAT) options:NSStringDrawingUsesFontLeading | NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName: _clableMsg.font} context:nil];
+    }else if([cnumberMsgType intValue] == enum_package_type_audio) {
+        srectBoundMsg = CGRectMake(0.0f, 0.0f, 150.0f, 30.0f);
+    }else if([cnumberMsgType intValue] == enum_package_type_image) {
+         srectBoundMsg = CGRectMake(0.0f, 0.0f, 150.0f, 60.0f);
+    }
+   
     
     if ([cstrFrom isEqualToString:self.cstrPeerFrom]) { //image icon is in left
         _cimageViewIcon.frame = CGRectMake(4.0f, 4.0f + (fHeight - fYOffset - sSizeImage.height) * 0.5f, sSizeImage.width, sSizeImage.height);
@@ -67,13 +107,18 @@
         
     }else { //image icon is in right
         _cimageViewIcon.frame = CGRectMake(fWidth - 4.0f - sSizeImage.width, 4.0f + (fHeight - fYOffset - sSizeImage.height) * 0.5f, sSizeImage.width, sSizeImage.height);
-        _cimageViewBg.frame = CGRectMake(CGRectGetMinX(_cimageViewIcon.frame) -2.0f - srectBoundMsg.size.width, 4.0f, srectBoundMsg.size.width, srectBoundMsg.size.height);
+        CGRect srectImageBg = CGRectMake(CGRectGetMinX(_cimageViewIcon.frame) -2.0f - srectBoundMsg.size.width, 4.0f, srectBoundMsg.size.width, srectBoundMsg.size.height);
+        _cimageViewBg.frame = srectImageBg;
         _clableMsg.textAlignment = NSTextAlignmentRight;
     }
-    _clableMsg.frame = _cimageViewBg.bounds;
     
+    if ([cnumberMsgType intValue] == enum_package_type_short_msg) {
+        _clableMsg.frame = _cimageViewBg.bounds;
+    }
+    _cimageViewAudio.frame = CGRectMake((CGRectGetWidth(_cimageViewBg.bounds) - _cimageViewAudio.image.size.width) * 0.5f, (CGRectGetHeight(_cimageViewBg.bounds) - _cimageViewAudio.image.size.height) * 0.5f, _cimageViewAudio.image.size.width, _cimageViewAudio.image.size.height);
+    
+
     _clableDate.frame = CGRectMake(CGRectGetMinX(_cimageViewBg.frame), CGRectGetMaxY(_cimageViewBg.frame) + 2.0f, 100.0f, 20.0f);
-    
     
 }
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated
@@ -85,35 +130,124 @@
 -(void)feedDictionaryInfo:(NSDictionary*)acdicInfo {
     
     self.cdicInfo = acdicInfo;
+//    NSLog(@"%@", [self.cdicInfo description]);
+    
+    NSNumber* cnumberMsgType = self.cdicInfo[k_chat_msg_type];
+
     NSString* cstrPeopleHeaderIcon = acdicInfo[k_chat_from_header_icon];
     if (!cstrPeopleHeaderIcon) {
         cstrPeopleHeaderIcon = k_people_icon_default;
     }
 #pragma mark - fix me need remote icon
+    _c_aduio_player = nil;
     
     UIImage* cimageIconDefault = [UIImage imageNamed:cstrPeopleHeaderIcon];
     _cimageViewIcon.image = cimageIconDefault;
+    _cimageViewBg.image = nil;
+    _cimageViewBg.animationImages = nil;
+    _cimageViewAudio.hidden = YES;
     
-    NSString* cstrMsg = acdicInfo[k_chat_msg];
+    if ([cnumberMsgType intValue] == enum_package_type_short_msg) {
+        NSLog(@"msg type is msg");
+        NSString* cstrMsg = [[NSString alloc] initWithData:acdicInfo[k_chat_msg] encoding:NSUTF8StringEncoding];
+        _clableMsg.text = cstrMsg;
+    }else if([cnumberMsgType intValue] == enum_package_type_audio) {
+        _cimageViewAudio.hidden = NO;
+
+        if (!_c_aduio_player) {
+            NSError* cError = nil;
+            NSData* cData = acdicInfo[k_chat_msg];
+//            NSLog(@"playing ---- data length is %lu", (unsigned long)[cData length]);
+            _c_aduio_player = [[AVAudioPlayer alloc] initWithData:cData error:&cError];
+            _c_aduio_player.delegate = self;
+            if (cError) {
+                NSLog(@"can't play audio %@", [cError description]);
+            }else {
+                //stop other playing
+                [[NSNotificationCenter defaultCenter] postNotificationName:k_noti_playing object:nil userInfo:self.cdicInfo];
+                [_cimageViewAudio startAnimating];
+            }
+        }
+
+            NSLog(@"msg type is audio");
+    }else if([cnumberMsgType intValue] == enum_package_type_image) {
+                NSLog(@"msg type is image");
+    }
     NSNumber* cnumberDate = acdicInfo[k_chat_date];
-    
-    _clableMsg.text = cstrMsg;
-    
     
     _clableDate.text = [Common FormatDateLong:[cnumberDate doubleValue]];
     
     
-    
 }
+
+-(void)play {
+    if (_c_aduio_player) {
+        [_c_aduio_player play];
+    }
+}
+
 +(CGFloat)HeightForCell:(NSDictionary*)acdicInfo {
     
     CGFloat fHeight = 20.0f + 8.0f;
-    NSString* cstrMsg = acdicInfo[k_chat_msg];
-
-    CGRect srectBoundMsg = [cstrMsg boundingRectWithSize:CGSizeMake(200.0f, MAXFLOAT) options:NSStringDrawingUsesFontLeading | NSStringDrawingUsesLineFragmentOrigin  attributes:@{NSFontAttributeName: [UIFont preferredFontForTextStyle:UIFontTextStyleBody]} context:nil];
-    fHeight += CGRectGetHeight(srectBoundMsg);
+    NSNumber* cnumberMsgType = acdicInfo[k_chat_msg_type];
+    if ([cnumberMsgType intValue] == enum_package_type_short_msg) {
+        NSString* cstrMsg = [[NSString alloc] initWithData:acdicInfo[k_chat_msg] encoding:NSUTF8StringEncoding];
+        
+        CGRect srectBoundMsg = [cstrMsg boundingRectWithSize:CGSizeMake(200.0f, MAXFLOAT) options:NSStringDrawingUsesFontLeading | NSStringDrawingUsesLineFragmentOrigin  attributes:@{NSFontAttributeName: [UIFont preferredFontForTextStyle:UIFontTextStyleBody]} context:nil];
+        fHeight += CGRectGetHeight(srectBoundMsg);
+        if (srectBoundMsg.size.width < 150.0f) {
+            srectBoundMsg.size.width = 150.0f;
+        }
+    }else if ( [cnumberMsgType intValue] == enum_package_type_audio){
+        fHeight += 30.0f;
+    }else if ( [cnumberMsgType intValue] == enum_package_type_image){
+        fHeight += 60.0f;
+    }
+   
     
     
     return fHeight;
 }
+
+-(void)actionPlay:(UITapGestureRecognizer*)acTapGes {
+    NSLog(@"action play");
+    if (![_c_aduio_player isPlaying]) {
+        [_c_aduio_player prepareToPlay];
+        [_c_aduio_player play];
+        [_cimageViewAudio startAnimating];
+    }
+}
+- (void)audioPlayerDidFinishPlaying:(AVAudioPlayer *)player successfully:(BOOL)flag {
+    [_cimageViewAudio stopAnimating];
+}
+
+/* if an error occurs while decoding it will be reported to the delegate. */
+- (void)audioPlayerDecodeErrorDidOccur:(AVAudioPlayer *)player error:(NSError *)error  {
+    NSLog(@"%@", [error description]);
+}
+
+
+
+/* audioPlayerBeginInterruption: is called when the audio session has been interrupted while the player was playing. The player will have been paused. */
+- (void)audioPlayerBeginInterruption:(AVAudioPlayer *)player {
+    [player pause];
+    [_cimageViewAudio stopAnimating];
+}
+
+/* audioPlayerEndInterruption:withOptions: is called when the audio session interruption has ended and this player had been interrupted while playing. */
+/* Currently the only flag is AVAudioSessionInterruptionFlags_ShouldResume. */
+- (void)audioPlayerEndInterruption:(AVAudioPlayer *)player withOptions:(NSUInteger)flags{
+    [player play];
+    [_cimageViewAudio startAnimating];
+
+}
+-(void)actionNotiPlaying:(NSNotification*)acNoti {
+    if (![acNoti.userInfo isEqual:self.cdicInfo]) {
+        if (_c_aduio_player) {
+            [_c_aduio_player stop];
+            [_cimageViewAudio stopAnimating];
+        }
+    }
+}
+
 @end

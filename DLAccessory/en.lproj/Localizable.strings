@@ -35,4 +35,7 @@
 "k_conversation" = "Conversations";
 "k_conversation_title" = "Conversations";
 
+"k_error_audio" = "Error Recording Audio";
+"k_audio_disable" = "Your  device can't support audio recording or try again!";
+
 

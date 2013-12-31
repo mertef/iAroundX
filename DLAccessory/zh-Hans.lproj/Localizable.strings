@@ -34,7 +34,8 @@
 "k_my_friend"="周边";
 "k_conversation" = "会话";
 "k_conversation_title" = "消息列表";
-
+"k_error_audio" = "录音失败";
+"k_audio_disable" = "你的设备不支持录音或者重新再录一次！";
 
 
 

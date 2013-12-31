@@ -14,6 +14,8 @@
 @property(strong, nonatomic) NSDictionary* cdicInfo;
 @property(strong, nonatomic) DLViewIndicator* ccViewIndicator;
 @property(strong, nonatomic) UIView* cviewSeparator;
+@property(strong, nonatomic)UIImageView* cimageViewMsgType;
+
 -(void)feedInfo:(NSDictionary*)acdic;
 
 @end
