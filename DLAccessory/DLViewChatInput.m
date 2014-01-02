@@ -154,12 +154,15 @@
 -(void)actionAudio:(id)asender {
     if (self.ccAudio.bIsAnimating) {
         [self.ccAudio stopAnimation];
+        [NSObject cancelPreviousPerformRequestsWithTarget:self.idProtoViewChat selector:@selector(didStopRecording:) object:self];
         if ([self.idProtoViewChat respondsToSelector:@selector(didStopRecording:)]) {
             [self.idProtoViewChat performSelector:@selector(didStopRecording:) withObject:self];
         }
 
     }else {
         [self.ccAudio startAnimation];
+        [NSObject cancelPreviousPerformRequestsWithTarget:self.idProtoViewChat selector:@selector(didStartRecording:) object:self];
+
         if ([self.idProtoViewChat respondsToSelector:@selector(didStartRecording:)]) {
             [self.idProtoViewChat performSelector:@selector(didStartRecording:) withObject:self];
         }

@@ -13,6 +13,7 @@
 
 @implementation DLTableCellChat
 
+
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
 {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
@@ -59,7 +60,7 @@
         [_cimageViewBg addSubview:_cimageViewAudio];
         _cimageViewAudio.hidden = YES;
 
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(actionNotiPlaying:) name:k_noti_playing object:nil];
+//        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(actionNotiPlaying:) name:k_noti_playing object:nil];
         
     }
     return self;
@@ -93,6 +94,9 @@
         NSString* cstrMsg = [[NSString alloc] initWithData:self.cdicInfo[k_chat_msg] encoding:NSUTF8StringEncoding];
 
         srectBoundMsg = [cstrMsg boundingRectWithSize:CGSizeMake(200.0f, MAXFLOAT) options:NSStringDrawingUsesFontLeading | NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName: _clableMsg.font} context:nil];
+        if (srectBoundMsg.size.width < 150.0f) {
+            srectBoundMsg.size.width = 150.0f;
+        }
     }else if([cnumberMsgType intValue] == enum_package_type_audio) {
         srectBoundMsg = CGRectMake(0.0f, 0.0f, 150.0f, 30.0f);
     }else if([cnumberMsgType intValue] == enum_package_type_image) {
@@ -139,7 +143,6 @@
         cstrPeopleHeaderIcon = k_people_icon_default;
     }
 #pragma mark - fix me need remote icon
-    _c_aduio_player = nil;
     
     UIImage* cimageIconDefault = [UIImage imageNamed:cstrPeopleHeaderIcon];
     _cimageViewIcon.image = cimageIconDefault;
@@ -153,23 +156,21 @@
         _clableMsg.text = cstrMsg;
     }else if([cnumberMsgType intValue] == enum_package_type_audio) {
         _cimageViewAudio.hidden = NO;
-
+        NSLog(@"msg type is audio");
+        
         if (!_c_aduio_player) {
             NSError* cError = nil;
-            NSData* cData = acdicInfo[k_chat_msg];
-//            NSLog(@"playing ---- data length is %lu", (unsigned long)[cData length]);
+            NSData* cData = self.cdicInfo[k_chat_msg];
+            //            NSLog(@"playing ---- data length is %lu", (unsigned long)[cData length]);
             _c_aduio_player = [[AVAudioPlayer alloc] initWithData:cData error:&cError];
             _c_aduio_player.delegate = self;
             if (cError) {
                 NSLog(@"can't play audio %@", [cError description]);
-            }else {
-                //stop other playing
-                [[NSNotificationCenter defaultCenter] postNotificationName:k_noti_playing object:nil userInfo:self.cdicInfo];
-                [_cimageViewAudio startAnimating];
+            }else if(![_c_aduio_player prepareToPlay]){
+                NSLog(@"can't play audio");
             }
         }
-
-            NSLog(@"msg type is audio");
+        
     }else if([cnumberMsgType intValue] == enum_package_type_image) {
                 NSLog(@"msg type is image");
     }
@@ -181,9 +182,16 @@
 }
 
 -(void)play {
-    if (_c_aduio_player) {
-        [_c_aduio_player play];
+
+    if ([_c_aduio_player isPlaying]) {
+        [_c_aduio_player playAtTime:0.0f];
+        [self.cimageViewAudio startAnimating];
+    }else if([_c_aduio_player play]){
+        [[NSNotificationCenter defaultCenter] postNotificationName:k_noti_playing object:nil userInfo:self.cdicInfo];
+    }else {
+        NSLog(@"can't play!");
     }
+    
 }
 
 +(CGFloat)HeightForCell:(NSDictionary*)acdicInfo {
@@ -211,11 +219,7 @@
 
 -(void)actionPlay:(UITapGestureRecognizer*)acTapGes {
     NSLog(@"action play");
-    if (![_c_aduio_player isPlaying]) {
-        [_c_aduio_player prepareToPlay];
-        [_c_aduio_player play];
-        [_cimageViewAudio startAnimating];
-    }
+    [self play];
 }
 - (void)audioPlayerDidFinishPlaying:(AVAudioPlayer *)player successfully:(BOOL)flag {
     [_cimageViewAudio stopAnimating];

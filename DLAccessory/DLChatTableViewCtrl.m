@@ -81,10 +81,10 @@
 //    CGRect srectFrameEnd = [cvalueFrameEnd CGRectValue];
     if (self.bIsInputMode) {
         
-        CGFloat fHeight = CGRectGetHeight(self.view.bounds) - CGRectGetMaxY(self.ccViewChatInput.frame);
-        if( fHeight > k_height_keyboard) {
-            return;
-        }
+//        CGFloat fHeight = CGRectGetHeight(self.view.bounds) - CGRectGetMaxY(self.ccViewChatInput.frame);
+//        if( fHeight > k_height_keyboard) {
+//            return;
+//        }
         
         [UIView animateWithDuration:0.5f animations:^(void){
             self.ctableViewChat.frame = CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.view.bounds), CGRectGetHeight(self.view.bounds) - CGRectGetHeight(self.ccViewChatInput.frame));
@@ -141,8 +141,7 @@
         return;
     }
     err = nil;
-    int flags = AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation;
-    [audioSession setActive:YES withOptions:flags error:&err];
+    [audioSession setActive:YES error:&err];
     
     if(err){
         NSLog(@"audioSession: %@ %ld %@", [err domain], (long)[err code], [[err userInfo] description]);
@@ -195,7 +194,6 @@
 
     UITapGestureRecognizer* ctapGes = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyBoard:)];
     ctapGes.delegate = self;
-    ctapGes.delaysTouchesEnded = YES;
     [self.ctableViewChat addGestureRecognizer:ctapGes];
     
     [self.view addSubview:_ctableViewChat];
@@ -302,10 +300,11 @@
     }
     
     DLTableCellChat* ccCellChat = (DLTableCellChat*)cell;
+    
+    [ccCellChat feedDictionaryInfo:[self.cmutarrChatList objectAtIndex:[indexPath row]]];
     if ([indexPath row] == [self.cmutarrChatList count] - 1) {
         [ccCellChat play];
     }
-    [ccCellChat feedDictionaryInfo:[self.cmutarrChatList objectAtIndex:[indexPath row]]];
     return cell;
 }
 #pragma mark - textinput callback 
@@ -481,11 +480,12 @@
     NSMutableData* cmutDataPackage = [[NSMutableData alloc] init];
     [cmutDataPackage appendData:cdataHeader];
     [cmutDataPackage appendData:cdataAudio];
-    NSLog(@"send sizie is %lu", (u_long)[cmutDataPackage length]);
+//    NSLog(@"send sizie is %lu", (u_long)[cmutDataPackage length]);
     
     NSError* cError = nil;
     [self.cMulPeerSession sendData:cmutDataPackage toPeers:@[self.cdicPeerInfoTo[k_peer_id]] withMode:MCSessionSendDataReliable error:&cError];
     if (cError) {
+//        NSLog(@"I am the main thread %@", [NSThread isMainThread]?@"yes":@"NO");
         UIAlertView* calertMsg = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"k_session_error", nil) message:NSLocalizedString(@"k_error_session_msg", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"k_cancel", nil) otherButtonTitles:nil, nil];
         [calertMsg show];
     }else {
@@ -507,7 +507,6 @@
 /* audioRecorderDidFinishRecording:successfully: is called when a recording has been finished or stopped. This method is NOT called if the recorder is stopped due to an interruption. */
 - (void)audioRecorderDidFinishRecording:(AVAudioRecorder *)recorder successfully:(BOOL)flag {
     if (flag) {
-        [_c_audio_recorder stop];
     }
 }
 

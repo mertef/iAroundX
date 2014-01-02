@@ -102,7 +102,7 @@
     self.cdicInfo = acdic;
     NSString* cstrPeerName = [acdic objectForKey:k_chat_from_name];
     _clableName.text = cstrPeerName;
-    _clableName.hidden = YES;
+    _clableMsgHint.hidden = YES;
     NSDictionary* cdicItem = [self.cdicInfo[k_chat_list] lastObject];
     NSNumber* cnumberMsgType = [cdicItem objectForKey:k_chat_msg_type];
     _cimageViewMsgType.hidden = YES;
@@ -118,7 +118,7 @@
         case enum_package_type_short_msg:
         {
             _cimageViewMsgType.hidden = YES;
-            _clableName.hidden = NO;
+            _clableMsgHint.hidden = NO;
             NSString* cstrMsg =  [[NSString alloc] initWithData:cdicItem[k_chat_msg] encoding:NSUTF8StringEncoding];
             _clableMsgHint.text = cstrMsg;
         }

@@ -253,6 +253,10 @@
 
 }
 
+-(void) session:(MCSession *)session didReceiveCertificate:(NSArray *)certificate fromPeer:(MCPeerID *)peerID certificateHandler:(void (^)(BOOL accept))certificateHandler
+{
+   if (certificateHandler != nil) { certificateHandler(YES); }
+}
 // Received data from remote peer
 - (void)session:(MCSession *)session didReceiveData:(NSData *)data fromPeer:(MCPeerID *)peerID {
     NSLog(@"did receive data data lenght is %lu  package header %lu", (u_long)[data length], sizeof(T_PACKAGE_HEADER));
@@ -441,7 +445,9 @@
 #pragma mark - nearby advertise callback
 - (void)advertiser:(MCNearbyServiceAdvertiser *)advertiser didReceiveInvitationFromPeer:(MCPeerID *)peerID withContext:(NSData *)context invitationHandler:(void(^)(BOOL accept, MCSession *session))invitationHandler {
     NSLog(@"didReceiveInvitationFromPeer %@", [peerID displayName]);
-    invitationHandler(YES, _csession);
+    if (![_csession.connectedPeers containsObject:peerID]) {
+        invitationHandler(YES, _csession);
+    }
 }
 
 
@@ -538,6 +544,7 @@
     }
     return ccCellItem;
 }
+
 
 #pragma mark - cell proto 
 
@@ -664,9 +671,6 @@
     switch ([indexPath section]) {
         case 0://send file
         {
-            
-           
-            
            
         }
             break;
@@ -680,7 +684,7 @@
             if ([carrList count] == 0 ) {
                 self.cpeerIdGoingtoConnect = cPeerId;
 
-                [_cnearbyServiceBrowser invitePeer:cdicPeerItem[k_peer_id] toSession:_csession withContext:nil timeout:30.0f];
+                [_cnearbyServiceBrowser invitePeer:cdicPeerItem[k_peer_id] toSession:_csession withContext:nil timeout:10.0f];
             }else {
                 self.cpeerIdGoingtoConnect = nil;
             }
