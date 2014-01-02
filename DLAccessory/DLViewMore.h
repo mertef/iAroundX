@@ -8,6 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
-@interface DLViewMore : UIView
-
+@interface DLViewMore : UIView {
+    
+}
+@property(strong, nonatomic) UIButton* cbtnGallery, * cbtnCamera, * cbtnVideo, * cbtnLocation, * cbtnFile;
 @end

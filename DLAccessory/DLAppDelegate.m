@@ -35,7 +35,7 @@
     UINavigationController* ccConversationNavCtrl = [[DLNavigationCtrl alloc] init];
     [ccConversationNavCtrl pushViewController:_ccTableViewCtrlConverstaion animated:YES];
     
-    self.ctabbarItemConverstaion = [[UITabBarItem alloc] initWithTitle:NSLocalizedString(@"k_conversation", nil) image:[[UIImage imageNamed:@"conversation"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] selectedImage:[[UIImage imageNamed:@"conversation-h"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]];
+    self.ctabbarItemConverstaion = [[UITabBarItem alloc] initWithTitle:NSLocalizedString(@"k_conversation", nil) image:[[UIImage imageNamed:@"msg_n"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] selectedImage:[[UIImage imageNamed:@"msg_h"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]];
     
     ccConversationNavCtrl.tabBarItem = self.ctabbarItemConverstaion;
     

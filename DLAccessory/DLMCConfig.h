@@ -40,6 +40,8 @@
 #define k_chat_from_header_icon @"chat_from_header_icon"
 
 #define k_people_icon_default @"people_icon_default"
+#define k_people_icon_default_right @"people_default_r"
+
 #define k_noti_chat_msg @"chat_msg_item"
 #define k_noti_chat_msg_increase @"chat_msg_item_increase"
 #define k_noti_chat_msg_decrease @"chat_msg_item_decrease"

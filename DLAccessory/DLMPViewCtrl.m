@@ -175,8 +175,6 @@
 }
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    [self.navigationController.navigationBar setBarStyle:UIBarStyleBlack];
-    [self.navigationController.navigationBar setBarTintColor:[UIColor orangeColor]];
 
     [self setNeedsStatusBarAppearanceUpdate];
     [self.navigationController.navigationBar setNeedsDisplay];

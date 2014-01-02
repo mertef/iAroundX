@@ -24,13 +24,16 @@
         _cimageViewIcon = [[UIImageView alloc] init];
         [self.contentView addSubview:_cimageViewIcon];
         
+       
+
         _cimageViewBg = [[UIImageView alloc] init];
+        _cimageViewBg.clipsToBounds = YES;
         [self.contentView addSubview:_cimageViewBg];
         
         _clableMsg = [[UILabel alloc] init];
         _clableMsg.numberOfLines = 0;
-        _clableMsg.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
-        _clableMsg.lineBreakMode = NSLineBreakByCharWrapping;
+        _clableMsg.font = [[UIFont preferredFontForTextStyle:UIFontTextStyleBody] fontWithSize:20.0f];
+        _clableMsg.lineBreakMode = NSLineBreakByWordWrapping;
         _clableMsg.backgroundColor = [UIColor clearColor];
         
         [_cimageViewBg addSubview:_clableMsg];
@@ -40,7 +43,7 @@
         _clableDate = [[UILabel alloc] init];
         _clableDate.numberOfLines = 1;
         _clableDate.backgroundColor = [UIColor clearColor];
-        _clableDate.font = [[UIFont preferredFontForTextStyle:UIFontTextStyleFootnote] fontWithSize:12.0f];
+        _clableDate.font = [[UIFont preferredFontForTextStyle:UIFontTextStyleFootnote] fontWithSize:8.0f];
         _clableDate.textColor = [UIColor darkTextColor];
         [self.contentView addSubview:_clableDate];
         
@@ -59,6 +62,8 @@
         
         [_cimageViewBg addSubview:_cimageViewAudio];
         _cimageViewAudio.hidden = YES;
+        
+        self.selectionStyle = UITableViewCellSelectionStyleNone;
 
 //        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(actionNotiPlaying:) name:k_noti_playing object:nil];
         
@@ -79,8 +84,8 @@
 -(void)layoutSubviews {
     [super layoutSubviews];
     
-    CGFloat fYOffset = 4.0f;
-    CGFloat fHeight = CGRectGetHeight(self.contentView.bounds);
+//    CGFloat fYOffset = 4.0f;
+//    CGFloat fHeight = CGRectGetHeight(self.contentView.bounds);
     CGFloat fWidth = CGRectGetWidth(self.contentView.bounds);
     
     MCPeerID* cPeerIdFrom = [self.cdicInfo objectForKey:k_chat_from];
@@ -91,38 +96,51 @@
     
     NSNumber* cnumberMsgType = self.cdicInfo[k_chat_msg_type];
     if ([cnumberMsgType intValue] == enum_package_type_short_msg) {
-        NSString* cstrMsg = [[NSString alloc] initWithData:self.cdicInfo[k_chat_msg] encoding:NSUTF8StringEncoding];
-
-        srectBoundMsg = [cstrMsg boundingRectWithSize:CGSizeMake(200.0f, MAXFLOAT) options:NSStringDrawingUsesFontLeading | NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName: _clableMsg.font} context:nil];
+        srectBoundMsg = [_clableMsg.text boundingRectWithSize:CGSizeMake(150.0f, MAXFLOAT) options:NSStringDrawingUsesFontLeading | NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName: _clableMsg.font} context:nil];
         if (srectBoundMsg.size.width < 150.0f) {
             srectBoundMsg.size.width = 150.0f;
         }
     }else if([cnumberMsgType intValue] == enum_package_type_audio) {
-        srectBoundMsg = CGRectMake(0.0f, 0.0f, 150.0f, 30.0f);
+        srectBoundMsg = CGRectMake(0.0f, 0.0f, 150.0f, 54.0f);
     }else if([cnumberMsgType intValue] == enum_package_type_image) {
-         srectBoundMsg = CGRectMake(0.0f, 0.0f, 150.0f, 60.0f);
+         srectBoundMsg = CGRectMake(0.0f, 0.0f, 150.0f, 110.0f);
     }
-   
+    if (CGRectGetHeight(srectBoundMsg) < 54.0f) {
+        srectBoundMsg.size.height = 54.0f;
+    }
     
     if ([cstrFrom isEqualToString:self.cstrPeerFrom]) { //image icon is in left
-        _cimageViewIcon.frame = CGRectMake(4.0f, 4.0f + (fHeight - fYOffset - sSizeImage.height) * 0.5f, sSizeImage.width, sSizeImage.height);
-        _cimageViewBg.frame = CGRectMake(CGRectGetMaxX(_cimageViewIcon.frame) + 2.0f, 4.0f, srectBoundMsg.size.width, srectBoundMsg.size.height);
+        _cimageViewIcon.frame = CGRectMake(4.0f, 8.0f, sSizeImage.width, sSizeImage.height);
+        _cimageViewBg.frame = CGRectMake(CGRectGetMaxX(_cimageViewIcon.frame) + 4.0f, 4.0, srectBoundMsg.size.width + 26, srectBoundMsg.size.height + 14);
         _clableMsg.textAlignment = NSTextAlignmentLeft;
+        UIImage* cimageN = [UIImage imageNamed:@"msg_bubble_n"];
+        _cimageViewBg.image = [cimageN resizableImageWithCapInsets:UIEdgeInsetsMake(30.0f,30.0f, 24.0f, 24.0f) resizingMode:UIImageResizingModeStretch];
+        CGRect srectMsg = srectBoundMsg;
+        srectMsg.origin.x += 14.0f;
+        srectMsg.origin.y += 4.0f;
+        _clableMsg.frame = srectMsg;
+        if([cnumberMsgType intValue] == enum_package_type_audio) {
+            _cimageViewAudio.frame = CGRectMake((CGRectGetWidth(_cimageViewBg.bounds) - _cimageViewAudio.image.size.width) * 0.5f, (CGRectGetHeight(_cimageViewBg.bounds) - _cimageViewAudio.image.size.height) * 0.5f - 4.0f, _cimageViewAudio.image.size.width, _cimageViewAudio.image.size.height);
+        }
         
     }else { //image icon is in right
-        _cimageViewIcon.frame = CGRectMake(fWidth - 4.0f - sSizeImage.width, 4.0f + (fHeight - fYOffset - sSizeImage.height) * 0.5f, sSizeImage.width, sSizeImage.height);
-        CGRect srectImageBg = CGRectMake(CGRectGetMinX(_cimageViewIcon.frame) -2.0f - srectBoundMsg.size.width, 4.0f, srectBoundMsg.size.width, srectBoundMsg.size.height);
+        _cimageViewIcon.frame = CGRectMake(fWidth - 4.0f - sSizeImage.width, 18.0f, sSizeImage.width, sSizeImage.height);
+        CGRect srectImageBg = CGRectMake(fWidth - sSizeImage.width * 2.0f - 4.0f - srectBoundMsg.size.width, 4.0 , srectBoundMsg.size.width + 26.0f, srectBoundMsg.size.height + 14);
         _cimageViewBg.frame = srectImageBg;
         _clableMsg.textAlignment = NSTextAlignmentRight;
+        UIImage* cimageN = [UIImage imageNamed:@"msg_bubble_r"];
+        _cimageViewBg.image = [cimageN resizableImageWithCapInsets:UIEdgeInsetsMake(30.0f,30.0f, 24.0f, 24.0f) resizingMode:UIImageResizingModeStretch];
+        CGRect srectMsg = srectBoundMsg;
+        srectMsg.origin.x += 4.0f;
+        srectMsg.origin.y += 4.0f;
+        _clableMsg.frame = srectMsg;
+        if([cnumberMsgType intValue] == enum_package_type_audio) {
+            _cimageViewAudio.frame = CGRectMake((CGRectGetWidth(_cimageViewBg.bounds) - _cimageViewAudio.image.size.width) * 0.5f, (CGRectGetHeight(_cimageViewBg.bounds) - _cimageViewAudio.image.size.height) * 0.5f - 4.0f, _cimageViewAudio.image.size.width, _cimageViewAudio.image.size.height);
+        }
     }
-    
-    if ([cnumberMsgType intValue] == enum_package_type_short_msg) {
-        _clableMsg.frame = _cimageViewBg.bounds;
-    }
-    _cimageViewAudio.frame = CGRectMake((CGRectGetWidth(_cimageViewBg.bounds) - _cimageViewAudio.image.size.width) * 0.5f, (CGRectGetHeight(_cimageViewBg.bounds) - _cimageViewAudio.image.size.height) * 0.5f, _cimageViewAudio.image.size.width, _cimageViewAudio.image.size.height);
     
 
-    _clableDate.frame = CGRectMake(CGRectGetMinX(_cimageViewBg.frame), CGRectGetMaxY(_cimageViewBg.frame) + 2.0f, 100.0f, 20.0f);
+    _clableDate.frame = CGRectMake(CGRectGetMinX(_cimageViewBg.frame) + 30.0f, CGRectGetMaxY(_cimageViewBg.frame) - 10.0f, 60.0f, 20.0f);
     
 }
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated
@@ -135,29 +153,34 @@
     
     self.cdicInfo = acdicInfo;
 //    NSLog(@"%@", [self.cdicInfo description]);
-    
+    MCPeerID* cPeerIdFrom = [self.cdicInfo objectForKey:k_chat_from];
+
     NSNumber* cnumberMsgType = self.cdicInfo[k_chat_msg_type];
 
     NSString* cstrPeopleHeaderIcon = acdicInfo[k_chat_from_header_icon];
     if (!cstrPeopleHeaderIcon) {
-        cstrPeopleHeaderIcon = k_people_icon_default;
+        NSString* cstrFrom = [cPeerIdFrom displayName];
+        if ([cstrFrom isEqualToString:self.cstrPeerFrom]) {
+            cstrPeopleHeaderIcon = k_people_icon_default;
+        }else {
+            cstrPeopleHeaderIcon = k_people_icon_default_right;
+        }
     }
 #pragma mark - fix me need remote icon
     
     UIImage* cimageIconDefault = [UIImage imageNamed:cstrPeopleHeaderIcon];
     _cimageViewIcon.image = cimageIconDefault;
-    _cimageViewBg.image = nil;
-    _cimageViewBg.animationImages = nil;
     _cimageViewAudio.hidden = YES;
     
     if ([cnumberMsgType intValue] == enum_package_type_short_msg) {
         NSLog(@"msg type is msg");
         NSString* cstrMsg = [[NSString alloc] initWithData:acdicInfo[k_chat_msg] encoding:NSUTF8StringEncoding];
         _clableMsg.text = cstrMsg;
+        _clableMsg.hidden = NO;
     }else if([cnumberMsgType intValue] == enum_package_type_audio) {
         _cimageViewAudio.hidden = NO;
         NSLog(@"msg type is audio");
-        
+        _clableMsg.hidden = YES;
         if (!_c_aduio_player) {
             NSError* cError = nil;
             NSData* cData = self.cdicInfo[k_chat_msg];
@@ -173,6 +196,7 @@
         
     }else if([cnumberMsgType intValue] == enum_package_type_image) {
                 NSLog(@"msg type is image");
+        _clableMsg.hidden = YES;
     }
     NSNumber* cnumberDate = acdicInfo[k_chat_date];
     
@@ -185,29 +209,32 @@
 
     if ([_c_aduio_player isPlaying]) {
         [_c_aduio_player playAtTime:0.0f];
-        [self.cimageViewAudio startAnimating];
     }else if([_c_aduio_player play]){
         [[NSNotificationCenter defaultCenter] postNotificationName:k_noti_playing object:nil userInfo:self.cdicInfo];
     }else {
         NSLog(@"can't play!");
     }
+    [self.cimageViewAudio startAnimating];
+
     
 }
 
 +(CGFloat)HeightForCell:(NSDictionary*)acdicInfo {
     
-    CGFloat fHeight = 20.0f + 8.0f;
+    CGFloat fHeight = 20.0f + 54.0f + 8.0f;
     NSNumber* cnumberMsgType = acdicInfo[k_chat_msg_type];
     if ([cnumberMsgType intValue] == enum_package_type_short_msg) {
         NSString* cstrMsg = [[NSString alloc] initWithData:acdicInfo[k_chat_msg] encoding:NSUTF8StringEncoding];
         
-        CGRect srectBoundMsg = [cstrMsg boundingRectWithSize:CGSizeMake(200.0f, MAXFLOAT) options:NSStringDrawingUsesFontLeading | NSStringDrawingUsesLineFragmentOrigin  attributes:@{NSFontAttributeName: [UIFont preferredFontForTextStyle:UIFontTextStyleBody]} context:nil];
-        fHeight += CGRectGetHeight(srectBoundMsg);
+        CGRect srectBoundMsg = [cstrMsg boundingRectWithSize:CGSizeMake(150.0f, MAXFLOAT) options:NSStringDrawingUsesFontLeading | NSStringDrawingUsesLineFragmentOrigin  attributes:@{NSFontAttributeName: [[UIFont preferredFontForTextStyle:UIFontTextStyleBody] fontWithSize:20.0f]} context:nil];
+        if (CGRectGetHeight(srectBoundMsg) > 54.0f) {
+            fHeight += (CGRectGetHeight(srectBoundMsg) - 54.0f);
+        }
         if (srectBoundMsg.size.width < 150.0f) {
             srectBoundMsg.size.width = 150.0f;
         }
     }else if ( [cnumberMsgType intValue] == enum_package_type_audio){
-        fHeight += 30.0f;
+       
     }else if ( [cnumberMsgType intValue] == enum_package_type_image){
         fHeight += 60.0f;
     }
