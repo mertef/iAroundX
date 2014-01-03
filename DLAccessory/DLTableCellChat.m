@@ -104,6 +104,7 @@
         srectBoundMsg = CGRectMake(0.0f, 0.0f, 150.0f, 54.0f);
     }else if([cnumberMsgType intValue] == enum_package_type_image) {
          srectBoundMsg = CGRectMake(0.0f, 0.0f, 150.0f, 110.0f);
+    }else if([cnumberMsgType intValue] == enum_package_type_video) {
     }
     if (CGRectGetHeight(srectBoundMsg) < 54.0f) {
         srectBoundMsg.size.height = 54.0f;
@@ -139,6 +140,14 @@
         }
     }
     
+    
+     if([cnumberMsgType intValue] == enum_package_type_image) {
+         self.cimageViewMsgImage.frame = _clableMsg.frame;
+    }else if([cnumberMsgType intValue] == enum_package_type_video) {
+        self.cimageViewMsgVideo.frame = _clableMsg.frame;
+
+    }
+    
 
     _clableDate.frame = CGRectMake(CGRectGetMinX(_cimageViewBg.frame) + 30.0f, CGRectGetMaxY(_cimageViewBg.frame) - 10.0f, 60.0f, 20.0f);
     
@@ -171,16 +180,22 @@
     UIImage* cimageIconDefault = [UIImage imageNamed:cstrPeopleHeaderIcon];
     _cimageViewIcon.image = cimageIconDefault;
     _cimageViewAudio.hidden = YES;
+    self.cimageViewMsgImage.hidden = YES;
+    self.cimageViewMsgVideo.hidden = YES;
+    self.cimageViewBg.hidden = YES;
     
     if ([cnumberMsgType intValue] == enum_package_type_short_msg) {
         NSLog(@"msg type is msg");
         NSString* cstrMsg = [[NSString alloc] initWithData:acdicInfo[k_chat_msg] encoding:NSUTF8StringEncoding];
         _clableMsg.text = cstrMsg;
         _clableMsg.hidden = NO;
+        self.cimageViewBg.hidden = NO;
+
     }else if([cnumberMsgType intValue] == enum_package_type_audio) {
         _cimageViewAudio.hidden = NO;
         NSLog(@"msg type is audio");
         _clableMsg.hidden = YES;
+        self.cimageViewBg.hidden = NO;
         if (!_c_aduio_player) {
             NSError* cError = nil;
             NSData* cData = self.cdicInfo[k_chat_msg];
@@ -197,6 +212,29 @@
     }else if([cnumberMsgType intValue] == enum_package_type_image) {
                 NSLog(@"msg type is image");
         _clableMsg.hidden = YES;
+        self.cimageViewBg.hidden = YES;
+        if (!self.cimageViewMsgImage) {
+            self.cimageViewMsgImage = [[UIImageView alloc] init];
+            self.cimageViewMsgImage.contentMode = UIViewContentModeScaleAspectFit;
+            self.cimageViewMsgImage.backgroundColor = [UIColor clearColor];
+
+            [self.cimageViewBg addSubview:self.cimageViewMsgImage];
+        }
+        self.cimageViewMsgImage.hidden = NO;
+        NSData* cdata = self.cdicInfo[k_chat_msg];
+        UIImage* cimage = [UIImage imageWithData:cdata];
+        self.cimageViewMsgImage.image = cimage;
+        
+    }else if([cnumberMsgType intValue] == enum_package_type_video) {
+        _clableMsg.hidden = YES;
+        self.cimageViewBg.hidden = YES;
+        if (!self.cimageViewMsgVideo) {
+            self.cimageViewMsgVideo = [[UIImageView alloc] init];
+            self.cimageViewMsgVideo.contentMode = UIViewContentModeScaleAspectFit;
+            self.cimageViewMsgVideo.backgroundColor = [UIColor clearColor];
+            [self.cimageViewBg addSubview:self.cimageViewMsgVideo];
+        }
+        self.cimageViewMsgVideo.hidden = NO;
     }
     NSNumber* cnumberDate = acdicInfo[k_chat_date];
     
@@ -237,6 +275,8 @@
        
     }else if ( [cnumberMsgType intValue] == enum_package_type_image){
         fHeight += 60.0f;
+    }else if ( [cnumberMsgType intValue] == enum_package_type_video){
+        
     }
    
     

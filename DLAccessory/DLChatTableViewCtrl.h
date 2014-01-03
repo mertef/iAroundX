@@ -13,7 +13,7 @@
 @class MCSession;
 @class DLViewMore;
 
-@interface DLChatTableViewCtrl : UIViewController<UITableViewDelegate, UITableViewDataSource, DLViewChatInputProto, AVAudioRecorderDelegate, UIGestureRecognizerDelegate>{
+@interface DLChatTableViewCtrl : UIViewController<UITableViewDelegate, UITableViewDataSource, DLViewChatInputProto, AVAudioRecorderDelegate, UIGestureRecognizerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate>{
     AVAudioRecorder* _c_audio_recorder;
     NSString* _c_str_audio_recording_path;
 }
@@ -31,5 +31,9 @@
 -(void)dismissKeyBoard:(UITapGestureRecognizer*)acTapGes;
 
 -(void)scrollChatToBottom;
-
+-(void)actionSelectGallery:(id)aidSender;
+-(void)actionSelectCamera:(id)aidSender;
+-(void)actionSelectVideo:(id)aidSender;
+-(void)actionSelectFolder:(id)aidSender;
+-(void)actionSelectLocation:(id)aidSender;
 @end

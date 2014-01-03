@@ -14,6 +14,9 @@
 @property(strong, nonatomic) UIImageView* cimageViewIcon;
 @property(strong, nonatomic) UIImageView* cimageViewBg;
 @property(strong, nonatomic) UIImageView* cimageViewAudio;
+@property(strong, nonatomic) UIImageView* cimageViewMsgImage;
+@property(strong, nonatomic) UIImageView* cimageViewMsgVideo;
+
 @property(strong, nonatomic) UILabel* clableMsg;
 @property(strong, nonatomic) UILabel* clableDate;
 @property(strong, nonatomic) NSDictionary* cdicInfo;

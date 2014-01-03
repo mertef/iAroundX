@@ -178,6 +178,7 @@
 
     [self setNeedsStatusBarAppearanceUpdate];
     [self.navigationController.navigationBar setNeedsDisplay];
+    self.tabBarController.tabBar.hidden = NO;
 }
 - (void)dealloc
 {
@@ -272,7 +273,7 @@
     if (puPackage->_u_l_package_type == enum_package_type_short_msg ||
         
         puPackage->_u_l_package_type == enum_package_type_audio ||
-        
+        puPackage->_u_l_package_type == enum_package_type_video ||
         puPackage->_u_l_package_type == enum_package_type_image) {
         NSData* cdataMsg = [data subdataWithRange:NSMakeRange(sizeof(T_PACKAGE_HEADER), puPackage->_u_l_package_length)];
         NSLog(@"data size is %lu", (unsigned long)[cdataMsg length]);
@@ -280,13 +281,25 @@
     }
     
     if (puPackage->_u_l_package_size == (puPackage->_u_l_package_length + puPackage->_u_l_current_offset)) {
+        
+        NSMutableData* cmutData = [[NSMutableData alloc] initWithData:self.cmutData];
+
         if (puPackage->_u_l_package_type == enum_package_type_short_msg) {
             NSString* cstrMsg = [[NSString alloc] initWithData:self.cmutData  encoding:NSUTF8StringEncoding];
             NSLog(@"received short msg from %@ : %@", [peerID displayName], cstrMsg);
+        }else if(puPackage->_u_l_package_type == enum_package_type_image) {
+            NSLog(@"received image from %@ ", [peerID displayName]);
+            NSString* cstrTest = [NSHomeDirectory() stringByAppendingPathComponent:@"/Documents/t.jpg"];
+            NSLog(@"----%@", cstrTest);
+            [cmutData writeToFile:cstrTest atomically:YES];
+        }else if(puPackage->_u_l_package_type == enum_package_type_video) {
+            NSLog(@"received video msg from %@ ", [peerID displayName]);
+
         }
+        
         NSDictionary* cdicChatItem = @{k_chat_from:peerID,
                                        k_chat_to:self.cpeerId,
-                                       k_chat_msg:[[NSMutableData alloc ] initWithData:self.cmutData],
+                                       k_chat_msg:cmutData,
                                        k_chat_msg_type:@(puPackage->_u_l_package_type),
                                        k_chat_date: @([[NSDate date] timeIntervalSince1970])
                                        };

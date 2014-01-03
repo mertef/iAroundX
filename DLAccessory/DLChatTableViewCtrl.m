@@ -11,9 +11,11 @@
 #import "DLMCConfig.h"
 #import <MultipeerConnectivity/MultipeerConnectivity.h>
 #import "DLViewMore.h"
+#import <MobileCoreServices/MobileCoreServices.h>
 
 @interface DLChatTableViewCtrl ()
 -(void)initAvAudioRecroder;
+-(void)sendData:(NSData*)aData toPeer:(MCPeerID*)acPeerId withType:(T_PACKAGE_TYPE)atPackageType;
 
 @end
 
@@ -49,6 +51,8 @@
 {
     _c_str_audio_recording_path = nil;
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    self.tabBarController.tabBar.hidden = NO;
+
 }
 
 -(void)didKeyBoardAppear:(NSNotification*)acNotifi {
@@ -123,13 +127,14 @@
 
 -(void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-    self.tabBarController.tabBar.hidden = NO;
 }
 -(void)viewWillLayoutSubviews {
     [super viewWillLayoutSubviews];
     
 }
-
+-(void)viewWillAppear:(BOOL)animated {
+    self.tabBarController.tabBar.hidden = YES;
+}
 
 -(void)initAvAudioRecroder {
     
@@ -353,6 +358,13 @@
     
     if (!self.ccViewMore) {
         self.ccViewMore = [[DLViewMore alloc] initWithFrame: CGRectMake(0.0f, CGRectGetHeight(self.view.bounds), CGRectGetWidth(self.view.bounds), k_height_keyboard)];
+        [self.ccViewMore.cbtnGallery addTarget:self action:@selector(actionSelectGallery:) forControlEvents:UIControlEventTouchUpInside];
+        [self.ccViewMore.cbtnCamera addTarget:self action:@selector(actionSelectCamera:) forControlEvents:UIControlEventTouchUpInside];
+        [self.ccViewMore.cbtnVideo addTarget:self action:@selector(actionSelectVideo:) forControlEvents:UIControlEventTouchUpInside];
+        [self.ccViewMore.cbtnLocation addTarget:self action:@selector(actionSelectLocation:) forControlEvents:UIControlEventTouchUpInside];
+        [self.ccViewMore.cbtnFile addTarget:self action:@selector(actionSelectFolder:) forControlEvents:UIControlEventTouchUpInside];
+
+
     }
     CGFloat fHeight = CGRectGetHeight(self.view.bounds) - CGRectGetMaxY(self.ccViewChatInput.frame);
 
@@ -532,5 +544,142 @@
 }
 
 
+#pragma mark - buttion action 
+-(void)actionSelectGallery:(id)aidSender {
+    if( ![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary] ) {
+        UIAlertView* cAlertMsg = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"k_error_camera", nil) message:NSLocalizedString(@"k_error_camera_not_availale", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"k_ok", nil) otherButtonTitles:nil, nil];
+        [cAlertMsg show];
+        return;
+    }
+    
+    UIImagePickerController* cImagePickerCtrl = [[UIImagePickerController alloc] init];
+    cImagePickerCtrl.mediaTypes = @[((__bridge NSString*)kUTTypeImage)];
+    cImagePickerCtrl.delegate = self;
+    [self presentViewController:cImagePickerCtrl animated:YES completion:^(void){
+        
+    }];
+}
+-(void)actionSelectCamera:(id)aidSender {
+    if( ![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera] || ![UIImagePickerController isCameraDeviceAvailable:UIImagePickerControllerCameraDeviceRear] ) {
+        UIAlertView* cAlertMsg = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"k_error_camera", nil) message:NSLocalizedString(@"k_error_camera_not_availale", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"k_ok", nil) otherButtonTitles:nil, nil];
+        [cAlertMsg show];
+        return;
+    }
+    
+    UIImagePickerController* cImagePickerCtr = [[UIImagePickerController alloc] init];
+    cImagePickerCtr.mediaTypes = @[(__bridge NSString*)kUTTypeImage];
+    cImagePickerCtr.sourceType = UIImagePickerControllerSourceTypeCamera;
+    cImagePickerCtr.allowsEditing = YES;
+    cImagePickerCtr.showsCameraControls = YES;
+    cImagePickerCtr.delegate = self;
+    [self presentViewController:cImagePickerCtr animated:YES completion:^(void){
+    }];
+}
+-(void)actionSelectVideo:(id)aidSender {
+    if( ![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera] || ![UIImagePickerController isCameraDeviceAvailable:UIImagePickerControllerCameraDeviceRear] ) {
+        UIAlertView* cAlertMsg = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"k_error_camera", nil) message:NSLocalizedString(@"k_error_camera_not_availale", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"k_ok", nil) otherButtonTitles:nil, nil];
+        [cAlertMsg show];
+        return;
+    }
+    
+    UIImagePickerController* cImagePickerCtr = [[UIImagePickerController alloc] init];
+    cImagePickerCtr.mediaTypes = @[(__bridge NSString*)kUTTypeMovie];
+    cImagePickerCtr.sourceType = UIImagePickerControllerSourceTypeCamera;
+    cImagePickerCtr.allowsEditing = YES;
+    cImagePickerCtr.showsCameraControls = YES;
+    cImagePickerCtr.delegate = self;
+    [self presentViewController:cImagePickerCtr animated:YES completion:^(void){
+    }];
 
+}
+-(void)actionSelectFolder:(id)aidSender {
+    
+}
+-(void)actionSelectLocation:(id)aidSender {
+    
+}
+
+- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
+    [self dismissViewControllerAnimated:YES completion:^(void){
+        NSLog(@"%@", [info description]);
+        /*
+         "k_cancel" = "取消";
+         "k_ok" = "确定";
+         "k_rename_file" = "保存文件名字";
+         */
+        NSData* cdataPicture = nil;
+        if ([[info objectForKey:UIImagePickerControllerMediaType] isEqualToString:(__bridge NSString*)kUTTypeImage]) {
+            UIImage* cimageEditedImage = [info objectForKey:UIImagePickerControllerEditedImage];
+            if (cimageEditedImage) {
+                cdataPicture = UIImageJPEGRepresentation(cimageEditedImage, 0.5f);
+            }else {
+                UIImage* cimageOriginal = [info objectForKey:UIImagePickerControllerOriginalImage];
+                cdataPicture = UIImageJPEGRepresentation(cimageOriginal, 0.5f);
+            }
+            [self sendData:cdataPicture toPeer:self.cdicPeerInfoTo[k_peer_id] withType:enum_package_type_image];
+            
+            NSLog(@"picture");
+        }else if ([[info objectForKey:UIImagePickerControllerMediaType] isEqualToString:(__bridge NSString*)kUTTypeMovie]) {
+            NSLog(@"movei");
+            NSURL* curlMovie = [info objectForKey:UIImagePickerControllerMediaURL];
+            NSData* cdataMovie = [[NSData alloc] initWithContentsOfURL:curlMovie];
+            [self sendData:cdataMovie toPeer:self.cdicPeerInfoTo[k_peer_id] withType:enum_package_type_video];
+
+        }
+       
+        
+        
+    }];
+    
+}
+-(void)sendData:(NSData*)aData toPeer:(MCPeerID*)acPeerId withType:(T_PACKAGE_TYPE)atPackageType {
+    u_int32_t uiLength = (u_int32_t)[aData length];
+    u_int32_t uiOffset = 1024 * 1024 ; //64 kb
+    u_int32_t uiLoopCount = uiLength / uiOffset;
+    u_int32_t uiRemainder = uiLength % uiOffset;
+
+    u_int32_t uiLoop = 0;
+    NSMutableData* cmutdata = [[NSMutableData alloc] init];
+    NSError* cError = nil;
+    for (; uiLoop < uiLoopCount ;  uiLoop ++) {
+        [cmutdata setLength:0];
+        T_PACKAGE_HEADER tPackageHeader;
+        tPackageHeader._u_l_current_offset = uiLoop * uiOffset;
+        tPackageHeader._u_l_package_length = uiOffset;
+        tPackageHeader._u_l_package_size = uiLength;
+        tPackageHeader._u_l_package_type = atPackageType;
+        
+        NSData* cdataHeader = [NSData dataWithBytes:&tPackageHeader length:sizeof(tPackageHeader)];
+
+        [cmutdata appendData:cdataHeader];
+        [cmutdata appendData:[aData subdataWithRange:NSMakeRange(tPackageHeader._u_l_current_offset, tPackageHeader._u_l_package_length)]];
+        if (cError) {
+            NSLog(@"%@", [cError description]);
+            break;
+        }
+        [self.cMulPeerSession sendData:cmutdata toPeers:@[acPeerId] withMode:MCSessionSendDataReliable error:&cError];
+
+        NSLog(@"percent is %.2f", (tPackageHeader._u_l_current_offset + tPackageHeader._u_l_package_length) / (CGFloat)uiLength);
+    }
+    if(uiRemainder > 0){
+        [cmutdata setLength:0];
+        T_PACKAGE_HEADER tPackageHeader;
+        tPackageHeader._u_l_current_offset = uiLoop * uiOffset;
+        tPackageHeader._u_l_package_length = uiRemainder;
+        tPackageHeader._u_l_package_size = uiLength;
+        tPackageHeader._u_l_package_type = atPackageType;
+        NSData* cdataHeader = [NSData dataWithBytes:&tPackageHeader length:sizeof(tPackageHeader)];
+        [cmutdata appendData:cdataHeader];
+
+        [cmutdata appendData:[aData subdataWithRange:NSMakeRange(tPackageHeader._u_l_current_offset, tPackageHeader._u_l_package_length)]];
+        NSLog(@"percent is %.2f", (tPackageHeader._u_l_current_offset + tPackageHeader._u_l_package_length) / (CGFloat)uiLength);
+        [self.cMulPeerSession sendData:cmutdata toPeers:@[acPeerId] withMode:MCSessionSendDataReliable error:&cError];
+        if (cError) {
+            NSLog(@"%@", [cError description]);
+        }
+
+    }
+
+    
+}
 @end
