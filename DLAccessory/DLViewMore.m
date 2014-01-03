@@ -46,6 +46,10 @@
         [_cbtnFile setImage:[UIImage imageNamed:@"more_folder"] forState:UIControlStateNormal];
         [self addSubview:_cbtnFile];
         
+        _cbtnVideoFile = [[UIButton alloc] initWithFrame:CGRectZero];
+        [_cbtnVideoFile setImage:[UIImage imageNamed:@"more_select_video"] forState:UIControlStateNormal];
+        [self addSubview:_cbtnVideoFile];
+
         
     }
     return self;
@@ -57,11 +61,13 @@
     CGFloat fHOffset = fWidth / 3.0f;
     CGFloat fImageWidth = 64.0f ;//[_cbtnGallery imageForState:UIControlStateNormal].size.width;
     _cbtnGallery.frame = CGRectMake(20.0f + (fHOffset - fImageWidth) * 0.5f, 20.0f, fImageWidth, fImageWidth);
-    _cbtnCamera.frame = CGRectMake(CGRectGetMaxX(_cbtnGallery.frame) + 20.0f +(fHOffset - fImageWidth) * 0.5f, 20.0f, fImageWidth, fImageWidth);
-    _cbtnVideo.frame =  CGRectMake(CGRectGetMaxX(_cbtnCamera.frame) + 20.0f +(fHOffset - fImageWidth) * 0.5f, 20.0f, fImageWidth, fImageWidth);
-    _cbtnLocation.frame =CGRectMake(20.0f + (fHOffset - fImageWidth) * 0.5f, CGRectGetMaxY(_cbtnGallery.frame) + 20.0f, fImageWidth, fImageWidth);
-    _cbtnFile.frame = CGRectMake(CGRectGetMaxX(_cbtnLocation.frame) + 30.0f, CGRectGetMaxY(_cbtnGallery.frame) + 20.0f, fImageWidth, fImageWidth);
+    _cbtnVideoFile.frame = CGRectMake(CGRectGetMaxX(_cbtnGallery.frame) + 20.0f +(fHOffset - fImageWidth) * 0.5f, 20.0f, fImageWidth, fImageWidth);
+    _cbtnCamera.frame =  CGRectMake(CGRectGetMaxX(_cbtnVideoFile.frame) + 20.0f +(fHOffset - fImageWidth) * 0.5f, 20.0f, fImageWidth, fImageWidth);
     
+    _cbtnVideo.frame =CGRectMake(20.0f + (fHOffset - fImageWidth) * 0.5f, CGRectGetMaxY(_cbtnCamera.frame) + 20.0f, fImageWidth, fImageWidth);
+    _cbtnLocation.frame = CGRectMake(CGRectGetMaxX(_cbtnVideo.frame) + 30.0f, CGRectGetMaxY(_cbtnGallery.frame) + 20.0f, fImageWidth, fImageWidth);
+    _cbtnFile.frame =  CGRectMake(CGRectGetMaxX(_cbtnLocation.frame) + 20.0f +(fHOffset - fImageWidth) * 0.5f, CGRectGetMaxY(_cbtnGallery.frame) + 20.0f, fImageWidth, fImageWidth);
+
 }
 /*
 // Only override drawRect: if you perform custom drawing.

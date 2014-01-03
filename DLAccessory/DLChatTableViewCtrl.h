@@ -36,4 +36,6 @@
 -(void)actionSelectVideo:(id)aidSender;
 -(void)actionSelectFolder:(id)aidSender;
 -(void)actionSelectLocation:(id)aidSender;
+-(void)actionSelectVideoFile:(id)aidSender;
+
 @end

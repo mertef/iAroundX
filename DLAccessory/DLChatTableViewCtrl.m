@@ -363,6 +363,8 @@
         [self.ccViewMore.cbtnVideo addTarget:self action:@selector(actionSelectVideo:) forControlEvents:UIControlEventTouchUpInside];
         [self.ccViewMore.cbtnLocation addTarget:self action:@selector(actionSelectLocation:) forControlEvents:UIControlEventTouchUpInside];
         [self.ccViewMore.cbtnFile addTarget:self action:@selector(actionSelectFolder:) forControlEvents:UIControlEventTouchUpInside];
+        [self.ccViewMore.cbtnVideoFile addTarget:self action:@selector(actionSelectVideoFile:) forControlEvents:UIControlEventTouchUpInside];
+
 
 
     }
@@ -546,14 +548,12 @@
 
 #pragma mark - buttion action 
 -(void)actionSelectGallery:(id)aidSender {
-    if( ![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary] ) {
-        UIAlertView* cAlertMsg = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"k_error_camera", nil) message:NSLocalizedString(@"k_error_camera_not_availale", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"k_ok", nil) otherButtonTitles:nil, nil];
-        [cAlertMsg show];
-        return;
-    }
+   
     
     UIImagePickerController* cImagePickerCtrl = [[UIImagePickerController alloc] init];
     cImagePickerCtrl.mediaTypes = @[((__bridge NSString*)kUTTypeImage)];
+    cImagePickerCtrl.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+
     cImagePickerCtrl.delegate = self;
     [self presentViewController:cImagePickerCtrl animated:YES completion:^(void){
         
@@ -575,6 +575,18 @@
     [self presentViewController:cImagePickerCtr animated:YES completion:^(void){
     }];
 }
+-(void)actionSelectVideoFile:(id)aidSender {
+    
+    UIImagePickerController* cImagePickerCtr = [[UIImagePickerController alloc] init];
+    cImagePickerCtr.mediaTypes = @[(__bridge NSString*)kUTTypeMovie];
+    cImagePickerCtr.allowsEditing = NO;
+    cImagePickerCtr.sourceType = UIImagePickerControllerSourceTypeSavedPhotosAlbum;
+    cImagePickerCtr.delegate = self;
+    [self presentViewController:cImagePickerCtr animated:YES completion:^(void){
+    }];
+
+}
+
 -(void)actionSelectVideo:(id)aidSender {
     if( ![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera] || ![UIImagePickerController isCameraDeviceAvailable:UIImagePickerControllerCameraDeviceRear] ) {
         UIAlertView* cAlertMsg = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"k_error_camera", nil) message:NSLocalizedString(@"k_error_camera_not_availale", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"k_ok", nil) otherButtonTitles:nil, nil];

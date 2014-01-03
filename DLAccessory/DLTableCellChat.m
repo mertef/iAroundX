@@ -10,6 +10,8 @@
 #import "DLMCConfig.h"
 #import "Common.h"
 #import <MultipeerConnectivity/MultipeerConnectivity.h>
+#import <AVFoundation/AVFoundation.h>
+#import <MediaPlayer/MediaPlayer.h>
 
 @implementation DLTableCellChat
 
@@ -64,6 +66,8 @@
         _cimageViewAudio.hidden = YES;
         
         self.selectionStyle = UITableViewCellSelectionStyleNone;
+        
+//        [[NSNotificationCenter defaultCenter]  addObserver:self selector:@selector(actionNotiImageThumb:) name:MPMoviePlayerThumbnailImageRequestDidFinishNotification object:nil];
 
 //        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(actionNotiPlaying:) name:k_noti_playing object:nil];
         
@@ -105,6 +109,8 @@
     }else if([cnumberMsgType intValue] == enum_package_type_image) {
          srectBoundMsg = CGRectMake(0.0f, 0.0f, 150.0f, 110.0f);
     }else if([cnumberMsgType intValue] == enum_package_type_video) {
+        srectBoundMsg = CGRectMake(0.0f, 0.0f, 150.0f, 54.0f);
+
     }
     if (CGRectGetHeight(srectBoundMsg) < 54.0f) {
         srectBoundMsg.size.height = 54.0f;
@@ -114,8 +120,13 @@
         _cimageViewIcon.frame = CGRectMake(4.0f, 8.0f, sSizeImage.width, sSizeImage.height);
         _cimageViewBg.frame = CGRectMake(CGRectGetMaxX(_cimageViewIcon.frame) + 4.0f, 4.0, srectBoundMsg.size.width + 26, srectBoundMsg.size.height + 14);
         _clableMsg.textAlignment = NSTextAlignmentLeft;
-        UIImage* cimageN = [UIImage imageNamed:@"msg_bubble_n"];
-        _cimageViewBg.image = [cimageN resizableImageWithCapInsets:UIEdgeInsetsMake(30.0f,30.0f, 24.0f, 24.0f) resizingMode:UIImageResizingModeStretch];
+        if([cnumberMsgType intValue] == enum_package_type_short_msg ||
+           [cnumberMsgType intValue] == enum_package_type_audio
+           ) {
+            UIImage* cimageN = [UIImage imageNamed:@"msg_bubble_n"];
+           _cimageViewBg.image = [cimageN resizableImageWithCapInsets:UIEdgeInsetsMake(30.0f,30.0f, 24.0f, 24.0f) resizingMode:UIImageResizingModeStretch];
+       }
+    
         CGRect srectMsg = srectBoundMsg;
         srectMsg.origin.x += 14.0f;
         srectMsg.origin.y += 4.0f;
@@ -129,8 +140,12 @@
         CGRect srectImageBg = CGRectMake(fWidth - sSizeImage.width * 2.0f - 4.0f - srectBoundMsg.size.width, 4.0 , srectBoundMsg.size.width + 26.0f, srectBoundMsg.size.height + 14);
         _cimageViewBg.frame = srectImageBg;
         _clableMsg.textAlignment = NSTextAlignmentRight;
-        UIImage* cimageN = [UIImage imageNamed:@"msg_bubble_r"];
-        _cimageViewBg.image = [cimageN resizableImageWithCapInsets:UIEdgeInsetsMake(30.0f,30.0f, 24.0f, 24.0f) resizingMode:UIImageResizingModeStretch];
+        if([cnumberMsgType intValue] == enum_package_type_short_msg ||
+           [cnumberMsgType intValue] == enum_package_type_audio
+           ) {
+            UIImage* cimageN = [UIImage imageNamed:@"msg_bubble_r"];
+            _cimageViewBg.image = [cimageN resizableImageWithCapInsets:UIEdgeInsetsMake(30.0f,30.0f, 24.0f, 24.0f) resizingMode:UIImageResizingModeStretch];
+        }
         CGRect srectMsg = srectBoundMsg;
         srectMsg.origin.x += 4.0f;
         srectMsg.origin.y += 4.0f;
@@ -144,7 +159,11 @@
      if([cnumberMsgType intValue] == enum_package_type_image) {
          self.cimageViewMsgImage.frame = _clableMsg.frame;
     }else if([cnumberMsgType intValue] == enum_package_type_video) {
-        self.cimageViewMsgVideo.frame = _clableMsg.frame;
+        self.cimageViewMsgVideoFirstFrame.frame = _clableMsg.frame;
+        NSLog(@"---%@", NSStringFromCGRect(self.cimageViewMsgVideoFirstFrame.frame));
+        UIImage* cimageVideo = self.cimageViewMsgVideo.image;
+        self.cimageViewMsgVideo.frame = CGRectMake(CGRectGetWidth(self.cimageViewMsgVideoFirstFrame.frame) * 0.5f -cimageVideo.size.width * 0.5f , CGRectGetWidth(self.cimageViewMsgVideoFirstFrame.frame) * 0.5f - cimageVideo.size.height * 0.5f, cimageVideo.size.width, cimageVideo.size.height);
+        
 
     }
     
@@ -180,22 +199,20 @@
     UIImage* cimageIconDefault = [UIImage imageNamed:cstrPeopleHeaderIcon];
     _cimageViewIcon.image = cimageIconDefault;
     _cimageViewAudio.hidden = YES;
+    _cimageViewBg.image = nil;
     self.cimageViewMsgImage.hidden = YES;
     self.cimageViewMsgVideo.hidden = YES;
-    self.cimageViewBg.hidden = YES;
-    
+    self.cimageViewMsgVideoFirstFrame.hidden = YES;
     if ([cnumberMsgType intValue] == enum_package_type_short_msg) {
         NSLog(@"msg type is msg");
         NSString* cstrMsg = [[NSString alloc] initWithData:acdicInfo[k_chat_msg] encoding:NSUTF8StringEncoding];
         _clableMsg.text = cstrMsg;
         _clableMsg.hidden = NO;
-        self.cimageViewBg.hidden = NO;
 
     }else if([cnumberMsgType intValue] == enum_package_type_audio) {
         _cimageViewAudio.hidden = NO;
         NSLog(@"msg type is audio");
         _clableMsg.hidden = YES;
-        self.cimageViewBg.hidden = NO;
         if (!_c_aduio_player) {
             NSError* cError = nil;
             NSData* cData = self.cdicInfo[k_chat_msg];
@@ -210,9 +227,8 @@
         }
         
     }else if([cnumberMsgType intValue] == enum_package_type_image) {
-                NSLog(@"msg type is image");
+         NSLog(@"msg type is image");
         _clableMsg.hidden = YES;
-        self.cimageViewBg.hidden = YES;
         if (!self.cimageViewMsgImage) {
             self.cimageViewMsgImage = [[UIImageView alloc] init];
             self.cimageViewMsgImage.contentMode = UIViewContentModeScaleAspectFit;
@@ -227,14 +243,51 @@
         
     }else if([cnumberMsgType intValue] == enum_package_type_video) {
         _clableMsg.hidden = YES;
-        self.cimageViewBg.hidden = YES;
+        if (!self.cimageViewMsgVideoFirstFrame) {
+            self.cimageViewMsgVideoFirstFrame = [[UIImageView alloc] init];
+            self.cimageViewMsgVideoFirstFrame.contentMode = UIViewContentModeScaleAspectFit;
+            self.cimageViewMsgVideoFirstFrame.backgroundColor = [UIColor yellowColor];
+            [self.cimageViewBg addSubview:self.cimageViewMsgVideoFirstFrame];
+        }
+        
         if (!self.cimageViewMsgVideo) {
             self.cimageViewMsgVideo = [[UIImageView alloc] init];
             self.cimageViewMsgVideo.contentMode = UIViewContentModeScaleAspectFit;
+            self.cimageViewMsgVideo.image = [UIImage imageNamed:@"player"];
             self.cimageViewMsgVideo.backgroundColor = [UIColor clearColor];
-            [self.cimageViewBg addSubview:self.cimageViewMsgVideo];
+            [self.cimageViewMsgVideoFirstFrame addSubview:self.cimageViewMsgVideo];
         }
-        self.cimageViewMsgVideo.hidden = NO;
+
+        
+        //NSString* cstrTempUrl = [self.cdicInfo objectForKey:k_chat_msg_media_url];
+        /*
+        if (!_c_movie_player_ctr) {
+            _c_movie_player_ctr = [[MPMoviePlayerController alloc] initWithContentURL:[NSURL fileURLWithPath:cstrTempUrl]];
+        }else {
+            [_c_movie_player_ctr setContentURL:[NSURL fileURLWithPath:cstrTempUrl]];
+        }
+        [_c_movie_player_ctr play];
+
+        [_c_movie_player_ctr requestThumbnailImagesAtTimes:@[ [NSValue valueWithCMTime:CMTimeMake(0, 0)] ] timeOption:MPMovieTimeOptionNearestKeyFrame];
+         */
+        /*
+        AVAsset* casset = [AVAsset assetWithURL:[NSURL fileURLWithPath:cstrTempUrl]];
+        NSArray* carrList = [casset tracks];
+        for (AVAssetTrack* cAssetTrack in carrList) {
+            NSLog(@"%@:%@", [cAssetTrack mediaType], [[cAssetTrack formatDescriptions] description]);
+        }
+        AVAssetImageGenerator* cAssetImageGenerator = [AVAssetImageGenerator assetImageGeneratorWithAsset:casset];
+        CMTime tTimeActually;
+        NSError* cError = nil;
+        CGImageRef rImageFirstFrame = [cAssetImageGenerator copyCGImageAtTime:CMTimeMake(0, 0) actualTime:&tTimeActually error:&cError];
+        if (!cError) {
+            self.cimageViewMsgVideoFirstFrame.image = [UIImage imageWithCGImage:rImageFirstFrame];
+            CGImageRelease(rImageFirstFrame);
+        }else {
+            NSLog(@"%@", [cError description]);
+        }
+        */
+        self.cimageViewMsgVideoFirstFrame.hidden = NO;
     }
     NSNumber* cnumberDate = acdicInfo[k_chat_date];
     
@@ -242,7 +295,22 @@
     
     
 }
-
+-(void)actionNotiImageThumb:(NSNotification*)acNoti {
+    /*
+     serInfo dictionary contains values for the following keys:
+     MPMoviePlayerThumbnailImageKey
+     MPMoviePlayerThumbnailTimeKey
+     If the capture request finished with an error, the userInfo dictionary contains values for the following two keys:
+     
+     MPMoviePlayerThumbnailErrorKey
+     MPMoviePlayerThumbnailTimeKey
+     */
+    if (acNoti.userInfo && [acNoti.userInfo objectForKey:MPMoviePlayerThumbnailImageKey]) {
+        UIImage* cimage = [acNoti.userInfo objectForKey:MPMoviePlayerThumbnailImageKey];
+    }else {
+        NSLog(@"generate image error : %@", [[acNoti.userInfo objectForKey:MPMoviePlayerThumbnailErrorKey] description]);
+    }
+}
 -(void)play {
 
     if ([_c_aduio_player isPlaying]) {

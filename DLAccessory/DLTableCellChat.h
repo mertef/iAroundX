@@ -8,14 +8,18 @@
 
 #import <UIKit/UIKit.h>
 #import <AVFoundation/AVFoundation.h>
+@class MPMoviePlayerController;
 @interface DLTableCellChat : UITableViewCell<AVAudioPlayerDelegate, UIGestureRecognizerDelegate> {
     AVAudioPlayer* _c_aduio_player;
+    MPMoviePlayerController* _c_movie_player_ctr;
 }
 @property(strong, nonatomic) UIImageView* cimageViewIcon;
 @property(strong, nonatomic) UIImageView* cimageViewBg;
 @property(strong, nonatomic) UIImageView* cimageViewAudio;
 @property(strong, nonatomic) UIImageView* cimageViewMsgImage;
 @property(strong, nonatomic) UIImageView* cimageViewMsgVideo;
+@property(strong, nonatomic) UIImageView* cimageViewMsgVideoFirstFrame;
+
 
 @property(strong, nonatomic) UILabel* clableMsg;
 @property(strong, nonatomic) UILabel* clableDate;
@@ -25,5 +29,6 @@
 +(CGFloat)HeightForCell:(NSDictionary*)acdicInfo;
 
 -(void)play;
+-(void)actionNotiImageThumb:(NSNotification*)acNoti;
 
 @end

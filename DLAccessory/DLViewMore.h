@@ -11,5 +11,5 @@
 @interface DLViewMore : UIView {
     
 }
-@property(strong, nonatomic) UIButton* cbtnGallery, * cbtnCamera, * cbtnVideo, * cbtnLocation, * cbtnFile;
+@property(strong, nonatomic) UIButton* cbtnGallery, * cbtnCamera, * cbtnVideo, * cbtnLocation, * cbtnFile, * cbtnVideoFile;
 @end

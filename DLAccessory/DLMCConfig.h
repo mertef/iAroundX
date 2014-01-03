@@ -35,6 +35,8 @@
 #define k_chat_to @"chat_to"
 
 #define k_chat_msg  @"chat_msg"
+#define k_chat_msg_media_url  @"chat_msg_media_url"
+
 #define k_chat_msg_type @"msg_type"
 #define k_chat_date @"chat_date"
 #define k_chat_from_header_icon @"chat_from_header_icon"
