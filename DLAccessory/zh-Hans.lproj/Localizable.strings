@@ -38,5 +38,20 @@
 "k_audio_disable" = "你的设备不支持录音或者重新再录一次！";
 
 
+"k_receiving_video_begin" = "开始接收视频文件!";
+"k_receiving_video_end" = "接收完毕!";
+
+"k_receiving_image_begin" = "开始接收图片文件!";
+"k_receiving_image_end" = "图片接收完毕!";
+
+"k_receiving_file_size" = "文件大小:";
+
+"k_sending_video_begin" = "开始发送视频文件!";
+"k_sending_video_end" = "发送视频文件完毕!";
+
+"k_sending_image_begin" = "开始发送图片文件!";
+"k_sending_image_end" = "发送图片文件完毕!";
+"k_send_file_failure" = "发送文件失败，休息会再发吧!";
+
 
 

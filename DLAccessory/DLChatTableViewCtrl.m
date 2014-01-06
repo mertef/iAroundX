@@ -12,6 +12,8 @@
 #import <MultipeerConnectivity/MultipeerConnectivity.h>
 #import "DLViewMore.h"
 #import <MobileCoreServices/MobileCoreServices.h>
+#import <MediaPlayer/MediaPlayer.h>
+#import "MBProgressHUD.h"
 
 @interface DLChatTableViewCtrl ()
 -(void)initAvAudioRecroder;
@@ -49,8 +51,11 @@
 }
 - (void)dealloc
 {
-    _c_str_audio_recording_path = nil;
+    _c_str_audio_recording_path = nil;    
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [self.cProgressSending removeObserver:self forKeyPath:@"fractionCompleted"];
+    [self.cProgressSending removeObserver:self forKeyPath:@"fractionCompleted"];
+
     self.tabBarController.tabBar.hidden = NO;
 
 }
@@ -241,6 +246,16 @@
 
        
         return;
+    }else if([keyPath isEqualToString:@"fractionCompleted"]){
+//        NSLog(@"sending percentage is %f", [self.cProgressSending fractionCompleted]);
+        dispatch_async(dispatch_get_main_queue(), ^(void){
+            self.ctProgressView.progress = [[change objectForKey:NSKeyValueChangeNewKey] floatValue];
+            if (self.cProgressSending.fractionCompleted >= 1.0f) {
+                [self dismissProgressView];
+            }
+        });
+       
+        return;
     }
     [super observeValueForKeyPath:keyPath ofObject:object change:change context:nil];
 }
@@ -301,6 +316,7 @@
     if (!cell) {
         cell = [[DLTableCellChat alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"k_cell_chat"];
         DLTableCellChat* ccCellChat = (DLTableCellChat*)cell;
+        ccCellChat.idChatProto = self;
         ccCellChat.cstrPeerFrom = [self.cdicPeerInfoFrom objectForKey:k_peer_id_name];
     }
     
@@ -613,13 +629,15 @@
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
     [self dismissViewControllerAnimated:YES completion:^(void){
-        NSLog(@"%@", [info description]);
+//        NSLog(@"%@", [info description]);
         /*
          "k_cancel" = "取消";
          "k_ok" = "确定";
          "k_rename_file" = "保存文件名字";
          */
         NSData* cdataPicture = nil;
+        
+        
         if ([[info objectForKey:UIImagePickerControllerMediaType] isEqualToString:(__bridge NSString*)kUTTypeImage]) {
             UIImage* cimageEditedImage = [info objectForKey:UIImagePickerControllerEditedImage];
             if (cimageEditedImage) {
@@ -628,31 +646,153 @@
                 UIImage* cimageOriginal = [info objectForKey:UIImagePickerControllerOriginalImage];
                 cdataPicture = UIImageJPEGRepresentation(cimageOriginal, 0.5f);
             }
+            /*
+             NSString* cstrFileName = nil;
+            NSTimeInterval iInterval = [[NSDate date] timeIntervalSince1970];
+            cstrFileName = [NSString stringWithFormat:@"%f.jpg", iInterval];
+            
+            NSString* cstrMediaURl = [NSTemporaryDirectory() stringByAppendingPathComponent:cstrFileName];
+            [cdataPicture writeToURL:[NSURL fileURLWithPath:cstrMediaURl] atomically:YES];
+
+            [self sendMedia:[NSURL fileURLWithPath:cstrMediaURl] toPeer:self.cdicPeerInfoTo[k_peer_id] withType:enum_package_type_image];
+             */
+
             [self sendData:cdataPicture toPeer:self.cdicPeerInfoTo[k_peer_id] withType:enum_package_type_image];
             
             NSLog(@"picture");
         }else if ([[info objectForKey:UIImagePickerControllerMediaType] isEqualToString:(__bridge NSString*)kUTTypeMovie]) {
             NSLog(@"movei");
             NSURL* curlMovie = [info objectForKey:UIImagePickerControllerMediaURL];
+            /*
+             NSString* cstrFileName = nil;
+            NSTimeInterval iInterval = [[NSDate date] timeIntervalSince1970];
+            cstrFileName = [NSString stringWithFormat:@"%f.mov", iInterval];
+            NSString* cstrMediaURl = [NSTemporaryDirectory() stringByAppendingPathComponent:cstrFileName];
+            NSError* cError = nil;
+            [[NSFileManager defaultManager] copyItemAtURL:curlMovie toURL:[NSURL fileURLWithPath:cstrMediaURl] error:&cError];
+            if (!cError) {
+                [self sendMedia:[NSURL fileURLWithPath:cstrMediaURl] toPeer:self.cdicPeerInfoTo[k_peer_id] withType:enum_package_type_video];
+            }else {
+                UIAlertView* cAlertMsg = [[UIAlertView alloc] initWithTitle:nil message:NSLocalizedString(@"k_save_file_failure", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"k_ok", nil) otherButtonTitles:nil, nil];
+                [cAlertMsg show];
+            }*/
             NSData* cdataMovie = [[NSData alloc] initWithContentsOfURL:curlMovie];
             [self sendData:cdataMovie toPeer:self.cdicPeerInfoTo[k_peer_id] withType:enum_package_type_video];
-
         }
-       
-        
         
     }];
     
 }
+
+-(void)sendMedia:(NSURL*)aUrlMedia toPeer:(MCPeerID*)acPeerId withType:(T_PACKAGE_TYPE)atPackageType  {
+    
+    NSString* cstrFileName = [[aUrlMedia absoluteString] lastPathComponent];
+    
+    [self showProgressView];
+
+    self.cProgressSending = [self.cMulPeerSession sendResourceAtURL:aUrlMedia withName:cstrFileName toPeer:acPeerId withCompletionHandler:^(NSError* acError){
+        if (acError) {
+            UIAlertView* cAlertMsg = [[UIAlertView alloc] initWithTitle:nil message:NSLocalizedString(@"k_save_file_failure", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"k_ok", nil) otherButtonTitles:nil, nil];
+            [cAlertMsg show];
+            
+        }else {
+            dispatch_async(dispatch_get_main_queue(), ^(void){
+                [self dismissProgressView];
+            });
+        }
+    }];
+    [self.cProgressSending addObserver:self forKeyPath:@"fractionCompleted" options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:nil];
+
+}
+
+-(void)dismissProgressView {
+    [self.ctProgressView hide:YES];
+}
+
+-(void)showProgressView {
+    if (![[NSThread currentThread] isMainThread]) {
+        
+        UIWindow* cwindowApp = [[UIApplication sharedApplication] keyWindow];
+        self.ctProgressView = [[MBProgressHUD alloc] initWithWindow:cwindowApp];
+        CGSize sSizeHud =  [self.ctProgressView  sizeThatFits:CGSizeMake(CGRectGetWidth(self.view.frame) * 0.6f, 200.0f)];
+        CGRect srectProgressView = CGRectMake((CGRectGetWidth(self.view.frame) - sSizeHud.width) * 0.5f, 180.0f, sSizeHud.width, sSizeHud.height);
+
+        self.ctProgressView.frame = srectProgressView;
+        self.ctProgressView.mode = MBProgressHUDModeDeterminate;
+        self.ctProgressView.animationType = MBProgressHUDAnimationZoomIn;
+        self.ctProgressView.removeFromSuperViewOnHide = YES;
+        [cwindowApp addSubview:self.ctProgressView];
+        return;
+    }
+    dispatch_async(dispatch_get_main_queue(), ^(void){
+        UIWindow* cwindowApp = [[UIApplication sharedApplication] keyWindow];
+        self.ctProgressView = [[MBProgressHUD alloc] initWithWindow:cwindowApp];
+        CGSize sSizeHud = CGSizeMake(180.0f, 200.0f);
+        CGRect srectProgressView = CGRectMake((CGRectGetWidth(self.view.frame) - sSizeHud.width) * 0.5f, 180.0f, sSizeHud.width, sSizeHud.height);
+        self.ctProgressView.frame = srectProgressView;
+        
+        self.ctProgressView.mode = MBProgressHUDModeDeterminate;
+        self.ctProgressView.animationType = MBProgressHUDAnimationZoomIn;
+        self.ctProgressView.removeFromSuperViewOnHide = YES;
+        [self.ctProgressView sizeToFit];
+        [cwindowApp addSubview:self.ctProgressView];
+        
+    
+    });
+}
+
 -(void)sendData:(NSData*)aData toPeer:(MCPeerID*)acPeerId withType:(T_PACKAGE_TYPE)atPackageType {
+    
+     /*
+     "k_sending_video_begin" = "Sending video file begin!";
+     "k_sending_video_end" = "Sending video Finished!";
+     
+     "k_sending_image_begin" = "Sending image file begin!";
+     "k_sending_image_end" = "Sending image Finished!";
+     
+     "k_sending_file_size" = "Size:";
+     */
+    
+    UIWindow* cwindowKey = [[UIApplication sharedApplication] keyWindow];
+    self.ctProgressView = (MBProgressHUD*)[cwindowKey viewWithTag:k_tag_progress_view_chat];
+    if (!self.ctProgressView) {
+        self.ctProgressView = [[MBProgressHUD alloc] initWithWindow:cwindowKey];
+         self.ctProgressView.removeFromSuperViewOnHide = YES;
+         self.ctProgressView.tag = k_tag_progress_view_chat;
+         self.ctProgressView.mode = MBProgressHUDModeDeterminate;
+         self.ctProgressView.progress = 0.01f;
+        CGSize sSizeHud =  [ self.ctProgressView sizeThatFits:CGSizeMake(CGRectGetWidth(self.view.frame) * 0.6f, 200.0f)];
+         self.ctProgressView.frame = CGRectMake((CGRectGetWidth(self.view.frame) - sSizeHud.width) * 0.5f, 180.0f, sSizeHud.width, sSizeHud.height);
+    }
+    
+    
+    CGFloat fSize = [aData length] / (CGFloat)(1024  * 1024);
+    switch (atPackageType) {
+        case enum_package_type_image:
+            self.ctProgressView.labelText = NSLocalizedString(@"k_sending_image_begin", nil);
+            self.ctProgressView.detailsLabelText = [NSString stringWithFormat:@"%@ %0.2fM", NSLocalizedString(@"", nil), fSize];
+
+            break;
+        case enum_package_type_video:
+            self.ctProgressView.labelText = NSLocalizedString(@"k_sending_video_begin", nil);
+            
+            break;
+        default:
+            break;
+    }
+    dispatch_async(dispatch_get_main_queue(), ^(void){
+        [cwindowKey addSubview:self.ctProgressView];
+    });
+    
     u_int32_t uiLength = (u_int32_t)[aData length];
-    u_int32_t uiOffset = 1024 * 1024 ; //64 kb
+    u_int32_t uiOffset = 1024 * 512;
     u_int32_t uiLoopCount = uiLength / uiOffset;
     u_int32_t uiRemainder = uiLength % uiOffset;
 
     u_int32_t uiLoop = 0;
     NSMutableData* cmutdata = [[NSMutableData alloc] init];
     NSError* cError = nil;
+    BOOL bSendFlag = YES;
     for (; uiLoop < uiLoopCount ;  uiLoop ++) {
         [cmutdata setLength:0];
         T_PACKAGE_HEADER tPackageHeader;
@@ -665,15 +805,18 @@
 
         [cmutdata appendData:cdataHeader];
         [cmutdata appendData:[aData subdataWithRange:NSMakeRange(tPackageHeader._u_l_current_offset, tPackageHeader._u_l_package_length)]];
+        
+        bSendFlag = [self.cMulPeerSession sendData:cmutdata toPeers:@[acPeerId] withMode:MCSessionSendDataReliable error:&cError];
         if (cError) {
             NSLog(@"%@", [cError description]);
             break;
         }
-        [self.cMulPeerSession sendData:cmutdata toPeers:@[acPeerId] withMode:MCSessionSendDataReliable error:&cError];
-
-        NSLog(@"percent is %.2f", (tPackageHeader._u_l_current_offset + tPackageHeader._u_l_package_length) / (CGFloat)uiLength);
+        CGFloat fProgress = (tPackageHeader._u_l_current_offset + tPackageHeader._u_l_package_length) / (CGFloat)uiLength;
+        NSLog(@"percent is %.2f", fProgress);
+        self.ctProgressView.progress = fProgress;
+        
     }
-    if(uiRemainder > 0){
+    if(uiRemainder > 0 && bSendFlag){
         [cmutdata setLength:0];
         T_PACKAGE_HEADER tPackageHeader;
         tPackageHeader._u_l_current_offset = uiLoop * uiOffset;
@@ -688,10 +831,40 @@
         [self.cMulPeerSession sendData:cmutdata toPeers:@[acPeerId] withMode:MCSessionSendDataReliable error:&cError];
         if (cError) {
             NSLog(@"%@", [cError description]);
-        }
+            self.ctProgressView.labelText = NSLocalizedString(@"k_session_error", nil);
 
+        }
+        
+    }
+    
+    
+    switch (atPackageType) {
+        case enum_package_type_image:
+            self.ctProgressView.labelText = NSLocalizedString(@"k_sending_image_end", nil);
+            break;
+        case enum_package_type_video:
+            self.ctProgressView.labelText = NSLocalizedString(@"k_sending_video_end", nil);
+            break;
+        default:
+            break;
     }
 
+    
+    [self.ctProgressView hide:YES afterDelay:0.1f];
+
+    
+}
+
+#pragma mark - chat callback 
+-(void)didRequestPlayerVideo:(NSDictionary*)acdicInfo {
+    MPMoviePlayerViewController* cMoviePlayerViewCtrl = nil;;
+
+    NSURL* curl = [NSURL fileURLWithPath:acdicInfo[k_chat_msg_media_url]];
+    cMoviePlayerViewCtrl = [[MPMoviePlayerViewController alloc] initWithContentURL:curl];
+    [[cMoviePlayerViewCtrl moviePlayer] play];
+    [self presentMoviePlayerViewControllerAnimated:cMoviePlayerViewCtrl];
+}
+-(void)didRequestShowImage:(NSDictionary*)acdicInfo {
     
 }
 @end

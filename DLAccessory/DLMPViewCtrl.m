@@ -57,12 +57,8 @@
         
         // progress gradient, red, animated
 
-
-        
-       
-       
-        self.cmutData = [[NSMutableData alloc] init];
-
+                      
+        self.cmutdicPeerMap = [[NSMutableDictionary alloc] init];
         
     }
     return self;
@@ -260,6 +256,23 @@
 - (void)session:(MCSession *)session didReceiveData:(NSData *)data fromPeer:(MCPeerID *)peerID {
     NSLog(@"did receive data data lenght is %lu  package header %lu", (u_long)[data length], sizeof(T_PACKAGE_HEADER));
     
+    /*
+     "k_receiving_video_begin" = "Receiving video file begin!";
+     "k_receiving_video_end" = "Receiving video Finished!";
+     
+     "k_receiving_image_begin" = "Receiving image file begin!";
+     "k_receiving_image_end" = "Receiving image Finished!";
+     
+     "k_receiving_file_size" = "Size:";
+     */
+    NSMutableData* cmutdata = [self.cmutdicPeerMap objectForKey:[peerID displayName]];
+    if (!cmutdata) {
+        cmutdata = [[NSMutableData alloc] init];
+        [self.cmutdicPeerMap setObject:cmutdata forKey:[peerID displayName]];
+    }
+
+    
+    
     u_long ulPackageHeaderSize = (u_long)sizeof(T_PACKAGE_HEADER);
     if ([data length] < ulPackageHeaderSize) {
         return;
@@ -276,18 +289,48 @@
         puPackage->_u_l_package_type == enum_package_type_video ||
         puPackage->_u_l_package_type == enum_package_type_image) {
         NSData* cdataMsg = [data subdataWithRange:NSMakeRange(sizeof(T_PACKAGE_HEADER), puPackage->_u_l_package_length)];
-        NSLog(@"data size is %lu", (unsigned long)[cdataMsg length]);
-        [self.cmutData appendData:cdataMsg];
+//        NSLog(@"data size is %lu", (unsigned long)[cdataMsg length]);
+        [cmutdata appendData:cdataMsg];
     }
+    
+    dispatch_async(dispatch_get_main_queue(), ^(void){
+        if (puPackage->_u_l_package_type == enum_package_type_video || puPackage->_u_l_package_type == enum_package_type_image){
+            if (![self.view viewWithTag:k_tag_progress_view]) {
+                [self.view addSubview:self.ctProgressHud];
+                [self.ctProgressHud show:YES];
+                self.ctProgressHud.progress = 0.0f;
+                self.ctProgressHud.labelText = NSLocalizedString(@"k_receiving_video_begin", nil);
+                [self.view bringSubviewToFront:self.ctProgressHud];
+            }
+        }
+        
+    });
+    
+    if (puPackage->_u_l_package_type == enum_package_type_video){
+       CGFloat fProgress = [cmutdata length] / (CGFloat)puPackage->_u_l_package_size;
+       self.ctProgressHud.progress = fProgress;
+        CGFloat fSize = (CGFloat)puPackage->_u_l_package_size / (CGFloat)(1024.0  * 1024.0f);
+        self.ctProgressHud.labelText = [NSString stringWithFormat:@"%@:%%%0.2f",NSLocalizedString(@"k_receiving_video_begin", nil), fProgress * 100.0f];
+
+        self.ctProgressHud.detailsLabelText = [NSString stringWithFormat:@"%@ %0.2fM", NSLocalizedString(@"k_receiving_file_size", nil), fSize];
+        
+    }else if (puPackage->_u_l_package_type == enum_package_type_image){
+        CGFloat fProgress = [cmutdata length] / (CGFloat)puPackage->_u_l_package_size;
+        self.ctProgressHud.progress = fProgress;
+        CGFloat fSize = (CGFloat)puPackage->_u_l_package_size / (CGFloat)(1024.0  * 1024.0f);
+        self.ctProgressHud.labelText = [NSString stringWithFormat:@"%@:%%%0.2f",NSLocalizedString(@"k_receiving_video_begin", nil), fProgress * 100.0f];
+        self.ctProgressHud.detailsLabelText = [NSString stringWithFormat:@"%@ %0.2fM", NSLocalizedString(@"k_receiving_file_size", nil), fSize];
+    }
+
     
     if (puPackage->_u_l_package_size == (puPackage->_u_l_package_length + puPackage->_u_l_current_offset)) {
         
-        NSMutableData* cmutData = [[NSMutableData alloc] initWithData:self.cmutData];
+        NSMutableData* cmutData = [[NSMutableData alloc] initWithData:cmutdata];
         NSString* cstrMediaUrl = @"";
         NSTimeInterval tTime = [[NSDate date] timeIntervalSince1970];
         long lTime = round(tTime);
         if (puPackage->_u_l_package_type == enum_package_type_short_msg) {
-            NSString* cstrMsg = [[NSString alloc] initWithData:self.cmutData  encoding:NSUTF8StringEncoding];
+            NSString* cstrMsg = [[NSString alloc] initWithData:cmutdata  encoding:NSUTF8StringEncoding];
             NSLog(@"received short msg from %@ : %@", [peerID displayName], cstrMsg);
         }else if(puPackage->_u_l_package_type == enum_package_type_image) {
             NSLog(@"received image from %@ ", [peerID displayName]);
@@ -295,6 +338,7 @@
             NSLog(@"----%@", cstrMediaUrl);
             [cmutData writeToFile:cstrMediaUrl atomically:NO];
         }else if(puPackage->_u_l_package_type == enum_package_type_video) {
+            
             NSLog(@"received video msg from %@ ", [peerID displayName]);
             cstrMediaUrl = [NSHomeDirectory() stringByAppendingFormat:@"/Documents/%ld.mov", lTime];
             [cmutData writeToFile:cstrMediaUrl atomically:NO];
@@ -312,7 +356,20 @@
         [[NSNotificationCenter defaultCenter] postNotificationName:k_noti_chat_msg object:nil userInfo:cdicChatItem];
 
         
-        [self.cmutData setLength:0];
+        [cmutdata setLength:0];
+        [self.cmutdicPeerMap removeObjectForKey:[peerID displayName]];
+        if ([self.view viewWithTag:k_tag_progress_view]) {
+            dispatch_async(dispatch_get_main_queue(), ^(void){
+                if (puPackage->_u_l_package_type == enum_package_type_video){
+                    self.ctProgressHud.labelText = NSLocalizedString(@"k_receiving_video_end", nil);
+
+                }else if(puPackage->_u_l_package_type == enum_package_type_image) {
+                    self.ctProgressHud.labelText = NSLocalizedString(@"k_receiving_image_end", nil);
+
+                }
+                [self.ctProgressHud hide:YES afterDelay:1.0f];
+            });
+        }
         
     }
     free(puPackage);puPackage = NULL;
@@ -330,7 +387,10 @@
     NSLog(@"didStartReceivingResourceWithName %@", resourceName);
 
    
-   
+    NSMutableData* cmutdata = [self.cmutdicPeerMap objectForKey:[peerID displayName]];
+    if (!cmutdata) {
+        [self.cmutdicPeerMap setObject:[NSMutableData data] forKey:[peerID displayName]];
+    }
     
     dispatch_async(dispatch_get_main_queue(), ^(void){
         if (![self.view viewWithTag:k_tag_progress_view]) {
@@ -340,7 +400,7 @@
         [self.view bringSubviewToFront:self.ctProgressHud];
         [self.ctProgressHud show:YES];
     });
-    [self.cmutData setLength:0];
+    [cmutdata setLength:0];
     
     self.cpeerIdCurrent = peerID;
     
@@ -367,6 +427,8 @@
 // Finished receiving a resource from remote peer and saved the content in a temporary location - the app is responsible for moving the file to a permanent location within its sandbox
 - (void)session:(MCSession *)session didFinishReceivingResourceWithName:(NSString *)resourceName fromPeer:(MCPeerID *)peerID atURL:(NSURL *)localURL withError:(NSError *)error {
     
+    NSMutableData* cmutdata = [self.cmutdicPeerMap objectForKey:[peerID displayName]];
+
     if ([self.view viewWithTag:k_tag_progress_view]) {
         dispatch_async(dispatch_get_main_queue(), ^(void){
             self.ctProgressHud.labelText = NSLocalizedString(@"k_receiving_file_finished", nil);
@@ -374,34 +436,65 @@
         });
     }
     if (error) {
-        [_cmutData setLength:0];
+        [cmutdata setLength:0];
         NSLog(@"receive error %@", [error description]);
     }else{ //save file
-        [self.cmutData appendData:[[NSData alloc] initWithContentsOfURL:localURL]];
+        [cmutdata appendData:[[NSData alloc] initWithContentsOfURL:localURL]];
         NSString* cstrHome = NSHomeDirectory();
-        NSString* cstrFileName = [cstrHome stringByAppendingFormat:@"/Documents/%@", resourceName];
+        NSString* cstrMediaUrl = [cstrHome stringByAppendingFormat:@"/Documents/%@", resourceName];
         NSError* cError = nil;
-        if ([[NSFileManager defaultManager] fileExistsAtPath:cstrFileName]) {
-            [[NSFileManager defaultManager] removeItemAtPath:cstrFileName error:&cError];
+        if ([[NSFileManager defaultManager] fileExistsAtPath:cstrMediaUrl]) {
+            [[NSFileManager defaultManager] removeItemAtPath:cstrMediaUrl error:&cError];
            
         }
         if (cError) {
             NSLog(@"can't delete the file, file exists!");
         }else {
-            [self.cmutData  writeToFile:cstrFileName atomically:YES];
+            [cmutdata  writeToFile:cstrMediaUrl atomically:YES];
         }
-        if ([resourceName hasSuffix:@"jpg"]) {
-            NSLog(@"show image");
-            dispatch_async(dispatch_get_main_queue(), ^(void){
-                DLImageViewCtrl* ccImageViewCtrl = [[DLImageViewCtrl alloc]
-                                                     init];
-                [self presentViewController:ccImageViewCtrl animated:YES completion:^(void){
-                    ccImageViewCtrl.cimageView.contentMode = UIViewContentModeScaleAspectFill;
-                    ccImageViewCtrl.cimageView.backgroundColor = [UIColor orangeColor];
-                    ccImageViewCtrl.cimageView.image = [[UIImage alloc] initWithData:self.cmutData];
-                }];
-            });
+        NSDictionary* cdicChatItem = nil;
+        if ([resourceName hasSuffix:k_file_type_video]) {
+           cdicChatItem = @{k_chat_from:peerID,
+                                           k_chat_to:self.cpeerId,
+                                           k_chat_msg:cmutdata,
+                                           k_chat_msg_type:@(enum_package_type_video),
+                                           k_chat_date: @([[NSDate date] timeIntervalSince1970]),
+                                           k_chat_msg_media_url:cstrMediaUrl
+                                           };
+        }else if([resourceName hasSuffix:k_file_type_image]) {
+             cdicChatItem = @{k_chat_from:peerID,
+                                           k_chat_to:self.cpeerId,
+                                           k_chat_msg:cmutdata,
+                                           k_chat_msg_type:@(enum_package_type_image),
+                                           k_chat_date: @([[NSDate date] timeIntervalSince1970]),
+                                           k_chat_msg_media_url:cstrMediaUrl
+                                           };
+        }else {
+            cdicChatItem = @{k_chat_from:peerID,
+                                           k_chat_to:self.cpeerId,
+                                           k_chat_msg:cmutdata,
+                                           k_chat_msg_type:@(enum_package_type_other),
+                                           k_chat_date: @([[NSDate date] timeIntervalSince1970]),
+                                           k_chat_msg_media_url:cstrMediaUrl
+                                           };
         }
+        [[NSNotificationCenter defaultCenter] postNotificationName:k_noti_chat_msg_increase object:nil userInfo:cdicChatItem];
+        [[NSNotificationCenter defaultCenter] postNotificationName:k_noti_chat_msg object:nil userInfo:cdicChatItem];
+        [self.cmutdicPeerMap removeObjectForKey:[peerID displayName]];
+
+        
+//        if ([resourceName hasSuffix:@"jpg"]) {
+//            NSLog(@"show image");
+//            dispatch_async(dispatch_get_main_queue(), ^(void){
+//                DLImageViewCtrl* ccImageViewCtrl = [[DLImageViewCtrl alloc]
+//                                                     init];
+//                [self presentViewController:ccImageViewCtrl animated:YES completion:^(void){
+//                    ccImageViewCtrl.cimageView.contentMode = UIViewContentModeScaleAspectFill;
+//                    ccImageViewCtrl.cimageView.backgroundColor = [UIColor orangeColor];
+//                    ccImageViewCtrl.cimageView.image = [[UIImage alloc] initWithData:self.cmutData];
+//                }];
+//            });
+//        }
     }
     self.cprogressCurrentReceiver = nil;
     [self.cprogressCurrentReceiver removeObserver:self forKeyPath:@"fractionCompleted"];

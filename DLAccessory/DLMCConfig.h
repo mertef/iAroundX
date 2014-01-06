@@ -53,13 +53,22 @@
 #define k_height_keyboard 216.0f
 #define k_default_recording_path @"s.aac"
 
+
+#define k_file_type_video @"mov"
+#define k_file_type_image @"jpg"
+
+
 #define k_noti_playing @"noti_playing_item"
+
+
+#define k_tag_progress_view_chat 0x3533
 typedef NS_ENUM(int32_t, T_PACKAGE_TYPE) {
     enum_package_type_short_msg = 0x300,
     enum_package_type_image,
     enum_package_type_audio,
     enum_package_type_video,
-    enum_package_type_stream
+    enum_package_type_stream,
+    enum_package_type_other
 };
 typedef struct {
        u_int32_t _u_l_package_type;

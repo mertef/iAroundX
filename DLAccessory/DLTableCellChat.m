@@ -160,11 +160,10 @@
          self.cimageViewMsgImage.frame = _clableMsg.frame;
     }else if([cnumberMsgType intValue] == enum_package_type_video) {
         self.cimageViewMsgVideoFirstFrame.frame = _clableMsg.frame;
-        NSLog(@"---%@", NSStringFromCGRect(self.cimageViewMsgVideoFirstFrame.frame));
+//        NSLog(@"---%@", NSStringFromCGRect(self.cimageViewMsgVideoFirstFrame.frame));
         UIImage* cimageVideo = self.cimageViewMsgVideo.image;
-        self.cimageViewMsgVideo.frame = CGRectMake(CGRectGetWidth(self.cimageViewMsgVideoFirstFrame.frame) * 0.5f -cimageVideo.size.width * 0.5f , CGRectGetWidth(self.cimageViewMsgVideoFirstFrame.frame) * 0.5f - cimageVideo.size.height * 0.5f, cimageVideo.size.width, cimageVideo.size.height);
-        
-
+        self.cimageViewMsgVideo.frame = CGRectMake(0.0f , 0.0f, cimageVideo.size.width, cimageVideo.size.height);
+        self.cimageViewMsgVideo.center = self.cimageViewMsgVideoFirstFrame.center;
     }
     
 
@@ -246,7 +245,7 @@
         if (!self.cimageViewMsgVideoFirstFrame) {
             self.cimageViewMsgVideoFirstFrame = [[UIImageView alloc] init];
             self.cimageViewMsgVideoFirstFrame.contentMode = UIViewContentModeScaleAspectFit;
-            self.cimageViewMsgVideoFirstFrame.backgroundColor = [UIColor yellowColor];
+//            self.cimageViewMsgVideoFirstFrame.backgroundColor = [UIColor yellowColor];
             [self.cimageViewBg addSubview:self.cimageViewMsgVideoFirstFrame];
         }
         
@@ -259,7 +258,7 @@
         }
 
         
-        //NSString* cstrTempUrl = [self.cdicInfo objectForKey:k_chat_msg_media_url];
+       NSString* cstrTempUrl = [self.cdicInfo objectForKey:k_chat_msg_media_url];
         /*
         if (!_c_movie_player_ctr) {
             _c_movie_player_ctr = [[MPMoviePlayerController alloc] initWithContentURL:[NSURL fileURLWithPath:cstrTempUrl]];
@@ -270,23 +269,24 @@
 
         [_c_movie_player_ctr requestThumbnailImagesAtTimes:@[ [NSValue valueWithCMTime:CMTimeMake(0, 0)] ] timeOption:MPMovieTimeOptionNearestKeyFrame];
          */
-        /*
+        
         AVAsset* casset = [AVAsset assetWithURL:[NSURL fileURLWithPath:cstrTempUrl]];
+        /*
         NSArray* carrList = [casset tracks];
         for (AVAssetTrack* cAssetTrack in carrList) {
             NSLog(@"%@:%@", [cAssetTrack mediaType], [[cAssetTrack formatDescriptions] description]);
-        }
+        }*/
         AVAssetImageGenerator* cAssetImageGenerator = [AVAssetImageGenerator assetImageGeneratorWithAsset:casset];
         CMTime tTimeActually;
         NSError* cError = nil;
-        CGImageRef rImageFirstFrame = [cAssetImageGenerator copyCGImageAtTime:CMTimeMake(0, 0) actualTime:&tTimeActually error:&cError];
+        CGImageRef rImageFirstFrame = [cAssetImageGenerator copyCGImageAtTime:CMTimeMake(1, 1) actualTime:&tTimeActually error:&cError];
         if (!cError) {
             self.cimageViewMsgVideoFirstFrame.image = [UIImage imageWithCGImage:rImageFirstFrame];
             CGImageRelease(rImageFirstFrame);
         }else {
             NSLog(@"%@", [cError description]);
         }
-        */
+        
         self.cimageViewMsgVideoFirstFrame.hidden = NO;
     }
     NSNumber* cnumberDate = acdicInfo[k_chat_date];
@@ -304,23 +304,37 @@
      
      MPMoviePlayerThumbnailErrorKey
      MPMoviePlayerThumbnailTimeKey
-     */
     if (acNoti.userInfo && [acNoti.userInfo objectForKey:MPMoviePlayerThumbnailImageKey]) {
         UIImage* cimage = [acNoti.userInfo objectForKey:MPMoviePlayerThumbnailImageKey];
     }else {
         NSLog(@"generate image error : %@", [[acNoti.userInfo objectForKey:MPMoviePlayerThumbnailErrorKey] description]);
     }
+    */
 }
 -(void)play {
 
-    if ([_c_aduio_player isPlaying]) {
-        [_c_aduio_player playAtTime:0.0f];
-    }else if([_c_aduio_player play]){
-        [[NSNotificationCenter defaultCenter] postNotificationName:k_noti_playing object:nil userInfo:self.cdicInfo];
-    }else {
-        NSLog(@"can't play!");
+    NSNumber* cnumberMsgType = self.cdicInfo[k_chat_msg_type];
+
+    if ([cnumberMsgType intValue] == enum_package_type_audio) {
+        if ([_c_aduio_player isPlaying]) {
+            [_c_aduio_player playAtTime:0.0f];
+        }else if([_c_aduio_player play]){
+            [[NSNotificationCenter defaultCenter] postNotificationName:k_noti_playing object:nil userInfo:self.cdicInfo];
+        }else {
+            NSLog(@"can't play!");
+        }
+        [self.cimageViewAudio startAnimating];
+    }else if([cnumberMsgType intValue] == enum_package_type_video) {
+        if ([self.idChatProto respondsToSelector:@selector(didRequestPlayerVideo:)]) {
+            [self.idChatProto didRequestPlayerVideo:self.cdicInfo];
+        }
+    }else if([cnumberMsgType intValue] == enum_package_type_image){
+        if ([self.idChatProto respondsToSelector:@selector(didRequestShowImage:)]) {
+            [self.idChatProto didRequestShowImage:self.cdicInfo];
+        }
+        
     }
-    [self.cimageViewAudio startAnimating];
+    
 
     
 }

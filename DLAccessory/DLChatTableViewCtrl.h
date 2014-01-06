@@ -9,13 +9,15 @@
 #import <UIKit/UIKit.h>
 #import "DLViewChatInput.h"
 #import <AVFoundation/AVFoundation.h>
+#import "DLTableCellChat.h"
 
 @class MCSession;
 @class DLViewMore;
-
-@interface DLChatTableViewCtrl : UIViewController<UITableViewDelegate, UITableViewDataSource, DLViewChatInputProto, AVAudioRecorderDelegate, UIGestureRecognizerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate>{
+@class MBProgressHUD;
+@interface DLChatTableViewCtrl : UIViewController<UITableViewDelegate, UITableViewDataSource, DLViewChatInputProto, AVAudioRecorderDelegate, UIGestureRecognizerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, DLTableCellChatProto>{
     AVAudioRecorder* _c_audio_recorder;
     NSString* _c_str_audio_recording_path;
+    
 }
 @property(strong, nonatomic) UITableView* ctableViewChat;
 @property(strong, nonatomic) NSMutableArray* cmutarrChatList;
@@ -26,6 +28,8 @@
 @property(strong, nonatomic) MCSession* cMulPeerSession;
 @property(strong, nonatomic) DLViewMore* ccViewMore;
 @property(assign, nonatomic) BOOL bIsInputMode;
+@property(strong, nonatomic) NSProgress* cProgressSending;
+@property(strong, nonatomic) MBProgressHUD* ctProgressView;
 -(void)feedChatList:(NSArray*)acarrList;
 
 -(void)dismissKeyBoard:(UITapGestureRecognizer*)acTapGes;
@@ -38,4 +42,6 @@
 -(void)actionSelectLocation:(id)aidSender;
 -(void)actionSelectVideoFile:(id)aidSender;
 
+-(void)dismissProgressView;
+-(void)showProgressView;
 @end

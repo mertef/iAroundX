@@ -15,7 +15,6 @@
 
 @class MBProgressHUD;
 @class PulsingHaloLayer;
-
 @interface DLMPViewCtrl : UIViewController<MCSessionDelegate, MCNearbyServiceBrowserDelegate,MCNearbyServiceAdvertiserDelegate, UITableViewDataSource, UITableViewDelegate,DLCellPopoutProto, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIAlertViewDelegate, UIViewControllerTransitioningDelegate>
 @property(nonatomic, strong) MCSession* csession;
 @property(nonatomic, strong) MCPeerID* cpeerId;
@@ -28,7 +27,7 @@
 @property(nonatomic, strong) UITableView* cTableServiceList;
 @property(nonatomic, strong) MBProgressHUD* ctProgressHud;
 
-@property(nonatomic, strong) NSMutableData* cmutData;
+
 
 @property(nonatomic, strong) MCPeerID* cpeerIdCurrent;
 @property(nonatomic, strong) NSProgress* cprogressCurrentReceiver;
@@ -41,6 +40,9 @@
 @property(strong, nonatomic) NSDictionary* cdicSelectedPeer;
 @property(copy, nonatomic) NSString* cstrSavedFilePath;
 @property(strong, nonatomic) UIButton* cbtnLogin, * cbtnFolder;
+
+@property(strong, nonatomic) NSMutableDictionary* cmutdicPeerMap;
+
 -(void)actionStartBrowserNearbyUsers:(id)aidSender;
 -(void)actionDismissServiceBrowser:(id)aidsender;
 -(void)actionSwipe:(UISwipeGestureRecognizer*)aswipeGes;
