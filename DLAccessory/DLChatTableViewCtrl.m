@@ -17,7 +17,7 @@
 
 @interface DLChatTableViewCtrl ()
 -(void)initAvAudioRecroder;
--(void)sendData:(NSData*)aData toPeer:(MCPeerID*)acPeerId withType:(T_PACKAGE_TYPE)atPackageType;
+-(void)sendData:(NSData*)aData toPeer:(MCPeerID*)acPeerId withType:(T_PACKAGE_TYPE)atPackageType mediaUrl:(NSURL*)acMediaUrl;
 
 @end
 
@@ -53,7 +53,6 @@
 {
     _c_str_audio_recording_path = nil;    
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [self.cProgressSending removeObserver:self forKeyPath:@"fractionCompleted"];
     [self.cProgressSending removeObserver:self forKeyPath:@"fractionCompleted"];
 
     self.tabBarController.tabBar.hidden = NO;
@@ -323,9 +322,7 @@
     DLTableCellChat* ccCellChat = (DLTableCellChat*)cell;
     
     [ccCellChat feedDictionaryInfo:[self.cmutarrChatList objectAtIndex:[indexPath row]]];
-    if ([indexPath row] == [self.cmutarrChatList count] - 1) {
-        [ccCellChat play];
-    }
+   
     return cell;
 }
 #pragma mark - textinput callback 
@@ -462,11 +459,10 @@
     
 }
 -(void)scrollChatToBottom {
-    if ([self.cmutarrChatList count] > 3) {
+    if ([self.ctableViewChat contentSize].height >= CGRectGetHeight(self.view.bounds) * 0.5f) {
         NSIndexPath* cIndexPath = [NSIndexPath indexPathForRow: [self.cmutarrChatList count] - 1 inSection: 0];
         [self.ctableViewChat scrollToRowAtIndexPath: cIndexPath atScrollPosition: UITableViewScrollPositionBottom animated: YES];
-    }
-    
+    }        
 }
 
 -(void)didStartRecording:(DLViewChatInput*)accViewChatInput {
@@ -646,6 +642,8 @@
                 UIImage* cimageOriginal = [info objectForKey:UIImagePickerControllerOriginalImage];
                 cdataPicture = UIImageJPEGRepresentation(cimageOriginal, 0.5f);
             }
+            NSURL* curlImage = [info objectForKey:UIImagePickerControllerMediaURL];
+
             /*
              NSString* cstrFileName = nil;
             NSTimeInterval iInterval = [[NSDate date] timeIntervalSince1970];
@@ -654,30 +652,32 @@
             NSString* cstrMediaURl = [NSTemporaryDirectory() stringByAppendingPathComponent:cstrFileName];
             [cdataPicture writeToURL:[NSURL fileURLWithPath:cstrMediaURl] atomically:YES];
 
-            [self sendMedia:[NSURL fileURLWithPath:cstrMediaURl] toPeer:self.cdicPeerInfoTo[k_peer_id] withType:enum_package_type_image];
+//            [self sendMedia:[NSURL fileURLWithPath:cstrMediaURl] toPeer:self.cdicPeerInfoTo[k_peer_id] withType:enum_package_type_image];
              */
 
-            [self sendData:cdataPicture toPeer:self.cdicPeerInfoTo[k_peer_id] withType:enum_package_type_image];
+            [self sendData:cdataPicture toPeer:self.cdicPeerInfoTo[k_peer_id] withType:enum_package_type_image mediaUrl:curlImage];
             
             NSLog(@"picture");
         }else if ([[info objectForKey:UIImagePickerControllerMediaType] isEqualToString:(__bridge NSString*)kUTTypeMovie]) {
             NSLog(@"movei");
             NSURL* curlMovie = [info objectForKey:UIImagePickerControllerMediaURL];
-            /*
+            
              NSString* cstrFileName = nil;
             NSTimeInterval iInterval = [[NSDate date] timeIntervalSince1970];
             cstrFileName = [NSString stringWithFormat:@"%f.mov", iInterval];
-            NSString* cstrMediaURl = [NSTemporaryDirectory() stringByAppendingPathComponent:cstrFileName];
+            NSString* cstrMediaURl = [NSHomeDirectory() stringByAppendingFormat:@"/Documents/%@", cstrFileName];
             NSError* cError = nil;
             [[NSFileManager defaultManager] copyItemAtURL:curlMovie toURL:[NSURL fileURLWithPath:cstrMediaURl] error:&cError];
             if (!cError) {
-                [self sendMedia:[NSURL fileURLWithPath:cstrMediaURl] toPeer:self.cdicPeerInfoTo[k_peer_id] withType:enum_package_type_video];
+//                [self sendMedia:[NSURL fileURLWithPath:cstrMediaURl] toPeer:self.cdicPeerInfoTo[k_peer_id] withType:enum_package_type_video];
+                NSData* cdataMovie = [[NSData alloc] initWithContentsOfURL:curlMovie];
+                [self sendData:cdataMovie toPeer:self.cdicPeerInfoTo[k_peer_id] withType:enum_package_type_video mediaUrl:[NSURL fileURLWithPath:cstrMediaURl]];
+                
             }else {
                 UIAlertView* cAlertMsg = [[UIAlertView alloc] initWithTitle:nil message:NSLocalizedString(@"k_save_file_failure", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"k_ok", nil) otherButtonTitles:nil, nil];
                 [cAlertMsg show];
-            }*/
-            NSData* cdataMovie = [[NSData alloc] initWithContentsOfURL:curlMovie];
-            [self sendData:cdataMovie toPeer:self.cdicPeerInfoTo[k_peer_id] withType:enum_package_type_video];
+            }
+            
         }
         
     }];
@@ -741,7 +741,7 @@
     });
 }
 
--(void)sendData:(NSData*)aData toPeer:(MCPeerID*)acPeerId withType:(T_PACKAGE_TYPE)atPackageType {
+-(void)sendData:(NSData*)aData toPeer:(MCPeerID*)acPeerId withType:(T_PACKAGE_TYPE)atPackageType mediaUrl:(NSURL*)acMediaUrl{
     
      /*
      "k_sending_video_begin" = "Sending video file begin!";
@@ -837,18 +837,32 @@
         
     }
     
-    
+    NSMutableDictionary* cmutdicItem = nil;
+    NSDate* cdateNow = [NSDate date];
+
     switch (atPackageType) {
         case enum_package_type_image:
             self.ctProgressView.labelText = NSLocalizedString(@"k_sending_image_end", nil);
+            cmutdicItem = [[NSMutableDictionary alloc] initWithObjectsAndKeys:self.cdicPeerInfoTo[k_peer_id], k_chat_to, self.cdicPeerInfoFrom[k_peer_id], k_chat_from, aData, k_chat_msg, [NSNumber numberWithDouble:[cdateNow timeIntervalSince1970]], k_chat_date, @(enum_package_type_image), k_chat_msg_type, [acMediaUrl absoluteString], k_chat_msg_media_url, nil];
             break;
         case enum_package_type_video:
             self.ctProgressView.labelText = NSLocalizedString(@"k_sending_video_end", nil);
+            cmutdicItem = [[NSMutableDictionary alloc] initWithObjectsAndKeys:self.cdicPeerInfoTo[k_peer_id], k_chat_to, self.cdicPeerInfoFrom[k_peer_id], k_chat_from, aData, k_chat_msg, [NSNumber numberWithDouble:[cdateNow timeIntervalSince1970]], k_chat_date, @(enum_package_type_video), k_chat_msg_type, [acMediaUrl absoluteString], k_chat_msg_media_url,nil];
+
             break;
         default:
             break;
     }
 
+
+    
+    [self.cmutarrChatList addObject:cmutdicItem];
+    dispatch_async(dispatch_get_main_queue(), ^(void){
+        [self.ctableViewChat reloadData];
+        [self scrollChatToBottom];
+    });
+
+  
     
     [self.ctProgressView hide:YES afterDelay:0.1f];
 
@@ -858,8 +872,8 @@
 #pragma mark - chat callback 
 -(void)didRequestPlayerVideo:(NSDictionary*)acdicInfo {
     MPMoviePlayerViewController* cMoviePlayerViewCtrl = nil;;
-
-    NSURL* curl = [NSURL fileURLWithPath:acdicInfo[k_chat_msg_media_url]];
+    NSLog(@"-----%@", acdicInfo[k_chat_msg_media_url]);
+    NSURL* curl = [NSURL URLWithString:acdicInfo[k_chat_msg_media_url]];
     cMoviePlayerViewCtrl = [[MPMoviePlayerViewController alloc] initWithContentURL:curl];
     [[cMoviePlayerViewCtrl moviePlayer] play];
     [self presentMoviePlayerViewControllerAnimated:cMoviePlayerViewCtrl];

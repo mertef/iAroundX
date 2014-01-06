@@ -270,7 +270,7 @@
         [_c_movie_player_ctr requestThumbnailImagesAtTimes:@[ [NSValue valueWithCMTime:CMTimeMake(0, 0)] ] timeOption:MPMovieTimeOptionNearestKeyFrame];
          */
         
-        AVAsset* casset = [AVAsset assetWithURL:[NSURL fileURLWithPath:cstrTempUrl]];
+        AVAsset* casset = [AVAsset assetWithURL:[NSURL URLWithString:cstrTempUrl] ];
         /*
         NSArray* carrList = [casset tracks];
         for (AVAssetTrack* cAssetTrack in carrList) {

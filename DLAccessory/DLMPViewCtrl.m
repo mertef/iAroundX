@@ -310,7 +310,7 @@
        CGFloat fProgress = [cmutdata length] / (CGFloat)puPackage->_u_l_package_size;
        self.ctProgressHud.progress = fProgress;
         CGFloat fSize = (CGFloat)puPackage->_u_l_package_size / (CGFloat)(1024.0  * 1024.0f);
-        self.ctProgressHud.labelText = [NSString stringWithFormat:@"%@:%%%0.2f",NSLocalizedString(@"k_receiving_video_begin", nil), fProgress * 100.0f];
+        self.ctProgressHud.labelText = [NSString stringWithFormat:@"%@:%0.2f%%",NSLocalizedString(@"k_receiving_video_begin", nil), fProgress * 100.0f];
 
         self.ctProgressHud.detailsLabelText = [NSString stringWithFormat:@"%@ %0.2fM", NSLocalizedString(@"k_receiving_file_size", nil), fSize];
         
@@ -318,7 +318,7 @@
         CGFloat fProgress = [cmutdata length] / (CGFloat)puPackage->_u_l_package_size;
         self.ctProgressHud.progress = fProgress;
         CGFloat fSize = (CGFloat)puPackage->_u_l_package_size / (CGFloat)(1024.0  * 1024.0f);
-        self.ctProgressHud.labelText = [NSString stringWithFormat:@"%@:%%%0.2f",NSLocalizedString(@"k_receiving_video_begin", nil), fProgress * 100.0f];
+        self.ctProgressHud.labelText = [NSString stringWithFormat:@"%@:%0.2f%%",NSLocalizedString(@"k_receiving_video_begin", nil), fProgress * 100.0f];
         self.ctProgressHud.detailsLabelText = [NSString stringWithFormat:@"%@ %0.2fM", NSLocalizedString(@"k_receiving_file_size", nil), fSize];
     }
 

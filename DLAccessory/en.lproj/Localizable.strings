@@ -38,19 +38,19 @@
 "k_error_audio" = "Error Recording Audio";
 "k_audio_disable" = "Your  device can't support audio recording or try again!";
 
-"k_receiving_video_begin" = "Receiving video file begin!";
+"k_receiving_video_begin" = "Receiving video begin!";
 "k_receiving_video_end" = "Receiving video Finished!";
 
-"k_receiving_image_begin" = "Receiving image file begin!";
+"k_receiving_image_begin" = "Receiving image  begin!";
 "k_receiving_image_end" = "Receiving image Finished!";
 
 "k_receiving_file_size" = "Size:";
 
 
-"k_sending_video_begin" = "Sending video file begin!";
+"k_sending_video_begin" = "Sending video  begin!";
 "k_sending_video_end" = "Sending video Finished!";
 
-"k_sending_image_begin" = "Sending image file begin!";
+"k_sending_image_begin" = "Sending image  begin!";
 "k_sending_image_end" = "Sending image Finished!";
 
 "k_send_file_failure" = "Sending File failure, Try later!";
