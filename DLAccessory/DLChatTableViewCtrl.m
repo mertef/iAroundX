@@ -14,6 +14,9 @@
 #import <MobileCoreServices/MobileCoreServices.h>
 #import <MediaPlayer/MediaPlayer.h>
 #import "MBProgressHUD.h"
+#import <CoreLocation/CoreLocation.h>
+#import <MapKit/MapKit.h>
+#import "DLMapViewCtrl.h"
 
 @interface DLChatTableViewCtrl ()
 -(void)initAvAudioRecroder;
@@ -620,6 +623,31 @@
     
 }
 -(void)actionSelectLocation:(id)aidSender {
+    if (![CLLocationManager locationServicesEnabled]) {
+        UIAlertView* cAlertMsg = [[UIAlertView alloc] initWithTitle:nil message:NSLocalizedString(@"k_location_disabled", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"k_ok", nil) otherButtonTitles:nil, nil];
+        [cAlertMsg show];
+    }
+    
+    if (!self.cLocationManager) {
+        self.cLocationManager = [[CLLocationManager alloc] init];
+    }
+    
+    self.cLocationCurrent = self.cLocationManager.location;
+    CLLocationCoordinate2D tLocationCoordinate = [self.cLocationCurrent coordinate];
+    NSString* cstrLocation = [[NSString alloc] initWithFormat:@"%f,%f",tLocationCoordinate.latitude, tLocationCoordinate.longitude];
+    NSLog(@"coordinate is %@", cstrLocation);
+    
+    NSData* cdataLocation = [[NSData alloc] initWithBytes:[cstrLocation UTF8String] length:[cstrLocation length]];
+    [self sendData:cdataLocation toPeer:self.cdicPeerInfoTo[k_peer_id] withType:enum_package_type_location mediaUrl:[NSURL URLWithString:k_url_invliad]];
+    
+    if (![CLLocationManager significantLocationChangeMonitoringAvailable]) {
+        UIAlertView* cAlertMsg = [[UIAlertView alloc] initWithTitle:nil message:NSLocalizedString(@"k_location_change_unavailable", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"k_ok", nil) otherButtonTitles:nil, nil];
+        [cAlertMsg show];
+        return;
+    }
+    [self.cLocationManager startMonitoringSignificantLocationChanges];
+    
+    
     
 }
 
@@ -751,7 +779,7 @@
      "k_sending_image_end" = "Sending image Finished!";
      
      "k_sending_file_size" = "Size:";
-     */
+    
     
     UIWindow* cwindowKey = [[UIApplication sharedApplication] keyWindow];
     self.ctProgressView = (MBProgressHUD*)[cwindowKey viewWithTag:k_tag_progress_view_chat];
@@ -783,7 +811,7 @@
     dispatch_async(dispatch_get_main_queue(), ^(void){
         [cwindowKey addSubview:self.ctProgressView];
     });
-    
+    */
     u_int32_t uiLength = (u_int32_t)[aData length];
     u_int32_t uiOffset = 1024 * 512;
     u_int32_t uiLoopCount = uiLength / uiOffset;
@@ -848,6 +876,10 @@
         case enum_package_type_video:
             self.ctProgressView.labelText = NSLocalizedString(@"k_sending_video_end", nil);
             cmutdicItem = [[NSMutableDictionary alloc] initWithObjectsAndKeys:self.cdicPeerInfoTo[k_peer_id], k_chat_to, self.cdicPeerInfoFrom[k_peer_id], k_chat_from, aData, k_chat_msg, [NSNumber numberWithDouble:[cdateNow timeIntervalSince1970]], k_chat_date, @(enum_package_type_video), k_chat_msg_type, [acMediaUrl absoluteString], k_chat_msg_media_url,nil];
+            
+        case enum_package_type_location:
+            self.ctProgressView.labelText = NSLocalizedString(@"k_sending_video_end", nil);
+            cmutdicItem = [[NSMutableDictionary alloc] initWithObjectsAndKeys:self.cdicPeerInfoTo[k_peer_id], k_chat_to, self.cdicPeerInfoFrom[k_peer_id], k_chat_from, aData, k_chat_msg, [NSNumber numberWithDouble:[cdateNow timeIntervalSince1970]], k_chat_date, @(enum_package_type_location), k_chat_msg_type, [acMediaUrl absoluteString], k_chat_msg_media_url,nil];
 
             break;
         default:
@@ -881,4 +913,30 @@
 -(void)didRequestShowImage:(NSDictionary*)acdicInfo {
     
 }
+-(void)didRequestShowLocation:(NSDictionary *)acdicInfo {
+    
+    DLMapViewCtrl* ccMapViewCtrl = [[DLMapViewCtrl alloc] init];
+    ccMapViewCtrl.cdicInfo = acdicInfo;
+    ccMapViewCtrl.tLocationCoordinate2d = self.cLocationCurrent.coordinate;
+    [self.navigationController pushViewController:ccMapViewCtrl animated:YES];
+    
+}
+#pragma mark - location manager 
+-(void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations {
+    self.cLocationCurrent = [locations lastObject];
+}
+-(void)locationManagerDidPauseLocationUpdates:(CLLocationManager *)manager {
+    
+}
+-(void)locationManagerDidResumeLocationUpdates:(CLLocationManager *)manager {
+    
+}
+-(void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error {
+    UIAlertView* cAlertMsg = [[UIAlertView alloc] initWithTitle:nil message:NSLocalizedString(@"k_location_invalid", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"k_ok", nil) otherButtonTitles:nil, nil];
+    [cAlertMsg show];
+}
+-(void)locationManager:(CLLocationManager *)manager didFinishDeferredUpdatesWithError:(NSError *)error {
+    
+}
+
 @end

@@ -53,5 +53,11 @@
 "k_sending_image_end" = "发送图片文件完毕!";
 "k_send_file_failure" = "发送文件失败，休息会再发吧!";
 
+"k_location_disabled" = "请开启地理位置服务!";
+"k_location_change_unavailable" = "设置不支持移动位置检测!";
+"k_location_invalid" = "地理位置无效!";
+
+
+
 
 

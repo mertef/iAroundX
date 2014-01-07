@@ -59,7 +59,7 @@
 
 
 #define k_noti_playing @"noti_playing_item"
-
+#define k_url_invliad @"file://invliad"
 
 #define k_tag_progress_view_chat 0x3533
 typedef NS_ENUM(int32_t, T_PACKAGE_TYPE) {
@@ -68,6 +68,7 @@ typedef NS_ENUM(int32_t, T_PACKAGE_TYPE) {
     enum_package_type_audio,
     enum_package_type_video,
     enum_package_type_stream,
+    enum_package_type_location,
     enum_package_type_other
 };
 typedef struct {

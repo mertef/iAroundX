@@ -10,11 +10,12 @@
 #import "DLViewChatInput.h"
 #import <AVFoundation/AVFoundation.h>
 #import "DLTableCellChat.h"
+#import <CoreLocation/CoreLocation.h>
 
 @class MCSession;
 @class DLViewMore;
 @class MBProgressHUD;
-@interface DLChatTableViewCtrl : UIViewController<UITableViewDelegate, UITableViewDataSource, DLViewChatInputProto, AVAudioRecorderDelegate, UIGestureRecognizerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, DLTableCellChatProto>{
+@interface DLChatTableViewCtrl : UIViewController<UITableViewDelegate, UITableViewDataSource, DLViewChatInputProto, AVAudioRecorderDelegate, UIGestureRecognizerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, DLTableCellChatProto, CLLocationManagerDelegate>{
     AVAudioRecorder* _c_audio_recorder;
     NSString* _c_str_audio_recording_path;
     
@@ -30,6 +31,8 @@
 @property(assign, nonatomic) BOOL bIsInputMode;
 @property(strong, nonatomic) NSProgress* cProgressSending;
 @property(strong, nonatomic) MBProgressHUD* ctProgressView;
+@property(strong, nonatomic) CLLocationManager* cLocationManager;
+@property(strong, nonatomic) CLLocation* cLocationCurrent;
 -(void)feedChatList:(NSArray*)acarrList;
 
 -(void)dismissKeyBoard:(UITapGestureRecognizer*)acTapGes;

@@ -134,6 +134,8 @@
         if([cnumberMsgType intValue] == enum_package_type_audio) {
             _cimageViewAudio.frame = CGRectMake((CGRectGetWidth(_cimageViewBg.bounds) - _cimageViewAudio.image.size.width) * 0.5f, (CGRectGetHeight(_cimageViewBg.bounds) - _cimageViewAudio.image.size.height) * 0.5f - 4.0f, _cimageViewAudio.image.size.width, _cimageViewAudio.image.size.height);
         }
+        self.cimageViewMsgLocation.center = CGPointMake(CGRectGetMaxX(self.cimageViewIcon.frame) + 30.0f, self.contentView.center.y - 10.0f);
+
         
     }else { //image icon is in right
         _cimageViewIcon.frame = CGRectMake(fWidth - 4.0f - sSizeImage.width, 18.0f, sSizeImage.width, sSizeImage.height);
@@ -153,18 +155,20 @@
         if([cnumberMsgType intValue] == enum_package_type_audio) {
             _cimageViewAudio.frame = CGRectMake((CGRectGetWidth(_cimageViewBg.bounds) - _cimageViewAudio.image.size.width) * 0.5f, (CGRectGetHeight(_cimageViewBg.bounds) - _cimageViewAudio.image.size.height) * 0.5f - 4.0f, _cimageViewAudio.image.size.width, _cimageViewAudio.image.size.height);
         }
+        self.cimageViewMsgLocation.center = CGPointMake(CGRectGetMinX(self.cimageViewIcon.frame) - 30.0f, self.contentView.center.y - 10.0f);
+
     }
     
     
      if([cnumberMsgType intValue] == enum_package_type_image) {
          self.cimageViewMsgImage.frame = _clableMsg.frame;
     }else if([cnumberMsgType intValue] == enum_package_type_video) {
-        self.cimageViewMsgVideoFirstFrame.frame = _clableMsg.frame;
+        self.cimageViewMsgVideoFirstFrame.frame = _clableMsg.bounds;
 //        NSLog(@"---%@", NSStringFromCGRect(self.cimageViewMsgVideoFirstFrame.frame));
-        UIImage* cimageVideo = self.cimageViewMsgVideo.image;
-        self.cimageViewMsgVideo.frame = CGRectMake(0.0f , 0.0f, cimageVideo.size.width, cimageVideo.size.height);
+        self.cimageViewMsgVideo.frame = CGRectMake(0.0f, 0.0f, self.cimageViewMsgVideo.image.size.width, self.cimageViewMsgVideo.image.size.height);
         self.cimageViewMsgVideo.center = self.cimageViewMsgVideoFirstFrame.center;
     }
+
     
 
     _clableDate.frame = CGRectMake(CGRectGetMinX(_cimageViewBg.frame) + 30.0f, CGRectGetMaxY(_cimageViewBg.frame) - 10.0f, 60.0f, 20.0f);
@@ -199,6 +203,7 @@
     _cimageViewIcon.image = cimageIconDefault;
     _cimageViewAudio.hidden = YES;
     _cimageViewBg.image = nil;
+    _cimageViewMsgLocation.hidden = YES;
     self.cimageViewMsgImage.hidden = YES;
     self.cimageViewMsgVideo.hidden = YES;
     self.cimageViewMsgVideoFirstFrame.hidden = YES;
@@ -288,7 +293,23 @@
         }
         
         self.cimageViewMsgVideoFirstFrame.hidden = NO;
+    } else if([cnumberMsgType intValue] == enum_package_type_location) {
+        if (!self.cimageViewMsgLocation) {
+            self.cimageViewMsgLocation = [[UIImageView alloc] init];
+            self.cimageViewMsgLocation.contentMode = UIViewContentModeScaleAspectFit;
+            UIImage* cimageLocation = [UIImage imageNamed:@"location"];
+            self.cimageViewMsgLocation.image = cimageLocation;
+            self.cimageViewMsgLocation.backgroundColor = [UIColor clearColor];
+            self.cimageViewMsgLocation.frame = CGRectMake(0.0f, 0.0f, cimageLocation.size.width, cimageLocation.size.height);
+            [self.contentView addSubview:self.cimageViewMsgLocation];
+
+        }
+        _cimageViewMsgLocation.hidden = NO;
+
     }
+    
+        
+
     NSNumber* cnumberDate = acdicInfo[k_chat_date];
     
     _clableDate.text = [Common FormatDateLong:[cnumberDate doubleValue]];
@@ -331,6 +352,11 @@
     }else if([cnumberMsgType intValue] == enum_package_type_image){
         if ([self.idChatProto respondsToSelector:@selector(didRequestShowImage:)]) {
             [self.idChatProto didRequestShowImage:self.cdicInfo];
+        }
+        
+    }else if([cnumberMsgType intValue] == enum_package_type_location){
+        if ([self.idChatProto respondsToSelector:@selector(didRequestShowLocation:)]) {
+            [self.idChatProto didRequestShowLocation:self.cdicInfo];
         }
         
     }

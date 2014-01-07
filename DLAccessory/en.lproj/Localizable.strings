@@ -55,7 +55,9 @@
 
 "k_send_file_failure" = "Sending File failure, Try later!";
 
-
+"k_location_disabled" = "Location service Disabled!";
+"k_location_change_unavailable" = "location Change monitoring not supported!";
+"k_location_invalid" = "Location invlalid!";
 
 
 

@@ -14,6 +14,7 @@
 @optional
 -(void)didRequestPlayerVideo:(NSDictionary*)acdicInfo;
 -(void)didRequestShowImage:(NSDictionary*)acdicInfo;
+-(void)didRequestShowLocation:(NSDictionary*)acdicInfo;
 @end
 @interface DLTableCellChat : UITableViewCell<AVAudioPlayerDelegate, UIGestureRecognizerDelegate> {
     AVAudioPlayer* _c_aduio_player;
@@ -26,6 +27,8 @@
 @property(strong, nonatomic) UIImageView* cimageViewMsgImage;
 @property(strong, nonatomic) UIImageView* cimageViewMsgVideo;
 @property(strong, nonatomic) UIImageView* cimageViewMsgVideoFirstFrame;
+@property(strong, nonatomic) UIImageView* cimageViewMsgLocation;
+
 @property(assign, nonatomic) id<DLTableCellChatProto> idChatProto;
 
 @property(strong, nonatomic) UILabel* clableMsg;
