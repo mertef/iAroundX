@@ -290,6 +290,7 @@
         puPackage->_u_l_package_type == enum_package_type_image) {
         NSData* cdataMsg = [data subdataWithRange:NSMakeRange(sizeof(T_PACKAGE_HEADER), puPackage->_u_l_package_length)];
 //        NSLog(@"data size is %lu", (unsigned long)[cdataMsg length]);
+        NSLog(@"msg id is %d", puPackage->_u_l_msg_id);
         [cmutdata appendData:cdataMsg];
     }
     
@@ -427,6 +428,8 @@
 // Finished receiving a resource from remote peer and saved the content in a temporary location - the app is responsible for moving the file to a permanent location within its sandbox
 - (void)session:(MCSession *)session didFinishReceivingResourceWithName:(NSString *)resourceName fromPeer:(MCPeerID *)peerID atURL:(NSURL *)localURL withError:(NSError *)error {
     
+    u_int32_t uiMsgId = [[NSDate date] timeIntervalSince1970];
+    
     NSMutableData* cmutdata = [self.cmutdicPeerMap objectForKey:[peerID displayName]];
 
     if ([self.view viewWithTag:k_tag_progress_view]) {
@@ -454,7 +457,9 @@
         }
         NSDictionary* cdicChatItem = nil;
         if ([resourceName hasSuffix:k_file_type_video]) {
-           cdicChatItem = @{k_chat_from:peerID,
+           cdicChatItem = @{
+                            k_chat_msg_id:@(uiMsgId),
+                            k_chat_from:peerID,
                                            k_chat_to:self.cpeerId,
                                            k_chat_msg:cmutdata,
                                            k_chat_msg_type:@(enum_package_type_video),
@@ -462,7 +467,9 @@
                                            k_chat_msg_media_url:cstrMediaUrl
                                            };
         }else if([resourceName hasSuffix:k_file_type_image]) {
-             cdicChatItem = @{k_chat_from:peerID,
+             cdicChatItem = @{
+                              k_chat_msg_id:@(uiMsgId),
+                              k_chat_from:peerID,
                                            k_chat_to:self.cpeerId,
                                            k_chat_msg:cmutdata,
                                            k_chat_msg_type:@(enum_package_type_image),
@@ -470,7 +477,9 @@
                                            k_chat_msg_media_url:cstrMediaUrl
                                            };
         }else {
-            cdicChatItem = @{k_chat_from:peerID,
+            cdicChatItem = @{
+                             k_chat_msg_id:@(uiMsgId),
+                             k_chat_from:peerID,
                                            k_chat_to:self.cpeerId,
                                            k_chat_msg:cmutdata,
                                            k_chat_msg_type:@(enum_package_type_other),
@@ -761,6 +770,23 @@
      }else {
      NSLog(@"tranfer complete");
      }
+     u_int32_t uiSessionId = lround([[NSDate date] timeIntervalSince1970]);
+
+     NSData* cdataMedia = [NSData dataWithContentsOfURL:acUrl];
+      NSDictionary*  cdicChatItem = @{
+                          k_chat_from:self.cpeerId,
+                          k_chat_to:acdicPeerId[k_peer_id],
+                          k_chat_msg:cdataMedia,
+                          k_chat_msg_id:@(uiSessionId),
+                          k_chat_msg_type:@(enum_package_type_other),
+                          k_chat_date: @([[NSDate date] timeIntervalSince1970]),
+                          k_chat_msg_media_url:[acUrl absoluteString]
+                          };
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:k_noti_chat_msg_increase object:nil userInfo:cdicChatItem];
+    [[NSNotificationCenter defaultCenter] postNotificationName:k_noti_chat_msg object:nil userInfo:cdicChatItem];
+
+                                    
      [self.cprogressCurrentSender removeObserver:self forKeyPath:@"fractionCompleted"];
      dispatch_async(dispatch_get_main_queue(), ^(void){
      self.ctProgressHud.labelText = NSLocalizedString(@"k_sending_file_finished", nil);

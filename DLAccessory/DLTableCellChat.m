@@ -135,6 +135,7 @@
             _cimageViewAudio.frame = CGRectMake((CGRectGetWidth(_cimageViewBg.bounds) - _cimageViewAudio.image.size.width) * 0.5f, (CGRectGetHeight(_cimageViewBg.bounds) - _cimageViewAudio.image.size.height) * 0.5f - 4.0f, _cimageViewAudio.image.size.width, _cimageViewAudio.image.size.height);
         }
         self.cimageViewMsgLocation.center = CGPointMake(CGRectGetMaxX(self.cimageViewIcon.frame) + 30.0f, self.contentView.center.y - 10.0f);
+        _clableDate.frame = CGRectMake(CGRectGetMaxX(_cimageViewBg.frame) - 30.0f, CGRectGetMaxY(_cimageViewBg.frame) - 10.0f, 60.0f, 20.0f);
 
         
     }else { //image icon is in right
@@ -156,10 +157,12 @@
             _cimageViewAudio.frame = CGRectMake((CGRectGetWidth(_cimageViewBg.bounds) - _cimageViewAudio.image.size.width) * 0.5f, (CGRectGetHeight(_cimageViewBg.bounds) - _cimageViewAudio.image.size.height) * 0.5f - 4.0f, _cimageViewAudio.image.size.width, _cimageViewAudio.image.size.height);
         }
         self.cimageViewMsgLocation.center = CGPointMake(CGRectGetMinX(self.cimageViewIcon.frame) - 30.0f, self.contentView.center.y - 10.0f);
+        _clableDate.frame = CGRectMake(CGRectGetMinX(_cimageViewBg.frame) + 30.0f, CGRectGetMaxY(_cimageViewBg.frame) - 10.0f, 60.0f, 20.0f);
+
 
     }
     
-    
+
      if([cnumberMsgType intValue] == enum_package_type_image) {
          self.cimageViewMsgImage.frame = _clableMsg.frame;
     }else if([cnumberMsgType intValue] == enum_package_type_video) {
@@ -171,7 +174,6 @@
 
     
 
-    _clableDate.frame = CGRectMake(CGRectGetMinX(_cimageViewBg.frame) + 30.0f, CGRectGetMaxY(_cimageViewBg.frame) - 10.0f, 60.0f, 20.0f);
     
 }
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated
@@ -275,7 +277,7 @@
         [_c_movie_player_ctr requestThumbnailImagesAtTimes:@[ [NSValue valueWithCMTime:CMTimeMake(0, 0)] ] timeOption:MPMovieTimeOptionNearestKeyFrame];
          */
         
-        AVAsset* casset = [AVAsset assetWithURL:[NSURL URLWithString:cstrTempUrl] ];
+        AVAsset* casset = [AVAsset assetWithURL:[NSURL fileURLWithPath:cstrTempUrl]];
         /*
         NSArray* carrList = [casset tracks];
         for (AVAssetTrack* cAssetTrack in carrList) {

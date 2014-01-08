@@ -34,7 +34,11 @@
 #define k_chat_list @"k_chat_list"
 #define k_chat_to @"chat_to"
 
+#define k_chat_msg_id  @"chat_msg_id"
 #define k_chat_msg  @"chat_msg"
+#define k_chat_msg_length  @"chat_msg_length"
+#define k_chat_msg_size  @"chat_msg_size"
+
 #define k_chat_msg_media_url  @"chat_msg_media_url"
 
 #define k_chat_msg_type @"msg_type"
@@ -76,6 +80,7 @@ typedef struct {
        u_int32_t _u_l_package_size;
        u_int32_t _u_l_package_length;
        u_int32_t _u_l_current_offset;
+       u_int32_t _u_l_msg_id;
 }T_PACKAGE_HEADER;
 
 #endif

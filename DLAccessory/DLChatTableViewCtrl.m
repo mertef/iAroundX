@@ -20,7 +20,7 @@
 
 @interface DLChatTableViewCtrl ()
 -(void)initAvAudioRecroder;
--(void)sendData:(NSData*)aData toPeer:(MCPeerID*)acPeerId withType:(T_PACKAGE_TYPE)atPackageType mediaUrl:(NSURL*)acMediaUrl;
+-(void)sendData:(NSData*)aData toPeer:(MCPeerID*)acPeerId withType:(T_PACKAGE_TYPE)atPackageType mediaPath:(NSString*)aqcstrMediaPath;
 
 @end
 
@@ -43,8 +43,21 @@
         NSDictionary* cdicUserInfo = acNoti.userInfo;
         MCPeerID* cpeerIdTo = [cdicUserInfo objectForKey:k_chat_to];
         MCPeerID* cpeerIdFrom = self.cdicPeerInfoFrom[k_peer_id];
+//        NSNumber* cnumberMsgId = cdicUserInfo[k_chat_msg_id];
+        
         if ([[cpeerIdFrom displayName] isEqualToString:[cpeerIdTo displayName]]) {
+            /*
+            NSPredicate* cpredicateMsgId = [NSPredicate predicateWithFormat:@"(%K == %@)", k_chat_msg_id, [cnumberMsgId stringValue]];
+            NSArray* carrList = [self.cmutarrChatList filteredArrayUsingPredicate:cpredicateMsgId];
+            if (carrList && [carrList count] > 0) {
+                NSUInteger uiMsgIndex = [self.cmutarrChatList indexOfObject:[carrList firstObject]];
+                [self.cmutarrChatList replaceObjectAtIndex:uiMsgIndex withObject:cdicUserInfo];
+            }else {
+               [self.cmutarrChatList addObject:cdicUserInfo];
+            }
+            */
             [self.cmutarrChatList addObject:cdicUserInfo];
+
             dispatch_async(dispatch_get_main_queue(), ^(void){
                 [self.ctableViewChat reloadData];
                 [self scrollChatToBottom];
@@ -337,11 +350,14 @@
         NSData* cdataTxt = [cstrText dataUsingEncoding:NSUTF8StringEncoding];
         NSUInteger uiUsedLength = [cdataTxt length];
         
+        u_int32_t uiMsgId = lround([[NSDate date] timeIntervalSince1970]);
+
         T_PACKAGE_HEADER tPackageHeader;
         tPackageHeader._u_l_package_type = enum_package_type_short_msg;
         tPackageHeader._u_l_package_size = (int32_t)(sizeof(T_PACKAGE_HEADER) + uiUsedLength);
         tPackageHeader._u_l_package_length = (int32_t)uiUsedLength;
         tPackageHeader._u_l_current_offset = (int32_t)sizeof(T_PACKAGE_HEADER);
+        tPackageHeader._u_l_msg_id = uiMsgId;
         
         NSData* cdataHeader = [NSData dataWithBytes:&tPackageHeader length:sizeof(tPackageHeader)];
         
@@ -626,19 +642,17 @@
     if (![CLLocationManager locationServicesEnabled]) {
         UIAlertView* cAlertMsg = [[UIAlertView alloc] initWithTitle:nil message:NSLocalizedString(@"k_location_disabled", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"k_ok", nil) otherButtonTitles:nil, nil];
         [cAlertMsg show];
+        return;
     }
     
     if (!self.cLocationManager) {
         self.cLocationManager = [[CLLocationManager alloc] init];
     }
-    
-    self.cLocationCurrent = self.cLocationManager.location;
-    CLLocationCoordinate2D tLocationCoordinate = [self.cLocationCurrent coordinate];
-    NSString* cstrLocation = [[NSString alloc] initWithFormat:@"%f,%f",tLocationCoordinate.latitude, tLocationCoordinate.longitude];
-    NSLog(@"coordinate is %@", cstrLocation);
-    
-    NSData* cdataLocation = [[NSData alloc] initWithBytes:[cstrLocation UTF8String] length:[cstrLocation length]];
-    [self sendData:cdataLocation toPeer:self.cdicPeerInfoTo[k_peer_id] withType:enum_package_type_location mediaUrl:[NSURL URLWithString:k_url_invliad]];
+    self.cLocationManager.delegate = self;
+    [self.cLocationManager startUpdatingLocation];
+
+
+
     
     if (![CLLocationManager significantLocationChangeMonitoringAvailable]) {
         UIAlertView* cAlertMsg = [[UIAlertView alloc] initWithTitle:nil message:NSLocalizedString(@"k_location_change_unavailable", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"k_ok", nil) otherButtonTitles:nil, nil];
@@ -671,6 +685,7 @@
                 cdataPicture = UIImageJPEGRepresentation(cimageOriginal, 0.5f);
             }
             NSURL* curlImage = [info objectForKey:UIImagePickerControllerMediaURL];
+            
 
             /*
              NSString* cstrFileName = nil;
@@ -683,7 +698,7 @@
 //            [self sendMedia:[NSURL fileURLWithPath:cstrMediaURl] toPeer:self.cdicPeerInfoTo[k_peer_id] withType:enum_package_type_image];
              */
 
-            [self sendData:cdataPicture toPeer:self.cdicPeerInfoTo[k_peer_id] withType:enum_package_type_image mediaUrl:curlImage];
+            [self sendData:cdataPicture toPeer:self.cdicPeerInfoTo[k_peer_id] withType:enum_package_type_image mediaPath:[curlImage path]];
             
             NSLog(@"picture");
         }else if ([[info objectForKey:UIImagePickerControllerMediaType] isEqualToString:(__bridge NSString*)kUTTypeMovie]) {
@@ -698,8 +713,8 @@
             [[NSFileManager defaultManager] copyItemAtURL:curlMovie toURL:[NSURL fileURLWithPath:cstrMediaURl] error:&cError];
             if (!cError) {
 //                [self sendMedia:[NSURL fileURLWithPath:cstrMediaURl] toPeer:self.cdicPeerInfoTo[k_peer_id] withType:enum_package_type_video];
-                NSData* cdataMovie = [[NSData alloc] initWithContentsOfURL:curlMovie];
-                [self sendData:cdataMovie toPeer:self.cdicPeerInfoTo[k_peer_id] withType:enum_package_type_video mediaUrl:[NSURL fileURLWithPath:cstrMediaURl]];
+                NSData* cdataMovie = [[NSData alloc] initWithContentsOfURL:[NSURL fileURLWithPath:cstrMediaURl]];
+                [self sendData:cdataMovie toPeer:self.cdicPeerInfoTo[k_peer_id] withType:enum_package_type_video mediaPath:cstrMediaURl];
                 
             }else {
                 UIAlertView* cAlertMsg = [[UIAlertView alloc] initWithTitle:nil message:NSLocalizedString(@"k_save_file_failure", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"k_ok", nil) otherButtonTitles:nil, nil];
@@ -769,7 +784,7 @@
     });
 }
 
--(void)sendData:(NSData*)aData toPeer:(MCPeerID*)acPeerId withType:(T_PACKAGE_TYPE)atPackageType mediaUrl:(NSURL*)acMediaUrl{
+-(void)sendData:(NSData*)aData toPeer:(MCPeerID*)acPeerId withType:(T_PACKAGE_TYPE)atPackageType mediaPath:(NSString*)aqcstrMediaPath{
     
      /*
      "k_sending_video_begin" = "Sending video file begin!";
@@ -813,7 +828,7 @@
     });
     */
     u_int32_t uiLength = (u_int32_t)[aData length];
-    u_int32_t uiOffset = 1024 * 512;
+    u_int32_t uiOffset = 1024 * 24;
     u_int32_t uiLoopCount = uiLength / uiOffset;
     u_int32_t uiRemainder = uiLength % uiOffset;
 
@@ -821,6 +836,8 @@
     NSMutableData* cmutdata = [[NSMutableData alloc] init];
     NSError* cError = nil;
     BOOL bSendFlag = YES;
+    
+    u_int32_t uiSessionId = lround([[NSDate date] timeIntervalSince1970]);
     for (; uiLoop < uiLoopCount ;  uiLoop ++) {
         [cmutdata setLength:0];
         T_PACKAGE_HEADER tPackageHeader;
@@ -828,7 +845,7 @@
         tPackageHeader._u_l_package_length = uiOffset;
         tPackageHeader._u_l_package_size = uiLength;
         tPackageHeader._u_l_package_type = atPackageType;
-        
+        tPackageHeader._u_l_msg_id = uiSessionId;
         NSData* cdataHeader = [NSData dataWithBytes:&tPackageHeader length:sizeof(tPackageHeader)];
 
         [cmutdata appendData:cdataHeader];
@@ -851,6 +868,8 @@
         tPackageHeader._u_l_package_length = uiRemainder;
         tPackageHeader._u_l_package_size = uiLength;
         tPackageHeader._u_l_package_type = atPackageType;
+        tPackageHeader._u_l_msg_id = uiSessionId;
+
         NSData* cdataHeader = [NSData dataWithBytes:&tPackageHeader length:sizeof(tPackageHeader)];
         [cmutdata appendData:cdataHeader];
 
@@ -871,15 +890,15 @@
     switch (atPackageType) {
         case enum_package_type_image:
             self.ctProgressView.labelText = NSLocalizedString(@"k_sending_image_end", nil);
-            cmutdicItem = [[NSMutableDictionary alloc] initWithObjectsAndKeys:self.cdicPeerInfoTo[k_peer_id], k_chat_to, self.cdicPeerInfoFrom[k_peer_id], k_chat_from, aData, k_chat_msg, [NSNumber numberWithDouble:[cdateNow timeIntervalSince1970]], k_chat_date, @(enum_package_type_image), k_chat_msg_type, [acMediaUrl absoluteString], k_chat_msg_media_url, nil];
+            cmutdicItem = [[NSMutableDictionary alloc] initWithObjectsAndKeys:self.cdicPeerInfoTo[k_peer_id], k_chat_to, self.cdicPeerInfoFrom[k_peer_id], k_chat_from, aData, k_chat_msg, [NSNumber numberWithDouble:[cdateNow timeIntervalSince1970]], k_chat_date, @(enum_package_type_image), k_chat_msg_type, aqcstrMediaPath, k_chat_msg_media_url, [NSNumber numberWithInt:uiSessionId],k_chat_msg_id,nil];
             break;
         case enum_package_type_video:
             self.ctProgressView.labelText = NSLocalizedString(@"k_sending_video_end", nil);
-            cmutdicItem = [[NSMutableDictionary alloc] initWithObjectsAndKeys:self.cdicPeerInfoTo[k_peer_id], k_chat_to, self.cdicPeerInfoFrom[k_peer_id], k_chat_from, aData, k_chat_msg, [NSNumber numberWithDouble:[cdateNow timeIntervalSince1970]], k_chat_date, @(enum_package_type_video), k_chat_msg_type, [acMediaUrl absoluteString], k_chat_msg_media_url,nil];
-            
+            cmutdicItem = [[NSMutableDictionary alloc] initWithObjectsAndKeys:self.cdicPeerInfoTo[k_peer_id], k_chat_to, self.cdicPeerInfoFrom[k_peer_id], k_chat_from, aData, k_chat_msg, [NSNumber numberWithDouble:[cdateNow timeIntervalSince1970]], k_chat_date, @(enum_package_type_video), k_chat_msg_type, aqcstrMediaPath, k_chat_msg_media_url,[NSNumber numberWithInt:uiSessionId],k_chat_msg_id,nil];
+            break;
         case enum_package_type_location:
             self.ctProgressView.labelText = NSLocalizedString(@"k_sending_video_end", nil);
-            cmutdicItem = [[NSMutableDictionary alloc] initWithObjectsAndKeys:self.cdicPeerInfoTo[k_peer_id], k_chat_to, self.cdicPeerInfoFrom[k_peer_id], k_chat_from, aData, k_chat_msg, [NSNumber numberWithDouble:[cdateNow timeIntervalSince1970]], k_chat_date, @(enum_package_type_location), k_chat_msg_type, [acMediaUrl absoluteString], k_chat_msg_media_url,nil];
+            cmutdicItem = [[NSMutableDictionary alloc] initWithObjectsAndKeys:self.cdicPeerInfoTo[k_peer_id], k_chat_to, self.cdicPeerInfoFrom[k_peer_id], k_chat_from, aData, k_chat_msg, [NSNumber numberWithDouble:[cdateNow timeIntervalSince1970]], k_chat_date, @(enum_package_type_location), k_chat_msg_type, aqcstrMediaPath, k_chat_msg_media_url,[NSNumber numberWithInt:uiSessionId],k_chat_msg_id,nil];
 
             break;
         default:
@@ -905,7 +924,8 @@
 -(void)didRequestPlayerVideo:(NSDictionary*)acdicInfo {
     MPMoviePlayerViewController* cMoviePlayerViewCtrl = nil;;
     NSLog(@"-----%@", acdicInfo[k_chat_msg_media_url]);
-    NSURL* curl = [NSURL URLWithString:acdicInfo[k_chat_msg_media_url]];
+    NSURL* curl = [NSURL fileURLWithPath:acdicInfo[k_chat_msg_media_url]];
+    
     cMoviePlayerViewCtrl = [[MPMoviePlayerViewController alloc] initWithContentURL:curl];
     [[cMoviePlayerViewCtrl moviePlayer] play];
     [self presentMoviePlayerViewControllerAnimated:cMoviePlayerViewCtrl];
@@ -917,13 +937,27 @@
     
     DLMapViewCtrl* ccMapViewCtrl = [[DLMapViewCtrl alloc] init];
     ccMapViewCtrl.cdicInfo = acdicInfo;
-    ccMapViewCtrl.tLocationCoordinate2d = self.cLocationCurrent.coordinate;
+    NSString* cstrLocation = [[NSString alloc] initWithData:[acdicInfo objectForKey:k_chat_msg] encoding:NSUTF8StringEncoding];
+    NSArray* carrLatitudeAndLongitude = [cstrLocation componentsSeparatedByString:@","];
+    CGFloat fLatitude = [[carrLatitudeAndLongitude firstObject] floatValue];
+    CGFloat fLongitude = [[carrLatitudeAndLongitude lastObject] floatValue];
+    
+    ccMapViewCtrl.tLocationCoordinate2d = CLLocationCoordinate2DMake(fLatitude, fLongitude);
     [self.navigationController pushViewController:ccMapViewCtrl animated:YES];
     
 }
 #pragma mark - location manager 
 -(void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations {
     self.cLocationCurrent = [locations lastObject];
+    CLLocationCoordinate2D tLocationCoordinate = [self.cLocationCurrent coordinate];
+    NSString* cstrLocation = [[NSString alloc] initWithFormat:@"%f,%f",tLocationCoordinate.latitude, tLocationCoordinate.longitude];
+    NSLog(@"coordinate is %@", cstrLocation);
+    
+    NSData* cdataLocation = [[NSData alloc] initWithBytes:[cstrLocation UTF8String] length:[cstrLocation length]];
+    [self sendData:cdataLocation toPeer:self.cdicPeerInfoTo[k_peer_id] withType:enum_package_type_location mediaPath:k_url_invliad];
+    [manager stopMonitoringSignificantLocationChanges];
+    [manager stopUpdatingLocation];
+    manager.delegate = nil;
 }
 -(void)locationManagerDidPauseLocationUpdates:(CLLocationManager *)manager {
     

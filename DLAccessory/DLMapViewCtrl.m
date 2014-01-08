@@ -39,11 +39,12 @@
     self.cMapView.mapType = MKMapTypeStandard;
     self.cMapView.delegate = self;
     self.cMapView.showsUserLocation = YES;
-    MKCoordinateRegion tCoorindateRegion =  MKCoordinateRegionMakeWithDistance(self.tLocationCoordinate2d, 500, 500);
+    MKCoordinateRegion tCoorindateRegion =  MKCoordinateRegionMakeWithDistance(self.tLocationCoordinate2d, 200, 200);
     self.cMapView.region = tCoorindateRegion;
     self.cMapView.centerCoordinate = self.tLocationCoordinate2d;
     [self.view addSubview:self.cMapView];
-    
+    NSLog(@"my locations is user location! %f,%f", self.tLocationCoordinate2d.latitude, self.tLocationCoordinate2d.longitude);
+
 	// Do any additional setup after loading the view.
     
 }
@@ -53,5 +54,9 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
-
+#pragma mark - 
+-(void)mapView:(MKMapView *)mapView didUpdateUserLocation:(MKUserLocation *)userLocation {
+    NSLog(@"user location! %f,%f", userLocation.coordinate.latitude, userLocation.coordinate.longitude);
+    [mapView setCenterCoordinate:userLocation.coordinate animated:YES];
+}
 @end
