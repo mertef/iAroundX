@@ -30,10 +30,11 @@
         [self addSubview:_cimageviewBg];
         
         _ctextViewInput = [[UITextView alloc] init];
-        _ctextViewInput.layer.cornerRadius = 2.0f;
+        _ctextViewInput.layer.cornerRadius = 6.0f;
+        
         _ctextViewInput.textContainerInset = UIEdgeInsetsMake(2.0f, 2.0f, 2.0f, 2.0f);
         _ctextViewInput.contentInset = UIEdgeInsetsMake(1.0f, 1.0f, 1.0f, 1.0f);
-        _ctextViewInput.layer.borderColor = [UIColor lightGrayColor].CGColor;
+        _ctextViewInput.layer.borderColor = [UIColor darkGrayColor].CGColor;
         _ctextViewInput.font = [[UIFont preferredFontForTextStyle:UIFontTextStyleBody] fontWithSize:20.0f];
         _ctextViewInput.layer.borderWidth = 1.0f;
         _ctextViewInput.returnKeyType = UIReturnKeySend;
@@ -103,6 +104,9 @@
         [self.idProtoViewChat performSelector:@selector(didSendTextMsg:) withObject:self];
     }
 }
+- (void)textViewDidChange:(UITextView *)textView {
+    [self performSelectorOnMainThread:@selector(computeContentBound) withObject:nil waitUntilDone:NO];
+}
 
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
     
@@ -111,10 +115,6 @@
     if ([textView.text length] > self.uMaxNubmerOfCharacter) {
         bShouldChange = NO;
     }
-    if (bShouldChange) {
-        [self computeContentBound];
-    }
-    
     if([text isEqualToString:@"\n"]) {
         bShouldChange = NO;
         [self performSelector:@selector(actionSendMsg:) withObject:nil afterDelay:0.0f];

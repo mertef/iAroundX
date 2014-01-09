@@ -266,10 +266,7 @@
      "k_receiving_file_size" = "Size:";
      */
     NSMutableData* cmutdata = [self.cmutdicPeerMap objectForKey:[peerID displayName]];
-    if (!cmutdata) {
-        cmutdata = [[NSMutableData alloc] init];
-        [self.cmutdicPeerMap setObject:cmutdata forKey:[peerID displayName]];
-    }
+    
 
     
     
@@ -289,9 +286,25 @@
         puPackage->_u_l_package_type == enum_package_type_video ||
         puPackage->_u_l_package_type == enum_package_type_image) {
         NSData* cdataMsg = [data subdataWithRange:NSMakeRange(sizeof(T_PACKAGE_HEADER), puPackage->_u_l_package_length)];
+        
+        if (!cmutdata) {
+            cmutdata = [[NSMutableData alloc] init];
+            [self.cmutdicPeerMap setObject:cmutdata forKey:[peerID displayName]];
+            NSDictionary* cdicChatItem = @{k_chat_from:peerID,
+                                           k_chat_to:self.cpeerId,
+                                           k_chat_msg_type:@(puPackage->_u_l_package_type),
+                                           k_chat_date: @([[NSDate date] timeIntervalSince1970]),
+                                           k_chat_msg_id:@(puPackage->_u_l_msg_id)
+                                           };
+            [[NSNotificationCenter defaultCenter] postNotificationName:k_noti_chat_msg_increase object:nil userInfo:cdicChatItem];
+            [[NSNotificationCenter defaultCenter] postNotificationName:k_noti_chat_msg object:nil userInfo:cdicChatItem];
+        }
+        
 //        NSLog(@"data size is %lu", (unsigned long)[cdataMsg length]);
         NSLog(@"msg id is %d", puPackage->_u_l_msg_id);
         [cmutdata appendData:cdataMsg];
+        
+        
     }
     
     dispatch_async(dispatch_get_main_queue(), ^(void){
@@ -351,9 +364,10 @@
                                        k_chat_msg:cmutData,
                                        k_chat_msg_type:@(puPackage->_u_l_package_type),
                                        k_chat_date: @([[NSDate date] timeIntervalSince1970]),
-                                       k_chat_msg_media_url:cstrMediaUrl
+                                       k_chat_msg_media_url:cstrMediaUrl,
+                                       k_chat_msg_id:@(puPackage->_u_l_msg_id)
                                        };
-        [[NSNotificationCenter defaultCenter] postNotificationName:k_noti_chat_msg_increase object:nil userInfo:cdicChatItem];
+//        [[NSNotificationCenter defaultCenter] postNotificationName:k_noti_chat_msg_increase object:nil userInfo:cdicChatItem];
         [[NSNotificationCenter defaultCenter] postNotificationName:k_noti_chat_msg object:nil userInfo:cdicChatItem];
 
         
@@ -770,7 +784,7 @@
      }else {
      NSLog(@"tranfer complete");
      }
-     u_int32_t uiSessionId = lround([[NSDate date] timeIntervalSince1970]);
+     u_int32_t uiSessionId = (u_int32_t)lround([[NSDate date] timeIntervalSince1970]);
 
      NSData* cdataMedia = [NSData dataWithContentsOfURL:acUrl];
       NSDictionary*  cdicChatItem = @{

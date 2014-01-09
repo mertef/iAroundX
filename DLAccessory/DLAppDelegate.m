@@ -25,7 +25,7 @@
 {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     self.window.backgroundColor = [UIColor clearColor];
-
+    
     _ccMpViewCtrl = [[DLMPViewCtrl alloc] init];
     
     UINavigationController* cCenterNavCt = [[DLNavigationCtrl alloc] init];
@@ -44,12 +44,13 @@
     cTabbarViewCtrl.viewControllers = @[cCenterNavCt, ccConversationNavCtrl];
     self.window.rootViewController = cTabbarViewCtrl;
     
-    [self.window makeKeyAndVisible];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(actionNotiMsgReceive:) name:k_noti_chat_msg_decrease object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(actionNotiMsgReceive:) name:k_noti_chat_msg_increase object:nil];
+    
+    [self.window makeKeyAndVisible];
 
-
+    //[self testFilterNumber];
     return YES;
 }
 -(void)actionNotiMsgReceive:(NSNotification*)acNoti {
@@ -187,6 +188,19 @@ typedef struct{
     NSData* cdataString = [cmutData subdataWithRange:NSMakeRange(sizeof(T_X), [[cstrX dataUsingEncoding:NSUTF8StringEncoding] length])];
     NSString* cstrTest = [[NSString alloc] initWithData:cdataString encoding:NSUTF8StringEncoding];
     NSLog(@"====%@", cstrTest);
-
+}
+-(void)testFilterNumber{
+    NSMutableArray* cmutArrNumber = [[NSMutableArray alloc ] init];
+    for (int i = 0; i < 60; i ++) {
+        NSDictionary* cdicNumber = @{k_chat_msg_id:@(i)};
+        [cmutArrNumber addObject:cdicNumber];
+    }
+    NSPredicate* cPredicateFilter = [NSPredicate predicateWithFormat:@"(%K == %d)", k_chat_msg_id, 13];
+    NSArray* carrList = [cmutArrNumber filteredArrayUsingPredicate:cPredicateFilter];
+    if (carrList && [carrList count] > 0) {
+        NSLog(@"----%@", [carrList description]);
+    }
+   
+    
 }
 @end

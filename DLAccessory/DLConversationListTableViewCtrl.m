@@ -41,12 +41,16 @@
     NSPredicate* cPredicateFrom = [NSPredicate predicateWithFormat:@"(%K == %@)", k_chat_from_name,cstrPeerFrom];
     NSArray* carrPeople = [self.cmutarrConversations filteredArrayUsingPredicate:cPredicateFrom];
     if (carrPeople && [carrPeople count] > 0) {
+
         NSMutableDictionary* cmutdicItem = [carrPeople firstObject];
         NSMutableArray* cmutarrChatLit = [cmutdicItem objectForKey:k_chat_list];
-        /*
+//        NSLog(@"---msgs placeHolder  %@",  [cmutarrChatLit description]);
+//        NSLog(@"---msgs  %@",  [acNoti.userInfo description]);
+
+        
         NSNumber* cnumberMsgId = [acNoti.userInfo objectForKey:k_chat_msg_id];
         
-        NSPredicate* cpredicateMsgId = [NSPredicate predicateWithFormat:@"(%K= %@)", k_chat_msg_id, [cnumberMsgId stringValue]];
+        NSPredicate* cpredicateMsgId = [NSPredicate predicateWithFormat:@"(%K == %d)", k_chat_msg_id, [cnumberMsgId intValue]];
         NSArray* carrListMsg = [cmutarrChatLit filteredArrayUsingPredicate:cpredicateMsgId];
         if (carrListMsg && [carrListMsg count] > 0) {
             NSUInteger uiMsgIndex = [cmutarrChatLit indexOfObject:[carrListMsg firstObject]];
@@ -54,8 +58,8 @@
         }else {
            [cmutarrChatLit addObject:acNoti.userInfo];
         }
-         */
-        [cmutarrChatLit addObject:acNoti.userInfo];
+        
+//        [cmutarrChatLit addObject:acNoti.userInfo];
         [self.ctableView reloadData];
     }else {
         NSMutableDictionary* cmutDicConversation = [NSMutableDictionary dictionary];

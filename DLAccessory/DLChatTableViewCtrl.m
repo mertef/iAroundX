@@ -43,11 +43,11 @@
         NSDictionary* cdicUserInfo = acNoti.userInfo;
         MCPeerID* cpeerIdTo = [cdicUserInfo objectForKey:k_chat_to];
         MCPeerID* cpeerIdFrom = self.cdicPeerInfoFrom[k_peer_id];
-//        NSNumber* cnumberMsgId = cdicUserInfo[k_chat_msg_id];
         
         if ([[cpeerIdFrom displayName] isEqualToString:[cpeerIdTo displayName]]) {
-            /*
-            NSPredicate* cpredicateMsgId = [NSPredicate predicateWithFormat:@"(%K == %@)", k_chat_msg_id, [cnumberMsgId stringValue]];
+            NSNumber* cnumberMsgId = cdicUserInfo[k_chat_msg_id];
+ 
+            NSPredicate* cpredicateMsgId = [NSPredicate predicateWithFormat:@"(%K == %d)", k_chat_msg_id, [cnumberMsgId intValue]];
             NSArray* carrList = [self.cmutarrChatList filteredArrayUsingPredicate:cpredicateMsgId];
             if (carrList && [carrList count] > 0) {
                 NSUInteger uiMsgIndex = [self.cmutarrChatList indexOfObject:[carrList firstObject]];
@@ -55,8 +55,8 @@
             }else {
                [self.cmutarrChatList addObject:cdicUserInfo];
             }
-            */
-            [self.cmutarrChatList addObject:cdicUserInfo];
+            
+            //[self.cmutarrChatList addObject:cdicUserInfo];
 
             dispatch_async(dispatch_get_main_queue(), ^(void){
                 [self.ctableViewChat reloadData];
@@ -228,7 +228,7 @@
 //    [_ccViewChatInput.ctextViewInput addObserver:self forKeyPath:@"sRectBoundContent" options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:nil];
     [self.view addSubview:_ccViewChatInput];
     
-     UIView* cviewBg = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.view.bounds), 20.0f)];
+     UIView* cviewBg = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.view.bounds), 1.0f)];
     [cviewBg setBackgroundColor:[UIColor clearColor]];
     self.ctableViewChat.tableFooterView = cviewBg;
 	// Do any additional setup after loading the view.
@@ -350,7 +350,7 @@
         NSData* cdataTxt = [cstrText dataUsingEncoding:NSUTF8StringEncoding];
         NSUInteger uiUsedLength = [cdataTxt length];
         
-        u_int32_t uiMsgId = lround([[NSDate date] timeIntervalSince1970]);
+        u_int32_t uiMsgId = (u_int32_t)lround([[NSDate date] timeIntervalSince1970]);
 
         T_PACKAGE_HEADER tPackageHeader;
         tPackageHeader._u_l_package_type = enum_package_type_short_msg;
@@ -478,7 +478,7 @@
     
 }
 -(void)scrollChatToBottom {
-    if ([self.ctableViewChat contentSize].height >= CGRectGetHeight(self.view.bounds) * 0.5f) {
+    if ([self.ctableViewChat contentSize].height >= CGRectGetHeight(self.ctableViewChat.bounds)  - k_height_keyboard) {
         NSIndexPath* cIndexPath = [NSIndexPath indexPathForRow: [self.cmutarrChatList count] - 1 inSection: 0];
         [self.ctableViewChat scrollToRowAtIndexPath: cIndexPath atScrollPosition: UITableViewScrollPositionBottom animated: YES];
     }        
@@ -515,10 +515,13 @@
     }
     
     T_PACKAGE_HEADER tPackageHeader;
+    u_int32_t uiSessionId = (u_int32_t)lround([[NSDate date] timeIntervalSince1970]);
+
     tPackageHeader._u_l_package_type = enum_package_type_audio;
     tPackageHeader._u_l_package_size = (int32_t)(sizeof(T_PACKAGE_HEADER) + uiUsedLength);
     tPackageHeader._u_l_package_length = (int32_t)uiUsedLength;
     tPackageHeader._u_l_current_offset = (int32_t)sizeof(T_PACKAGE_HEADER);
+    tPackageHeader._u_l_msg_id = uiSessionId;
     
     NSData* cdataHeader = [NSData dataWithBytes:&tPackageHeader length:sizeof(tPackageHeader)];
     
@@ -837,7 +840,7 @@
     NSError* cError = nil;
     BOOL bSendFlag = YES;
     
-    u_int32_t uiSessionId = lround([[NSDate date] timeIntervalSince1970]);
+    u_int32_t uiSessionId = (u_int32_t)lround([[NSDate date] timeIntervalSince1970]);
     for (; uiLoop < uiLoopCount ;  uiLoop ++) {
         [cmutdata setLength:0];
         T_PACKAGE_HEADER tPackageHeader;
@@ -922,6 +925,9 @@
 
 #pragma mark - chat callback 
 -(void)didRequestPlayerVideo:(NSDictionary*)acdicInfo {
+    if (![acdicInfo objectForKey:k_chat_msg]) {
+        return;
+    }
     MPMoviePlayerViewController* cMoviePlayerViewCtrl = nil;;
     NSLog(@"-----%@", acdicInfo[k_chat_msg_media_url]);
     NSURL* curl = [NSURL fileURLWithPath:acdicInfo[k_chat_msg_media_url]];
@@ -931,10 +937,15 @@
     [self presentMoviePlayerViewControllerAnimated:cMoviePlayerViewCtrl];
 }
 -(void)didRequestShowImage:(NSDictionary*)acdicInfo {
-    
+    if (![acdicInfo objectForKey:k_chat_msg]) {
+        return;
+    }
 }
 -(void)didRequestShowLocation:(NSDictionary *)acdicInfo {
     
+    if (![acdicInfo objectForKey:k_chat_msg]) {
+        return;
+    }
     DLMapViewCtrl* ccMapViewCtrl = [[DLMapViewCtrl alloc] init];
     ccMapViewCtrl.cdicInfo = acdicInfo;
     NSString* cstrLocation = [[NSString alloc] initWithData:[acdicInfo objectForKey:k_chat_msg] encoding:NSUTF8StringEncoding];

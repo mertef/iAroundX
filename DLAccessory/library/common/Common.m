@@ -571,14 +571,14 @@
                 cstrDay = [NSString stringWithFormat:@"%2ld分钟前",(long)iMinutesOffset];
             }
         }else {
-            cstrDay = [NSString stringWithFormat:@"今天 %02ld:%02ld", [cDateComponents hour], [cDateComponents minute]];
+            cstrDay = [NSString stringWithFormat:@"今天 %02ld:%02ld", (long)[cDateComponents hour], (long)[cDateComponents minute]];
         }
     }else if([cDateComponentsToday day] == [cDateComponents day] -1 ) {
-        cstrDay = [NSString stringWithFormat:@"昨天 %02ld:%02ld", [cDateComponents hour], [cDateComponents minute]];
+        cstrDay = [NSString stringWithFormat:@"昨天 %02ld:%02ld", (long)[cDateComponents hour],  (long)[cDateComponents minute]];
     }else if([cDateComponentsToday day] == [cDateComponents day]  - 2) {
-        cstrDay = [NSString stringWithFormat:@"前天 %2ld:%02ld", [cDateComponents hour], [cDateComponents minute]];
+        cstrDay = [NSString stringWithFormat:@"前天 %2ld:%02ld",  (long)[cDateComponents hour],  (long)[cDateComponents minute]];
     }else {
-        cstrDay = [NSString stringWithFormat:@"%02ld-%2ld %02ld:%02ld",[cDateComponents month],[cDateComponents day],[cDateComponents hour], [cDateComponents minute]];
+        cstrDay = [NSString stringWithFormat:@"%02ld-%2ld %02ld:%02ld", (long)[cDateComponents month], (long)[cDateComponents day], (long)[cDateComponents hour],  (long)[cDateComponents minute]];
     }
     [cdateFormatter release];
     //    //NSlog(@"%@", cstrDay);

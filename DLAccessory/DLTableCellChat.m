@@ -219,9 +219,10 @@
         _cimageViewAudio.hidden = NO;
         NSLog(@"msg type is audio");
         _clableMsg.hidden = YES;
-        if (!_c_aduio_player) {
+        _c_aduio_player = nil;
+        NSData* cData = self.cdicInfo[k_chat_msg];
+        if (!_c_aduio_player && cData) {
             NSError* cError = nil;
-            NSData* cData = self.cdicInfo[k_chat_msg];
             //            NSLog(@"playing ---- data length is %lu", (unsigned long)[cData length]);
             _c_aduio_player = [[AVAudioPlayer alloc] initWithData:cData error:&cError];
             _c_aduio_player.delegate = self;
@@ -244,8 +245,11 @@
         }
         self.cimageViewMsgImage.hidden = NO;
         NSData* cdata = self.cdicInfo[k_chat_msg];
-        UIImage* cimage = [UIImage imageWithData:cdata];
-        self.cimageViewMsgImage.image = cimage;
+        if (cdata) {
+            UIImage* cimage = [UIImage imageWithData:cdata];
+            self.cimageViewMsgImage.image = cimage;
+        }
+       
         
     }else if([cnumberMsgType intValue] == enum_package_type_video) {
         _clableMsg.hidden = YES;
@@ -266,34 +270,20 @@
 
         
        NSString* cstrTempUrl = [self.cdicInfo objectForKey:k_chat_msg_media_url];
-        /*
-        if (!_c_movie_player_ctr) {
-            _c_movie_player_ctr = [[MPMoviePlayerController alloc] initWithContentURL:[NSURL fileURLWithPath:cstrTempUrl]];
-        }else {
-            [_c_movie_player_ctr setContentURL:[NSURL fileURLWithPath:cstrTempUrl]];
-        }
-        [_c_movie_player_ctr play];
+        if (cstrTempUrl) {
+            AVAsset* casset = [AVAsset assetWithURL:[NSURL fileURLWithPath:cstrTempUrl]];
+            AVAssetImageGenerator* cAssetImageGenerator = [AVAssetImageGenerator assetImageGeneratorWithAsset:casset];
+            CMTime tTimeActually;
+            NSError* cError = nil;
+            CGImageRef rImageFirstFrame = [cAssetImageGenerator copyCGImageAtTime:CMTimeMake(1, 1) actualTime:&tTimeActually error:&cError];
+            if (!cError) {
+                self.cimageViewMsgVideoFirstFrame.image = [UIImage imageWithCGImage:rImageFirstFrame];
+                CGImageRelease(rImageFirstFrame);
+            }else {
+                NSLog(@"%@", [cError description]);
+            }
 
-        [_c_movie_player_ctr requestThumbnailImagesAtTimes:@[ [NSValue valueWithCMTime:CMTimeMake(0, 0)] ] timeOption:MPMovieTimeOptionNearestKeyFrame];
-         */
-        
-        AVAsset* casset = [AVAsset assetWithURL:[NSURL fileURLWithPath:cstrTempUrl]];
-        /*
-        NSArray* carrList = [casset tracks];
-        for (AVAssetTrack* cAssetTrack in carrList) {
-            NSLog(@"%@:%@", [cAssetTrack mediaType], [[cAssetTrack formatDescriptions] description]);
-        }*/
-        AVAssetImageGenerator* cAssetImageGenerator = [AVAssetImageGenerator assetImageGeneratorWithAsset:casset];
-        CMTime tTimeActually;
-        NSError* cError = nil;
-        CGImageRef rImageFirstFrame = [cAssetImageGenerator copyCGImageAtTime:CMTimeMake(1, 1) actualTime:&tTimeActually error:&cError];
-        if (!cError) {
-            self.cimageViewMsgVideoFirstFrame.image = [UIImage imageWithCGImage:rImageFirstFrame];
-            CGImageRelease(rImageFirstFrame);
-        }else {
-            NSLog(@"%@", [cError description]);
         }
-        
         self.cimageViewMsgVideoFirstFrame.hidden = NO;
     } else if([cnumberMsgType intValue] == enum_package_type_location) {
         if (!self.cimageViewMsgLocation) {
