@@ -254,7 +254,7 @@
 }
 // Received data from remote peer
 - (void)session:(MCSession *)session didReceiveData:(NSData *)data fromPeer:(MCPeerID *)peerID {
-    NSLog(@"did receive data data lenght is %lu  package header %lu", (u_long)[data length], sizeof(T_PACKAGE_HEADER));
+//    NSLog(@"did receive data data lenght is %lu  package header %lu", (u_long)[data length], sizeof(T_PACKAGE_HEADER));
     
     /*
      "k_receiving_video_begin" = "Receiving video file begin!";
@@ -289,6 +289,7 @@
         
         if (!cmutdata) {
             cmutdata = [[NSMutableData alloc] init];
+            [cmutdata setLength:0];
             [self.cmutdicPeerMap setObject:cmutdata forKey:[peerID displayName]];
             NSDictionary* cdicChatItem = @{k_chat_from:peerID,
                                            k_chat_to:self.cpeerId,
@@ -298,23 +299,23 @@
                                            };
             [[NSNotificationCenter defaultCenter] postNotificationName:k_noti_chat_msg_increase object:nil userInfo:cdicChatItem];
             [[NSNotificationCenter defaultCenter] postNotificationName:k_noti_chat_msg object:nil userInfo:cdicChatItem];
-        }else {
-            NSDictionary* cdicChatItem = @{k_chat_from:peerID,
-                                           k_chat_to:self.cpeerId,
-                                           k_chat_msg_type:@(puPackage->_u_l_package_type),
-                                           k_chat_date: @([[NSDate date] timeIntervalSince1970]),
-                                           k_chat_msg_id:@(puPackage->_u_l_msg_id),
-                                           k_chat_msg_size:@(puPackage->_u_l_package_size),
-                                           k_chat_msg_current_size:@([cmutdata length])
-                                           };
-            [[NSNotificationCenter defaultCenter] postNotificationName:k_noti_chat_msg_receive_progress object:nil userInfo:cdicChatItem];
-
         }
+        
+
+       
         
 //        NSLog(@"data size is %lu", (unsigned long)[cdataMsg length]);
         NSLog(@"msg id is %d", puPackage->_u_l_msg_id);
         [cmutdata appendData:cdataMsg];
-        
+        NSDictionary* cdicChatItemProgress = @{k_chat_from:peerID,
+                                               k_chat_to:self.cpeerId,
+                                               k_chat_msg_type:@(puPackage->_u_l_package_type),
+                                               k_chat_date: @([[NSDate date] timeIntervalSince1970]),
+                                               k_chat_msg_id:@(puPackage->_u_l_msg_id),
+                                               k_chat_msg_size:@(puPackage->_u_l_package_size),
+                                               k_chat_msg_current_size:@([cmutdata length])
+                                               };
+        [[NSNotificationCenter defaultCenter] postNotificationName:k_noti_chat_msg_receive_progress object:nil userInfo:cdicChatItemProgress];
         
     }
     

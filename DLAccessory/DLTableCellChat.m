@@ -170,12 +170,15 @@
      if([cnumberMsgType intValue] == enum_package_type_image) {
          self.cimageViewMsgImage.frame = _clableMsg.frame;
          self.cProgressIndicator.frame = CGRectMake(CGRectGetWidth(_clableMsg.frame) * 0.2f, CGRectGetHeight(_clableMsg.frame) * 0.5f - 4.0f, CGRectGetWidth(_clableMsg.frame) * 0.8f, 8.0f);
+         NSLog(@"---%@", NSStringFromCGRect(self.cProgressIndicator.frame));
+
     }else if([cnumberMsgType intValue] == enum_package_type_video) {
         self.cimageViewMsgVideoFirstFrame.frame = _clableMsg.bounds;
 //        NSLog(@"---%@", NSStringFromCGRect(self.cimageViewMsgVideoFirstFrame.frame));
         self.cimageViewMsgVideo.frame = CGRectMake(0.0f, 0.0f, self.cimageViewMsgVideo.image.size.width, self.cimageViewMsgVideo.image.size.height);
         self.cimageViewMsgVideo.center = self.cimageViewMsgVideoFirstFrame.center;
         self.cProgressIndicator.frame = CGRectMake(CGRectGetWidth(_clableMsg.frame) * 0.2f, CGRectGetHeight(_clableMsg.frame) * 0.5f - 4.0f, CGRectGetWidth(_clableMsg.frame) * 0.8f, 8.0f);
+        NSLog(@"---%@", NSStringFromCGRect(self.cProgressIndicator.frame));
 
     }
 
@@ -251,12 +254,7 @@
 
             [self.cimageViewBg addSubview:self.cimageViewMsgImage];
         }
-        self.cimageViewMsgImage.hidden = NO;
-        NSData* cdata = self.cdicInfo[k_chat_msg];
-        if (cdata) {
-            UIImage* cimage = [UIImage imageWithData:cdata];
-            self.cimageViewMsgImage.image = cimage;
-        }
+       
         if (!self.cProgressIndicator) {
             self.cProgressIndicator = [[UIProgressView alloc] initWithProgressViewStyle:UIProgressViewStyleBar];
             self.cProgressIndicator.tag = k_tag_chat_progress;
@@ -266,7 +264,17 @@
             [self.cimageViewMsgImage addSubview:self.cProgressIndicator];
         }
         
-        self.cProgressIndicator.hidden = NO;
+        NSData* cdata = self.cdicInfo[k_chat_msg];
+        if (cdata) {
+            self.cProgressIndicator.hidden = YES;
+            UIImage* cimage = [UIImage imageWithData:cdata];
+            self.cimageViewMsgImage.image = cimage;
+            self.cimageViewMsgImage.hidden = NO;
+        }else {
+            self.cProgressIndicator.hidden = NO;
+            self.cimageViewMsgImage.hidden = YES;
+        }
+        
         
     }else if([cnumberMsgType intValue] == enum_package_type_video) {
         _clableMsg.hidden = YES;
@@ -292,11 +300,12 @@
             [self.cimageViewMsgVideoFirstFrame addSubview:self.cProgressIndicator];
         }
 
-        self.cProgressIndicator.hidden = NO;
         
 //        self.cProgressIndicator.progress =;
        NSString* cstrTempUrl = [self.cdicInfo objectForKey:k_chat_msg_media_url];
         if (cstrTempUrl) {
+            self.cimageViewMsgVideo.hidden = NO;
+            self.cProgressIndicator.hidden = YES;
             AVAsset* casset = [AVAsset assetWithURL:[NSURL fileURLWithPath:cstrTempUrl]];
             AVAssetImageGenerator* cAssetImageGenerator = [AVAssetImageGenerator assetImageGeneratorWithAsset:casset];
             CMTime tTimeActually;
@@ -308,7 +317,9 @@
             }else {
                 NSLog(@"%@", [cError description]);
             }
-
+        }else {
+            self.cimageViewMsgVideo.hidden = YES;
+            self.cProgressIndicator.hidden = NO;
         }
         self.cimageViewMsgVideoFirstFrame.hidden = NO;
     } else if([cnumberMsgType intValue] == enum_package_type_location) {
@@ -327,7 +338,9 @@
     }
     
         
-
+    if (self.cProgressIndicator.progress >= 1.0f) {
+        self.cProgressIndicator.hidden = YES;
+    }
     NSNumber* cnumberDate = acdicInfo[k_chat_date];
     
     _clableDate.text = [Common FormatDateLong:[cnumberDate doubleValue]];
@@ -449,6 +462,8 @@
 
 -(void)actionUpdateReceivingProgress:(NSNotification*)acNoti {
     NSDictionary* acdicInfo = [acNoti userInfo];
+//    NSLog(@"progress %@", [acdicInfo description]);
+
     MCPeerID* cpeerIdFrom = acdicInfo[k_chat_from];
     MCPeerID* cpeerIdTo = acdicInfo[k_chat_to];
     NSNumber* cnumberMsgId = [acdicInfo objectForKey:k_chat_msg_id];
@@ -457,8 +472,8 @@
     MCPeerID* cpeerIdTo1 = self.cdicInfo[k_chat_to];
     NSNumber* cnumberMsgId1 = [self.cdicInfo objectForKey:k_chat_msg_id];
 
-    if ([cpeerIdFrom isEqual:cpeerIdFrom1] || [cpeerIdTo isEqual:cpeerIdTo1] ||
-        [cnumberMsgId isEqualToNumber:cnumberMsgId1])
+    if (!([cpeerIdFrom isEqual:cpeerIdFrom1] || [cpeerIdTo isEqual:cpeerIdTo1] ||
+        [cnumberMsgId isEqualToNumber:cnumberMsgId1]))
          {
             return;
     }
@@ -466,7 +481,10 @@
     NSNumber* cnumberSize = acdicInfo[k_chat_msg_size];
     NSNumber* cnumberSizeCurrent = acdicInfo[k_chat_msg_current_size];
     CGFloat fProgress = [cnumberSizeCurrent floatValue] / [cnumberSize floatValue];
-    self.cProgressIndicator.progress = fProgress;
+    NSLog(@"progress is %f", fProgress);
+   
+    dispatch_async(dispatch_get_main_queue(), ^(void){ [self.cProgressIndicator setProgress:fProgress animated:YES];});
+    
 }
 
 @end
