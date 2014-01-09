@@ -38,6 +38,8 @@
 #define k_chat_msg  @"chat_msg"
 #define k_chat_msg_length  @"chat_msg_length"
 #define k_chat_msg_size  @"chat_msg_size"
+#define k_chat_msg_current_size  @"chat_msg_current_size"
+
 
 #define k_chat_msg_media_url  @"chat_msg_media_url"
 
@@ -49,6 +51,8 @@
 #define k_people_icon_default_right @"people_default_r"
 
 #define k_noti_chat_msg @"chat_msg_item"
+#define k_noti_chat_msg_receive_progress @"chat_msg_receive_progress"
+
 #define k_noti_chat_msg_increase @"chat_msg_item_increase"
 #define k_noti_chat_msg_decrease @"chat_msg_item_decrease"
 #define k_msg_cout @"msg_count"
@@ -66,6 +70,8 @@
 #define k_url_invliad @"file://invliad"
 
 #define k_tag_progress_view_chat 0x3533
+
+#define k_tag_chat_progress 0x33313
 typedef NS_ENUM(int32_t, T_PACKAGE_TYPE) {
     enum_package_type_short_msg = 0x300,
     enum_package_type_image,

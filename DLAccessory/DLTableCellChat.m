@@ -67,6 +67,11 @@
         
         self.selectionStyle = UITableViewCellSelectionStyleNone;
         
+
+        [[NSNotificationCenter defaultCenter]  addObserver:self selector:@selector(actionUpdateReceivingProgress:) name:k_noti_chat_msg_receive_progress object:nil];
+
+        
+        
 //        [[NSNotificationCenter defaultCenter]  addObserver:self selector:@selector(actionNotiImageThumb:) name:MPMoviePlayerThumbnailImageRequestDidFinishNotification object:nil];
 
 //        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(actionNotiPlaying:) name:k_noti_playing object:nil];
@@ -136,7 +141,6 @@
         }
         self.cimageViewMsgLocation.center = CGPointMake(CGRectGetMaxX(self.cimageViewIcon.frame) + 30.0f, self.contentView.center.y - 10.0f);
         _clableDate.frame = CGRectMake(CGRectGetMaxX(_cimageViewBg.frame) - 30.0f, CGRectGetMaxY(_cimageViewBg.frame) - 10.0f, 60.0f, 20.0f);
-
         
     }else { //image icon is in right
         _cimageViewIcon.frame = CGRectMake(fWidth - 4.0f - sSizeImage.width, 18.0f, sSizeImage.width, sSizeImage.height);
@@ -159,17 +163,20 @@
         self.cimageViewMsgLocation.center = CGPointMake(CGRectGetMinX(self.cimageViewIcon.frame) - 30.0f, self.contentView.center.y - 10.0f);
         _clableDate.frame = CGRectMake(CGRectGetMinX(_cimageViewBg.frame) + 30.0f, CGRectGetMaxY(_cimageViewBg.frame) - 10.0f, 60.0f, 20.0f);
 
-
+     
     }
     
 
      if([cnumberMsgType intValue] == enum_package_type_image) {
          self.cimageViewMsgImage.frame = _clableMsg.frame;
+         self.cProgressIndicator.frame = CGRectMake(CGRectGetWidth(_clableMsg.frame) * 0.2f, CGRectGetHeight(_clableMsg.frame) * 0.5f - 4.0f, CGRectGetWidth(_clableMsg.frame) * 0.8f, 8.0f);
     }else if([cnumberMsgType intValue] == enum_package_type_video) {
         self.cimageViewMsgVideoFirstFrame.frame = _clableMsg.bounds;
 //        NSLog(@"---%@", NSStringFromCGRect(self.cimageViewMsgVideoFirstFrame.frame));
         self.cimageViewMsgVideo.frame = CGRectMake(0.0f, 0.0f, self.cimageViewMsgVideo.image.size.width, self.cimageViewMsgVideo.image.size.height);
         self.cimageViewMsgVideo.center = self.cimageViewMsgVideoFirstFrame.center;
+        self.cProgressIndicator.frame = CGRectMake(CGRectGetWidth(_clableMsg.frame) * 0.2f, CGRectGetHeight(_clableMsg.frame) * 0.5f - 4.0f, CGRectGetWidth(_clableMsg.frame) * 0.8f, 8.0f);
+
     }
 
     
@@ -209,6 +216,7 @@
     self.cimageViewMsgImage.hidden = YES;
     self.cimageViewMsgVideo.hidden = YES;
     self.cimageViewMsgVideoFirstFrame.hidden = YES;
+    self.cProgressIndicator.hidden = YES;
     if ([cnumberMsgType intValue] == enum_package_type_short_msg) {
         NSLog(@"msg type is msg");
         NSString* cstrMsg = [[NSString alloc] initWithData:acdicInfo[k_chat_msg] encoding:NSUTF8StringEncoding];
@@ -249,7 +257,16 @@
             UIImage* cimage = [UIImage imageWithData:cdata];
             self.cimageViewMsgImage.image = cimage;
         }
-       
+        if (!self.cProgressIndicator) {
+            self.cProgressIndicator = [[UIProgressView alloc] initWithProgressViewStyle:UIProgressViewStyleBar];
+            self.cProgressIndicator.tag = k_tag_chat_progress;
+        }
+        if (![[self.cProgressIndicator superview] isEqual:self.cimageViewMsgImage] ) {
+            [self.cProgressIndicator removeFromSuperview];
+            [self.cimageViewMsgImage addSubview:self.cProgressIndicator];
+        }
+        
+        self.cProgressIndicator.hidden = NO;
         
     }else if([cnumberMsgType intValue] == enum_package_type_video) {
         _clableMsg.hidden = YES;
@@ -267,8 +284,17 @@
             self.cimageViewMsgVideo.backgroundColor = [UIColor clearColor];
             [self.cimageViewMsgVideoFirstFrame addSubview:self.cimageViewMsgVideo];
         }
+        if (!self.cProgressIndicator) {
+            self.cProgressIndicator = [[UIProgressView alloc] initWithProgressViewStyle:UIProgressViewStyleBar];
+        }
+        if (![[self.cProgressIndicator superview] isEqual:self.cimageViewMsgVideoFirstFrame] ) {
+            [self.cProgressIndicator removeFromSuperview];
+            [self.cimageViewMsgVideoFirstFrame addSubview:self.cProgressIndicator];
+        }
 
+        self.cProgressIndicator.hidden = NO;
         
+//        self.cProgressIndicator.progress =;
        NSString* cstrTempUrl = [self.cdicInfo objectForKey:k_chat_msg_media_url];
         if (cstrTempUrl) {
             AVAsset* casset = [AVAsset assetWithURL:[NSURL fileURLWithPath:cstrTempUrl]];
@@ -419,6 +445,28 @@
             [_cimageViewAudio stopAnimating];
         }
     }
+}
+
+-(void)actionUpdateReceivingProgress:(NSNotification*)acNoti {
+    NSDictionary* acdicInfo = [acNoti userInfo];
+    MCPeerID* cpeerIdFrom = acdicInfo[k_chat_from];
+    MCPeerID* cpeerIdTo = acdicInfo[k_chat_to];
+    NSNumber* cnumberMsgId = [acdicInfo objectForKey:k_chat_msg_id];
+
+    MCPeerID* cpeerIdFrom1 = self.cdicInfo[k_chat_from];
+    MCPeerID* cpeerIdTo1 = self.cdicInfo[k_chat_to];
+    NSNumber* cnumberMsgId1 = [self.cdicInfo objectForKey:k_chat_msg_id];
+
+    if ([cpeerIdFrom isEqual:cpeerIdFrom1] || [cpeerIdTo isEqual:cpeerIdTo1] ||
+        [cnumberMsgId isEqualToNumber:cnumberMsgId1])
+         {
+            return;
+    }
+
+    NSNumber* cnumberSize = acdicInfo[k_chat_msg_size];
+    NSNumber* cnumberSizeCurrent = acdicInfo[k_chat_msg_current_size];
+    CGFloat fProgress = [cnumberSizeCurrent floatValue] / [cnumberSize floatValue];
+    self.cProgressIndicator.progress = fProgress;
 }
 
 @end

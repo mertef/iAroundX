@@ -19,7 +19,7 @@
 @interface DLTableCellChat : UITableViewCell<AVAudioPlayerDelegate, UIGestureRecognizerDelegate> {
     AVAudioPlayer* _c_aduio_player;
 //    MPMoviePlayerController* _c_movie_player_ctr;
-    
+
 }
 @property(strong, nonatomic) UIImageView* cimageViewIcon;
 @property(strong, nonatomic) UIImageView* cimageViewBg;
@@ -28,7 +28,7 @@
 @property(strong, nonatomic) UIImageView* cimageViewMsgVideo;
 @property(strong, nonatomic) UIImageView* cimageViewMsgVideoFirstFrame;
 @property(strong, nonatomic) UIImageView* cimageViewMsgLocation;
-
+@property(strong, nonatomic) UIProgressView* cProgressIndicator;
 @property(assign, nonatomic) id<DLTableCellChatProto> idChatProto;
 
 @property(strong, nonatomic) UILabel* clableMsg;
@@ -40,5 +40,5 @@
 
 -(void)play;
 -(void)actionNotiImageThumb:(NSNotification*)acNoti;
-
+-(void)actionUpdateReceivingProgress:(NSNotification*)acNoti;
 @end
