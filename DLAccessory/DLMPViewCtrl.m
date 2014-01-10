@@ -307,6 +307,7 @@
 //        NSLog(@"data size is %lu", (unsigned long)[cdataMsg length]);
         NSLog(@"msg id is %d", puPackage->_u_l_msg_id);
         [cmutdata appendData:cdataMsg];
+        
         NSDictionary* cdicChatItemProgress = @{k_chat_from:peerID,
                                                k_chat_to:self.cpeerId,
                                                k_chat_msg_type:@(puPackage->_u_l_package_type),

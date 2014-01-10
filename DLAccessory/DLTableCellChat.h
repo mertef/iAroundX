@@ -8,12 +8,14 @@
 
 #import <UIKit/UIKit.h>
 #import <AVFoundation/AVFoundation.h>
+@class DLProgressView;
+@class DLTableCellChat;
 //@class MPMoviePlayerController;
 @protocol DLTableCellChatProto <NSObject>
 
 @optional
 -(void)didRequestPlayerVideo:(NSDictionary*)acdicInfo;
--(void)didRequestShowImage:(NSDictionary*)acdicInfo;
+-(void)didRequestShowImage:(NSDictionary*)acdicInfo onTableCell:(DLTableCellChat*)accChatCell;
 -(void)didRequestShowLocation:(NSDictionary*)acdicInfo;
 @end
 @interface DLTableCellChat : UITableViewCell<AVAudioPlayerDelegate, UIGestureRecognizerDelegate> {
@@ -28,7 +30,7 @@
 @property(strong, nonatomic) UIImageView* cimageViewMsgVideo;
 @property(strong, nonatomic) UIImageView* cimageViewMsgVideoFirstFrame;
 @property(strong, nonatomic) UIImageView* cimageViewMsgLocation;
-@property(strong, nonatomic) UIProgressView* cProgressIndicator;
+@property(strong, nonatomic) DLProgressView* ccProgressIndicator;
 @property(assign, nonatomic) id<DLTableCellChatProto> idChatProto;
 
 @property(strong, nonatomic) UILabel* clableMsg;

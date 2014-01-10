@@ -18,6 +18,7 @@
 #import "DLFolderViewViewCtrl.h"
 #import "DLConversationListTableViewCtrl.h"
 #import "DLNavigationCtrl.h"
+#import "DLTabbarViewCtr.h"
 
 @implementation DLAppDelegate
 
@@ -39,7 +40,7 @@
     
     ccConversationNavCtrl.tabBarItem = self.ctabbarItemConverstaion;
     
-    UITabBarController* cTabbarViewCtrl = [[UITabBarController alloc] init];
+    UITabBarController* cTabbarViewCtrl = [[DLTabbarViewCtr alloc] init];
 
     cTabbarViewCtrl.viewControllers = @[cCenterNavCt, ccConversationNavCtrl];
     self.window.rootViewController = cTabbarViewCtrl;
@@ -203,4 +204,6 @@ typedef struct{
    
     
 }
+
+
 @end

@@ -17,6 +17,7 @@
 #import <CoreLocation/CoreLocation.h>
 #import <MapKit/MapKit.h>
 #import "DLMapViewCtrl.h"
+#import "DLZoomableImageView.h"
 
 @interface DLChatTableViewCtrl ()
 -(void)initAvAudioRecroder;
@@ -936,16 +937,23 @@
     [[cMoviePlayerViewCtrl moviePlayer] play];
     [self presentMoviePlayerViewControllerAnimated:cMoviePlayerViewCtrl];
 }
--(void)didRequestShowImage:(NSDictionary*)acdicInfo {
+-(void)didRequestShowImage:(NSDictionary*)acdicInfo onTableCell:(DLTableCellChat*)accChatCell{
     if (![acdicInfo objectForKey:k_chat_msg]) {
         return;
     }
+    UIWindow* cWindow = [[UIApplication sharedApplication] keyWindow];
+    CGRect srectFrom = [[accChatCell cimageViewBg] convertRect:[accChatCell cimageViewMsgImage].frame toView:cWindow];
+    DLZoomableImageView* ccZoomableImageView = [[DLZoomableImageView alloc] initWithFrame:cWindow.bounds];
+    [cWindow addSubview:ccZoomableImageView];
+    [ccZoomableImageView setImage:accChatCell.cimageViewMsgImage.image];
+    [ccZoomableImageView appearAnimationFromRect:srectFrom];
 }
 -(void)didRequestShowLocation:(NSDictionary *)acdicInfo {
     
     if (![acdicInfo objectForKey:k_chat_msg]) {
         return;
     }
+    
     DLMapViewCtrl* ccMapViewCtrl = [[DLMapViewCtrl alloc] init];
     ccMapViewCtrl.cdicInfo = acdicInfo;
     NSString* cstrLocation = [[NSString alloc] initWithData:[acdicInfo objectForKey:k_chat_msg] encoding:NSUTF8StringEncoding];
