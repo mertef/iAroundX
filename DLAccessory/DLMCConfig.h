@@ -72,6 +72,23 @@
 #define k_tag_progress_view_chat 0x3533
 
 #define k_tag_chat_progress 0x33313
+
+#define k_login_left_icon @"loing_left_icon"
+#define k_login_name @"login_name"
+#define k_login_value @"value"
+#define k_login_place_holder @"login_name_placeholder"
+#define k_name @"name"
+#define k_pwd @"pwd"
+
+#define k_color_gray0 [UIColor colorWithRed:0.9059f green:0.9059f blue:0.9059f alpha:1.0f]
+#define k_color_gray1 [UIColor colorWithRed:0.3451f green:0.3451f blue:0.3451f alpha:1.0f]
+#define k_color_green [UIColor colorWithRed:121.0f/255.0f green:165.0f/255.0f blue:25.0f/255.0f alpha:1.0f]
+#define k_color_white [UIColor colorWithRed:1.0f green:1.0f blue:1.0f alpha:1.0f]
+
+
+#define k_image_url @"image_url"
+#define k_image_url_type @"url_type"
+
 typedef NS_ENUM(int32_t, T_PACKAGE_TYPE) {
     enum_package_type_short_msg = 0x300,
     enum_package_type_image,
@@ -89,4 +106,9 @@ typedef struct {
        u_int32_t _u_l_msg_id;
 }T_PACKAGE_HEADER;
 
+typedef NS_ENUM(NSUInteger, enum_scroll_view_image_url_type) {
+    enum_scroll_view_image_url_file = 0x400,
+    enum_scroll_view_image_url_network,
+    enum_scroll_view_image_url_app
+};
 #endif

@@ -14,18 +14,20 @@
 #import "DLPerson.h"
 #import "DLAudio.h"
 
-#import "XHLoginViewController4.h"
 #import "DLFolderViewViewCtrl.h"
 #import "DLConversationListTableViewCtrl.h"
 #import "DLNavigationCtrl.h"
 #import "DLTabbarViewCtr.h"
+#import "DLFolderViewViewCtrl.h"
+#import "DLLoginViewCtrl.h"
+#import "DLViewCtrlPersonalCenter.h"
 
 @implementation DLAppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-    self.window.backgroundColor = [UIColor clearColor];
+    self.window.backgroundColor = [UIColor whiteColor];
     
     _ccMpViewCtrl = [[DLMPViewCtrl alloc] init];
     
@@ -40,9 +42,21 @@
     
     ccConversationNavCtrl.tabBarItem = self.ctabbarItemConverstaion;
     
-    UITabBarController* cTabbarViewCtrl = [[DLTabbarViewCtr alloc] init];
+    DLFolderViewViewCtrl* ccFolderViewCtrl = [[DLFolderViewViewCtrl alloc] init];
+    UINavigationController* ccNavCtrlFolder = [[DLNavigationCtrl alloc] initWithRootViewController:ccFolderViewCtrl];
+     UITabBarItem* cTabbarItemFolder = [[UITabBarItem alloc] initWithTitle:NSLocalizedString(@"k_folder", nil) image:[[UIImage imageNamed:@"tabbar_bottom_folder_n"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] selectedImage:[[UIImage imageNamed:@"tabbar_bottom_folder_h"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]];
+    ccNavCtrlFolder.tabBarItem = cTabbarItemFolder;
 
-    cTabbarViewCtrl.viewControllers = @[cCenterNavCt, ccConversationNavCtrl];
+
+    DLViewCtrlPersonalCenter* ccSettingCtrl = [[DLViewCtrlPersonalCenter alloc] init];
+    UINavigationController* ccNaviCtrlSetting = [[DLNavigationCtrl alloc] initWithRootViewController:ccSettingCtrl];
+     UITabBarItem* cTabbarItemSetting = [[UITabBarItem alloc] initWithTitle:NSLocalizedString(@"k_setting", nil) image:[[UIImage imageNamed:@"tabbar_setting_n"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] selectedImage:[[UIImage imageNamed:@"tabbar_setting_h"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]];
+    ccSettingCtrl.tabBarItem = cTabbarItemSetting;
+    
+    
+    UITabBarController* cTabbarViewCtrl = [[DLTabbarViewCtr alloc] init];
+    cTabbarViewCtrl.viewControllers = @[ccNavCtrlFolder, cCenterNavCt, ccConversationNavCtrl, ccNaviCtrlSetting];
+    cTabbarViewCtrl.selectedViewController = cCenterNavCt;
     self.window.rootViewController = cTabbarViewCtrl;
     
     

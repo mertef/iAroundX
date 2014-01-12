@@ -28,7 +28,12 @@
         
         UITapGestureRecognizer* cTapGes = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(actionTapExit:)];
         [self addGestureRecognizer:cTapGes];
-        
+        UISwipeGestureRecognizer* cSwipeGes = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(actionSwipe:)];
+        [self addGestureRecognizer:cSwipeGes];
+        UISwipeGestureRecognizer* cSwipeGesLeft = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(actionSwipe:)];
+        cSwipeGesLeft.direction = UISwipeGestureRecognizerDirectionLeft;
+        [self addGestureRecognizer:cSwipeGesLeft];
+
         self.minimumZoomScale = 1.0f;
         self.maximumZoomScale = 5.0f;
         
@@ -50,6 +55,20 @@
         self.cimageViewContent.hidden = YES;
         [self removeFromSuperview];
     }];
+}
+-(void)actionSwipe:(UISwipeGestureRecognizer*)acSwipeGes {
+    if (acSwipeGes.state == UIGestureRecognizerStateEnded) {
+        if (acSwipeGes.direction == UISwipeGestureRecognizerDirectionLeft) {
+            if ([self.idProtoZoomableImageView respondsToSelector:@selector(didSwipeLeft:)]) {
+                [self.idProtoZoomableImageView didSwipeLeft:self];
+            }
+        }else if(acSwipeGes.direction == UISwipeGestureRecognizerDirectionRight) {
+            if ([self.idProtoZoomableImageView respondsToSelector:@selector(didSwipeRight:)]) {
+                [self.idProtoZoomableImageView didSwipeRight:self];
+            }
+        }
+    }
+   
 }
 /*
 // Only override drawRect: if you perform custom drawing.

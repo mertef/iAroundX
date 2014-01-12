@@ -58,6 +58,15 @@
 "k_location_invalid" = "地理位置无效!";
 
 
+"k_folder" = "文件夹";
+"k_setting" = "设置";
 
 
+"k_login_title" = "登陆";
 
+"k_user_name" = "用户名";
+"k_user_pwd"= "密码";
+
+
+"k_register" = "注册";
+"k_login" = "登录";

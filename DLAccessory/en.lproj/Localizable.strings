@@ -59,6 +59,14 @@
 "k_location_change_unavailable" = "location Change monitoring not supported!";
 "k_location_invalid" = "Location invlalid!";
 
+"k_folder" = "Folder";
+"k_setting" = "Setting";
 
+"k_login_title" = "Login";
 
+"k_user_name" = "Name/Email";
+"k_user_pwd"= "Password";
+
+"k_register" = "Register";
+"k_login" = "Login";
 

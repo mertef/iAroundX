@@ -15,7 +15,6 @@
 #import <MobileCoreServices/MobileCoreServices.h>
 #import "PulsingHaloLayer.h"
 #import "DLFolderViewViewCtrl.h"
-#import "XHLoginViewController4.h"
 #import "DLFolderViewViewCtrl.h"
 #import "DLChatTableViewCtrl.h"
 #import "MBProgressHUD.h"
@@ -129,7 +128,7 @@
 //    _ctHaloLayer.frame = CGRectMake(0.0f, 0.0f, 100.0f, 100.0f);
     _ctHaloLayer.position = self.cviewTableHeader.center;
     [self.cviewTableHeader.layer addSublayer:_ctHaloLayer];
-    
+/*
     _cbtnLogin = [UIButton buttonWithType:UIButtonTypeCustom];
     UIImage* cimage = [UIImage imageNamed:@"people"];
     [_cbtnLogin setImage:cimage forState:UIControlStateNormal];
@@ -138,7 +137,7 @@
     [self.cviewTableHeader addSubview:_cbtnLogin];
     
     _cbtnFolder = [UIButton buttonWithType:UIButtonTypeCustom];
-    
+*/
     [self.cviewTableHeader addSubview:self.cimageViewBtnScan];
     UIImage* cimageFolder = [UIImage imageNamed:@"folder"];
     [_cbtnFolder setImage:cimageFolder forState:UIControlStateNormal];
@@ -944,8 +943,6 @@
 }
 
 -(void)actionLogin:(id)aidSender {
-    XHLoginViewController4* ctLoginViewCtrl = [[XHLoginViewController4 alloc] init];
-    [self.navigationController pushViewController:ctLoginViewCtrl animated:YES];
 }
 -(void)actionShowFolderManager:(id)aidSender {
     DLFolderViewViewCtrl* ccFolderViewCtrl = [[DLFolderViewViewCtrl alloc] init];
