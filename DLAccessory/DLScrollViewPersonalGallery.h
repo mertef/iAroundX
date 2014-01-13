@@ -12,5 +12,9 @@
 @property(strong, nonatomic) NSMutableArray* cmutarrImages;
 @property(strong, nonatomic) UIScrollView* cscrollviewImage;
 @property(strong, nonatomic) UIPageControl* cpageControl;
+@property(strong, nonatomic) UIButton* cbtnEdit;
 -(void)feedImages:(NSMutableArray*)acmutArrImages;
+-(void)actionEdit:(id)aidSender;
+-(void)setContentMenu:(NSMutableArray*)acMutarrMenus;
+
 @end

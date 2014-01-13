@@ -10,12 +10,16 @@
 #import "DLMCConfig.h"
 #import "DLZoomableImageView.h"
 #import "DLCache.h"
+#import "DLViewPCInfo.h"
+#import <QuartzCore/QuartzCore.h>
 
 @interface DLScrollViewPersonalGallery() {
     dispatch_queue_t _dispatch_queue_image;
+    NSMutableArray* _c_mut_arr_content_menus;
 }
 -(void)actionZoom:(UITapGestureRecognizer*)acTapGes;
-
+-(void)showContentMenu;
+-(void)hideContentMenu;
 @end
 @implementation DLScrollViewPersonalGallery
 
@@ -36,16 +40,24 @@
         [self addSubview:self.cscrollviewImage];
         _dispatch_queue_image = dispatch_queue_create("image",  DISPATCH_QUEUE_CONCURRENT);
         self.cpageControl = [[UIPageControl alloc] init];
-        self.cpageControl.pageIndicatorTintColor = k_color_white;
+        self.cpageControl.currentPageIndicatorTintColor = [UIColor orangeColor];
         [self.cscrollviewImage addSubview:self.cpageControl];
     
-        NSLog(@"%@", NSStringFromCGRect(self.cscrollviewImage.frame));
+        self.cbtnEdit = [UIButton buttonWithType:UIButtonTypeCustom];
+        
+        self.cbtnEdit.backgroundColor = [UIColor redColor];
+        self.cbtnEdit.frame = CGRectMake(CGRectGetWidth(self.bounds) - 60.0f, CGRectGetHeight(self.bounds) - 60.0f, 60.0f, 60.0f);
+        [self.cscrollviewImage addSubview:self.cbtnEdit];
+        [self.cbtnEdit addTarget:self action:@selector(actionEdit:) forControlEvents:UIControlEventTouchUpInside];
+    //    NSLog(@"%@", NSStringFromCGRect(self.cscrollviewImage.frame));
 
     }
     return self;
 }
 -(void)layoutSubviews {
     [super layoutSubviews];
+    self.cbtnEdit.frame = CGRectMake(CGRectGetWidth(self.bounds) - 60.0f + self.cscrollviewImage.contentOffset.x, CGRectGetHeight(self.bounds) - 60.0f, 60.0f, 60.0f);
+    [self.cscrollviewImage bringSubviewToFront:self.cbtnEdit];
 }
 - (void)dealloc
 {
@@ -110,6 +122,7 @@
     CGRect srectFrom = [self.cscrollviewImage convertRect:cViewTapped.frame toView:cWindow];
     DLZoomableImageView* ccZoomableImageView = [[DLZoomableImageView alloc] initWithFrame:cWindow.bounds];
     ccZoomableImageView.cimageViewContent.contentMode = UIViewContentModeScaleAspectFill;
+    ccZoomableImageView.clablePageNumber.text = [NSString stringWithFormat:@"%lu/%lu", self.cpageControl.currentPage + 1, self.cpageControl.numberOfPages];
     ccZoomableImageView.idProtoZoomableImageView = self;
     [cWindow addSubview:ccZoomableImageView];
     [ccZoomableImageView setImage:cimageViewTapped.image];
@@ -123,6 +136,9 @@
         CGRect srectPage = self.cpageControl.frame;
         srectPage.origin.x = fPage * CGRectGetWidth(self.bounds) + (CGRectGetWidth(self.bounds) - srectPage.size.width) * 0.5f;
         self.cpageControl.frame = srectPage;
+        
+        self.cbtnEdit.frame = CGRectMake(CGRectGetWidth(self.bounds) - 60.0f + self.cscrollviewImage.contentOffset.x, CGRectGetHeight(self.bounds) - 60.0f, 60.0f, 60.0f);
+        [self.cscrollviewImage bringSubviewToFront:self.cbtnEdit];
     }
 }
 
@@ -160,6 +176,8 @@
             });
         });
     }
+    accZoomableImageView.clablePageNumber.text = [NSString stringWithFormat:@"%lu/%lu", self.cpageControl.currentPage + 1, self.cpageControl.numberOfPages];
+
 }
 -(void)didSwipeRight:(DLZoomableImageView*)accZoomableImageView {
    
@@ -195,6 +213,54 @@
             });
         });
     }
+    accZoomableImageView.clablePageNumber.text = [NSString stringWithFormat:@"%lu/%lu", self.cpageControl.currentPage + 1, self.cpageControl.numberOfPages];
+
+}
+-(void)actionEdit:(id)aidSender {
+    [self showContentMenu];
+}
+
+-(void)setContentMenu:(NSMutableArray*)acMutarrMenus {
+    [_c_mut_arr_content_menus removeAllObjects];
+    _c_mut_arr_content_menus = nil;
+    _c_mut_arr_content_menus = acMutarrMenus;
+    for (UIView* cviewItem in _c_mut_arr_content_menus) {
+        cviewItem.center = self.cbtnEdit.center;
+        [self addSubview:cviewItem];
+    }
+}
+-(void)showContentMenu{
+    CGMutablePathRef rcmutPath = CGPathCreateMutable();
+    CGPathMoveToPoint(rcmutPath, NULL, self.cbtnEdit.center.x, self.cbtnEdit.center.y);
+    CFIndex iMenuCount = [_c_mut_arr_content_menus count];
+//    CGPoint sPointLeft = CGPointMake(CGRectGetWidth(self.bounds) - self.cbtnEdit.center.x, self.cbtnEdit.center.y);
+    CGPoint sPointCenter = CGPointMake(CGRectGetWidth(self.bounds) * 0.5f, self.cbtnEdit.center.y);
+    CGPoint sPointRight = self.cbtnEdit.center;
+    CGFloat fAngleOffset = 0.0f;
+    NSLog(@"show contnet menu  %@", NSStringFromCGRect(self.bounds));
+    CGFloat fRadius = CGRectGetHeight(self.bounds) - (CGRectGetHeight(self.bounds) - sPointCenter.y) - 10.0f;
+  
+    for (int i = 0 ; i < iMenuCount; i ++) {
+        fAngleOffset += M_PI / iMenuCount;
+        UIView* cviewItem = [_c_mut_arr_content_menus objectAtIndex:i];
+        
+        CGPoint sPointTemp = CGPointMake(sPointCenter.x + fRadius * cosf(fAngleOffset) , sPointCenter.y - fRadius * sinf(fAngleOffset));
+        
+        cviewItem.center = sPointTemp;
+        /*
+        CGPathAddArcToPoint(rcmutPath, NULL, sPointRight.x, sPointRight.y,sPointTemp.x, sPointTemp.y, fRadius);
+        CAKeyframeAnimation* ckeyframeAnimation = (CAKeyframeAnimation*)[cviewItem.layer animationForKey:@"ani_move_along_a_path"];
+        if (!ckeyframeAnimation) {
+            ckeyframeAnimation = [CAKeyframeAnimation animationWithKeyPath:@"position"];
+            CGPathRef rpath = CGPathCreateCopy(rcmutPath);
+            ckeyframeAnimation.path = rpath;
+            CGPathRelease(rpath); rpath = NULL;
+        }*/
+//        [cviewItem.layer addAnimation:ckeyframeAnimation forKey:@"ani_move_along_a_path"];
+    }
+    
+}
+-(void)hideContentMenu {
     
 }
 

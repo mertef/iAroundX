@@ -8,7 +8,10 @@
 
 #import <UIKit/UIKit.h>
 @class DLScrollViewPersonalGallery;
-@interface DLViewCtrlPersonalCenter : UIViewController
+@class DLViewPCInfo;
+@interface DLViewCtrlPersonalCenter : UIViewController<UIActionSheetDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate>
 @property(strong, nonatomic) DLScrollViewPersonalGallery* ccScrollviewPG;
-@property(strong, nonatomic) UIImageView* cimageviewAvator;
+@property(strong, nonatomic) DLViewPCInfo* ccViewPcInfo;
+@property(strong, nonatomic) UIActionSheet* cactionSheetChangeAvatar;
+-(void)actionChangeAvator:(UITapGestureRecognizer*)acTapGes;
 @end

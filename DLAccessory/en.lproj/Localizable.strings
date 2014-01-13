@@ -68,5 +68,16 @@
 "k_user_pwd"= "Password";
 
 "k_register" = "Register";
+
+
 "k_login" = "Login";
+
+"k_pc_name" = "Name";
+"k_pc_sex" = "Sexuality";
+"k_pc_age" = "Age";
+"k_pc_email" = "Email";
+
+"k_pc_change_avatar" = "Change Avatar";
+"k_pc_gallery" = "Photo gallery";
+"k_pc_camera" = "Take Pickture";
 

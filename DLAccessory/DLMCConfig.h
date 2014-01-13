@@ -84,6 +84,8 @@
 #define k_color_gray1 [UIColor colorWithRed:0.3451f green:0.3451f blue:0.3451f alpha:1.0f]
 #define k_color_green [UIColor colorWithRed:121.0f/255.0f green:165.0f/255.0f blue:25.0f/255.0f alpha:1.0f]
 #define k_color_white [UIColor colorWithRed:1.0f green:1.0f blue:1.0f alpha:1.0f]
+#define k_color_pink [UIColor colorWithRed:236.0f/255.0f green:0.0f/255.0f blue:140.0f/255.0f alpha:1.0f]
+
 
 
 #define k_image_url @"image_url"

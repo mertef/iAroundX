@@ -70,3 +70,14 @@
 
 "k_register" = "注册";
 "k_login" = "登录";
+
+
+
+"k_pc_name" = "名字";
+"k_pc_sex" = "性别";
+"k_pc_age" = "年龄";
+"k_pc_email" = "邮件地址";
+
+"k_pc_change_avatar" = "修改头像";
+"k_pc_gallery" = "照片";
+"k_pc_camera" = "相机";

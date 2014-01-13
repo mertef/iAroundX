@@ -19,6 +19,7 @@
 @property(strong, nonatomic) UIButton* cbtnSave;
 @property(assign, nonatomic) CGRect srectFrom;
 @property(assign, nonatomic) id<ProtoZoomableImageView> idProtoZoomableImageView;
+@property(strong, nonatomic) UILabel* clablePageNumber;
 -(void)actionPinch:(UIPinchGestureRecognizer*)acPinchGes;
 -(void)setImage:(UIImage*)acImage;
 -(void)appearAnimationFromRect:(CGRect)acRectFrom;

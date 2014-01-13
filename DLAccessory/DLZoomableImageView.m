@@ -37,11 +37,20 @@
         self.minimumZoomScale = 1.0f;
         self.maximumZoomScale = 5.0f;
         
+        self.clablePageNumber = [[UILabel alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.bounds) - 100.0f) * 0.5f , CGRectGetHeight(self.bounds) - 30.0f, 100.0f, 30.0f)];
+        self.clablePageNumber.textAlignment = NSTextAlignmentCenter;
+        self.clablePageNumber.backgroundColor = [UIColor colorWithRed:161.0f/255.0f green:204.0/255.0f blue:58.0f/255.0f alpha:1.0f];
+        self.clablePageNumber.textColor = [UIColor whiteColor];
+        self.clablePageNumber.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+        [self addSubview:self.clablePageNumber];
     }
     return self;
 }
 -(void)layoutSubviews {
     [super layoutSubviews];
+    CGRect srectPage = self.clablePageNumber.frame;
+    CGPoint spointOffset = self.contentOffset;
+    self.clablePageNumber.frame = CGRectMake((CGRectGetWidth(self.bounds) - 100.0f) * 0.5f + spointOffset.x,  CGRectGetHeight(self.bounds) - 30.0f + spointOffset.y, srectPage.size.width , srectPage.size.height);
 }
 -(void)actionPinch:(UIPinchGestureRecognizer*)acPinchGes {
 }
@@ -95,7 +104,7 @@
 //}
 
 - (void)scrollViewDidZoom:(UIScrollView *)scrollView {
-    NSLog(@"frame %@", NSStringFromCGRect(self.cimageViewContent.frame));
+//    NSLog(@"frame %@", NSStringFromCGRect(self.cimageViewContent.frame));
 }
 
 
