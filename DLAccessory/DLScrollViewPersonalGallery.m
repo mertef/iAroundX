@@ -48,7 +48,7 @@
         self.cbtnEdit = [UIButton buttonWithType:UIButtonTypeCustom];
         
         self.cbtnEdit.backgroundColor = [UIColor redColor];
-        self.cbtnEdit.frame = CGRectMake(CGRectGetWidth(self.bounds) - 40.0f, CGRectGetHeight(self.bounds) - 60.0f, 36.0f, 36.0f);
+        self.cbtnEdit.frame = CGRectMake(CGRectGetWidth(self.bounds) - 40.0f, CGRectGetHeight(self.bounds) - 80.0f, 36.0f, 36.0f);
         [self addSubview:self.cbtnEdit];
         [self.cbtnEdit addTarget:self action:@selector(actionEdit:) forControlEvents:UIControlEventTouchUpInside];
         self.clipsToBounds = YES;
@@ -260,21 +260,23 @@
         if ([cstrAniName  isEqualToString:@"ani_move_along_a_path"]) {
 //            Class tBounceMeta = [CSAnimation classForAnimationType:CSAnimationTypeShake];
 //            [tBounceMeta performAnimationOnView:cviewObj duration:2.0f delay:0.0f];
+            
             UIGravityBehavior* cgravityBe = [[UIGravityBehavior alloc] initWithItems:_c_mut_arr_content_menus];
             [self.cDyAni addBehavior:cgravityBe];
-            UIAttachmentBehavior* cattachementBe = [[UIAttachmentBehavior alloc] initWithItem:cviewObj offsetFromCenter:UIOffsetMake(1.0f, 1.0f) attachedToAnchor:cviewObj.center];
-            [cattachementBe setLength:8];
-            [cattachementBe setFrequency:25];
-            [cattachementBe setDamping:10];
+            UIAttachmentBehavior* cattachementBe = [[UIAttachmentBehavior alloc] initWithItem:cviewObj offsetFromCenter:UIOffsetMake(0.0f, 0.0f) attachedToAnchor:cviewObj.center];
+            [cattachementBe setLength:12];
+            [cattachementBe setFrequency:6];
+            [cattachementBe setDamping:5];
             
             [self.cDyAni addBehavior:cattachementBe];
             
             if (!self.cCollisionBe) {
                 self.cCollisionBe = [[UICollisionBehavior alloc] initWithItems:_c_mut_arr_content_menus];
+                self.cCollisionBe.collisionMode =  UICollisionBehaviorModeBoundaries;
                 [  self.cCollisionBe addBoundaryWithIdentifier:@"collision_boundary" fromPoint:CGPointMake(0.0f, CGRectGetHeight(self.bounds)) toPoint:CGPointMake(CGRectGetWidth(self.bounds), CGRectGetHeight(self.bounds))];
                 [self.cDyAni addBehavior:  self.cCollisionBe];
             }
-
+            
 
         }
     }
@@ -343,6 +345,7 @@
     for (UIDynamicBehavior* cdyBe in carrBehaviors) {
         [self.cDyAni removeBehavior:cdyBe];
     }
+    self.cCollisionBe = nil;
     
     for (NSInteger i = 0 ; i < iMenuCount; i ++) {
         fAngleOffset = M_2_PI - (M_PI / (CGFloat)iMenuCount) *  (i + 1);

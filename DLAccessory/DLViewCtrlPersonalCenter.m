@@ -82,7 +82,7 @@
     [self.view addSubview:self.ccScrollviewPG];
     
     NSMutableArray* cmutarrMenus = [NSMutableArray array];
-    for (int i = 0; i < 6; i ++) {
+    for (int i = 0; i < 4; i ++) {
         UIButton* cbtnItem = [UIButton buttonWithType:UIButtonTypeCustom];
         cbtnItem.frame = CGRectMake(0.0f, 0.0f, 36.0f, 36.0f);
         cbtnItem.backgroundColor = [UIColor redColor];
