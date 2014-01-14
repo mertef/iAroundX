@@ -12,6 +12,8 @@
 #import "DLCache.h"
 #import "DLViewPCInfo.h"
 #import <QuartzCore/QuartzCore.h>
+#import "DLCircle.h"
+#import "CSAnimation.h"
 
 @interface DLScrollViewPersonalGallery() {
     dispatch_queue_t _dispatch_queue_image;
@@ -46,17 +48,21 @@
         self.cbtnEdit = [UIButton buttonWithType:UIButtonTypeCustom];
         
         self.cbtnEdit.backgroundColor = [UIColor redColor];
-        self.cbtnEdit.frame = CGRectMake(CGRectGetWidth(self.bounds) - 60.0f, CGRectGetHeight(self.bounds) - 60.0f, 60.0f, 60.0f);
-        [self.cscrollviewImage addSubview:self.cbtnEdit];
+        self.cbtnEdit.frame = CGRectMake(CGRectGetWidth(self.bounds) - 40.0f, CGRectGetHeight(self.bounds) - 60.0f, 36.0f, 36.0f);
+        [self addSubview:self.cbtnEdit];
         [self.cbtnEdit addTarget:self action:@selector(actionEdit:) forControlEvents:UIControlEventTouchUpInside];
+        self.clipsToBounds = YES;
     //    NSLog(@"%@", NSStringFromCGRect(self.cscrollviewImage.frame));
+        
+//        DLCircle* ccCircle = [[DLCircle alloc] initWithFrame:self.bounds];
+//        [self addSubview:ccCircle];
 
     }
     return self;
 }
 -(void)layoutSubviews {
     [super layoutSubviews];
-    self.cbtnEdit.frame = CGRectMake(CGRectGetWidth(self.bounds) - 60.0f + self.cscrollviewImage.contentOffset.x, CGRectGetHeight(self.bounds) - 60.0f, 60.0f, 60.0f);
+//    self.cbtnEdit.frame = CGRectMake(CGRectGetWidth(self.bounds) - 60.0f + self.cscrollviewImage.contentOffset.x, CGRectGetHeight(self.bounds) - 60.0f, 60.0f, 60.0f);
     [self.cscrollviewImage bringSubviewToFront:self.cbtnEdit];
 }
 - (void)dealloc
@@ -136,9 +142,6 @@
         CGRect srectPage = self.cpageControl.frame;
         srectPage.origin.x = fPage * CGRectGetWidth(self.bounds) + (CGRectGetWidth(self.bounds) - srectPage.size.width) * 0.5f;
         self.cpageControl.frame = srectPage;
-        
-        self.cbtnEdit.frame = CGRectMake(CGRectGetWidth(self.bounds) - 60.0f + self.cscrollviewImage.contentOffset.x, CGRectGetHeight(self.bounds) - 60.0f, 60.0f, 60.0f);
-        [self.cscrollviewImage bringSubviewToFront:self.cbtnEdit];
     }
 }
 
@@ -217,7 +220,13 @@
 
 }
 -(void)actionEdit:(id)aidSender {
-    [self showContentMenu];
+    UIButton* cbtn = (UIButton*)aidSender;
+    cbtn.selected = !cbtn.selected;
+    if (cbtn.selected) {
+        [self showContentMenu];
+    }else {
+        [self hideContentMenu];
+    }
 }
 
 -(void)setContentMenu:(NSMutableArray*)acMutarrMenus {
@@ -225,43 +234,148 @@
     _c_mut_arr_content_menus = nil;
     _c_mut_arr_content_menus = acMutarrMenus;
     for (UIView* cviewItem in _c_mut_arr_content_menus) {
-        cviewItem.center = self.cbtnEdit.center;
         [self addSubview:cviewItem];
+        cviewItem.hidden = YES;
+        cviewItem.center = self.cbtnEdit.center;
+    }
+    [self bringSubviewToFront:self.cbtnEdit];
+    
+    if (!self.cDyAni) {
+        self.cDyAni = [[UIDynamicAnimator alloc] initWithReferenceView:self];
+
+       
+    }
+
+}
+- (void)animationDidStop:(CAAnimation *)anim finished:(BOOL)flag {
+    NSValue* cvalue = [anim valueForKey:@"position_destination"];
+    NSString* cstrAniName = [anim valueForKey:@"ani_name"];
+
+    if (cvalue) {
+        NSValue* cvalueObj = [anim valueForKey:@"obj"];
+//        CGPoint spointPostion = [cvalue CGPointValue];
+
+        UIView* cviewObj = (UIView*)[cvalueObj pointerValue];
+
+        if ([cstrAniName  isEqualToString:@"ani_move_along_a_path"]) {
+//            Class tBounceMeta = [CSAnimation classForAnimationType:CSAnimationTypeShake];
+//            [tBounceMeta performAnimationOnView:cviewObj duration:2.0f delay:0.0f];
+            UIGravityBehavior* cgravityBe = [[UIGravityBehavior alloc] initWithItems:_c_mut_arr_content_menus];
+            [self.cDyAni addBehavior:cgravityBe];
+            UIAttachmentBehavior* cattachementBe = [[UIAttachmentBehavior alloc] initWithItem:cviewObj offsetFromCenter:UIOffsetMake(1.0f, 1.0f) attachedToAnchor:cviewObj.center];
+            [cattachementBe setLength:8];
+            [cattachementBe setFrequency:25];
+            [cattachementBe setDamping:10];
+            
+            [self.cDyAni addBehavior:cattachementBe];
+            
+            if (!self.cCollisionBe) {
+                self.cCollisionBe = [[UICollisionBehavior alloc] initWithItems:_c_mut_arr_content_menus];
+                [  self.cCollisionBe addBoundaryWithIdentifier:@"collision_boundary" fromPoint:CGPointMake(0.0f, CGRectGetHeight(self.bounds)) toPoint:CGPointMake(CGRectGetWidth(self.bounds), CGRectGetHeight(self.bounds))];
+                [self.cDyAni addBehavior:  self.cCollisionBe];
+            }
+
+
+        }
     }
 }
+
 -(void)showContentMenu{
-    CGMutablePathRef rcmutPath = CGPathCreateMutable();
-    CGPathMoveToPoint(rcmutPath, NULL, self.cbtnEdit.center.x, self.cbtnEdit.center.y);
-    CFIndex iMenuCount = [_c_mut_arr_content_menus count];
-//    CGPoint sPointLeft = CGPointMake(CGRectGetWidth(self.bounds) - self.cbtnEdit.center.x, self.cbtnEdit.center.y);
-    CGPoint sPointCenter = CGPointMake(CGRectGetWidth(self.bounds) * 0.5f, self.cbtnEdit.center.y);
-    CGPoint sPointRight = self.cbtnEdit.center;
-    CGFloat fAngleOffset = 0.0f;
+   
     NSLog(@"show contnet menu  %@", NSStringFromCGRect(self.bounds));
-    CGFloat fRadius = CGRectGetHeight(self.bounds) - (CGRectGetHeight(self.bounds) - sPointCenter.y) - 10.0f;
-  
-    for (int i = 0 ; i < iMenuCount; i ++) {
-        fAngleOffset += M_PI / iMenuCount;
+
+    
+    CFIndex iMenuCount = [_c_mut_arr_content_menus count];
+    CGPoint sPointCenter = CGPointMake(CGRectGetWidth(self.bounds) * 0.5f, self.cbtnEdit.center.y);
+    CGFloat fAngleOffset =  0.0f;
+    CGFloat fRadius = CGRectGetWidth(self.bounds) * 0.5f  - (CGRectGetWidth(self.bounds) - CGRectGetMinX(self.cbtnEdit.frame));
+   
+    for (int i = 0 ; i < iMenuCount  ; i ++) {
+        
+        fAngleOffset =  -(M_PI / (CGFloat)iMenuCount) * (i + 1);
         UIView* cviewItem = [_c_mut_arr_content_menus objectAtIndex:i];
+        cviewItem.hidden = NO;
+//        CGPoint sPointTemp = CGPointMake(sPointCenter.x + fRadius * cosf(fAngleOffset) , sPointCenter.y - fRadius * sinf(fAngleOffset));
         
-        CGPoint sPointTemp = CGPointMake(sPointCenter.x + fRadius * cosf(fAngleOffset) , sPointCenter.y - fRadius * sinf(fAngleOffset));
-        
-        cviewItem.center = sPointTemp;
-        /*
-        CGPathAddArcToPoint(rcmutPath, NULL, sPointRight.x, sPointRight.y,sPointTemp.x, sPointTemp.y, fRadius);
         CAKeyframeAnimation* ckeyframeAnimation = (CAKeyframeAnimation*)[cviewItem.layer animationForKey:@"ani_move_along_a_path"];
         if (!ckeyframeAnimation) {
+            CGMutablePathRef rmutPath = CGPathCreateMutable();
+            CGAffineTransform sAffineTrans = self.transform;
+
+            CGPathMoveToPoint(rmutPath, &sAffineTrans, self.cbtnEdit.center.x, self.cbtnEdit.center.y);
+            CGPathAddArc(rmutPath, &sAffineTrans, sPointCenter.x, sPointCenter.y, fRadius, 0, fAngleOffset, true);
+            cviewItem.layer.position = CGPathGetCurrentPoint(rmutPath);
             ckeyframeAnimation = [CAKeyframeAnimation animationWithKeyPath:@"position"];
-            CGPathRef rpath = CGPathCreateCopy(rcmutPath);
-            ckeyframeAnimation.path = rpath;
-            CGPathRelease(rpath); rpath = NULL;
-        }*/
-//        [cviewItem.layer addAnimation:ckeyframeAnimation forKey:@"ani_move_along_a_path"];
+            ckeyframeAnimation.path = rmutPath;
+            ckeyframeAnimation.duration = 0.2f + i * 0.1f ;
+            ckeyframeAnimation.autoreverses = NO;
+            ckeyframeAnimation.removedOnCompletion = YES;
+            [ckeyframeAnimation setValue:[NSValue valueWithPointer:(void*)cviewItem] forKey:@"obj"];
+            [ckeyframeAnimation setValue:[NSValue valueWithCGPoint:CGPathGetCurrentPoint(rmutPath)] forKey:@"position_destination"];
+            
+            [ckeyframeAnimation setValue:@"ani_move_along_a_path" forKey:@"ani_name"];
+            ckeyframeAnimation.delegate =self;
+            
+            CGPathRelease(rmutPath); rmutPath = NULL;
+
+        }
+        [cviewItem.layer addAnimation:ckeyframeAnimation forKey:@"ani_move_along_a_path"];
+        
+     
+
+
     }
     
 }
 -(void)hideContentMenu {
+    CFIndex iMenuCount = [_c_mut_arr_content_menus count];
+    CGPoint sPointCenter = CGPointMake(CGRectGetWidth(self.bounds) * 0.5f, self.cbtnEdit.center.y);
+    CGFloat fAngleOffset =  0.0f;
+    CGFloat fRadius = CGRectGetWidth(self.bounds) * 0.5f  - (CGRectGetWidth(self.bounds) - CGRectGetMidX(self.cbtnEdit.frame));
     
+    NSArray* carrBehaviors = self.cDyAni.behaviors;
+    /*
+    for (UIDynamicBehavior* cdyBe  in [self.cDyAni behaviors]) {
+        if ([cdyBe isKindOfClass:[UIAttachmentBehavior class]]) {
+            [cmutarrAttachment addObject:cdyBe];
+        }
+    }*/
+    for (UIDynamicBehavior* cdyBe in carrBehaviors) {
+        [self.cDyAni removeBehavior:cdyBe];
+    }
+    
+    for (NSInteger i = 0 ; i < iMenuCount; i ++) {
+        fAngleOffset = M_2_PI - (M_PI / (CGFloat)iMenuCount) *  (i + 1);
+        NSLog(@"angle offset %f", fAngleOffset);
+        
+        UIView* cviewItem = [_c_mut_arr_content_menus objectAtIndex: i];
+        
+        CAKeyframeAnimation* ckeyframeAnimation = (CAKeyframeAnimation*)[cviewItem.layer animationForKey:@"ani_move_along_a_path_disappear"];
+        if (!ckeyframeAnimation) {
+            CGMutablePathRef rcmutPath = CGPathCreateMutable();
+            CGAffineTransform sAffineTrans = self.transform;
+//            CGPathMoveToPoint(rcmutPath, &sAffineTrans, cviewItem.layer.position.x, cviewItem.layer.position.y);
+            CGPathAddArc(rcmutPath, &sAffineTrans, sPointCenter.x
+                         , sPointCenter.y, fRadius, fAngleOffset, (M_PI / (CGFloat)iMenuCount) , false);
+            
+            ckeyframeAnimation = [CAKeyframeAnimation animationWithKeyPath:@"position"];
+            ckeyframeAnimation.path = rcmutPath;
+            cviewItem.layer.position = CGPathGetCurrentPoint(rcmutPath);
+            ckeyframeAnimation.duration = .2f + i * 0.1f ;
+            ckeyframeAnimation.removedOnCompletion = YES;
+            ckeyframeAnimation.autoreverses = NO;
+//            [ckeyframeAnimation setValue:[NSValue valueWithPointer:(void*)cviewItem] forKey:@"obj"];
+//            [ckeyframeAnimation setValue:[NSValue valueWithCGPoint:CGPathGetCurrentPoint(rcmutPath)] forKey:@"position_destination"];
+
+//            [ckeyframeAnimation setValue:@"ani_move_along_a_path_disappear" forKey:@"ani_name"];
+//            ckeyframeAnimation.delegate = self;
+
+            CGPathRelease(rcmutPath); rcmutPath = NULL;
+        }
+        [cviewItem.layer addAnimation:ckeyframeAnimation forKey:@"ani_move_along_a_path_disappear"];
+        
+
+    }
 }
 
 @end

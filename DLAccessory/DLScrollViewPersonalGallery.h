@@ -13,8 +13,11 @@
 @property(strong, nonatomic) UIScrollView* cscrollviewImage;
 @property(strong, nonatomic) UIPageControl* cpageControl;
 @property(strong, nonatomic) UIButton* cbtnEdit;
+@property(strong, nonatomic) UIDynamicAnimator* cDyAni;
+@property(strong, nonatomic) UICollisionBehavior* cCollisionBe;
 -(void)feedImages:(NSMutableArray*)acmutArrImages;
 -(void)actionEdit:(id)aidSender;
 -(void)setContentMenu:(NSMutableArray*)acMutarrMenus;
+
 
 @end

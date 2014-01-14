@@ -84,8 +84,9 @@
     NSMutableArray* cmutarrMenus = [NSMutableArray array];
     for (int i = 0; i < 6; i ++) {
         UIButton* cbtnItem = [UIButton buttonWithType:UIButtonTypeCustom];
-        cbtnItem.frame = CGRectMake(0.0f, 0.0f, 60.0f, 60.0f);
+        cbtnItem.frame = CGRectMake(0.0f, 0.0f, 36.0f, 36.0f);
         cbtnItem.backgroundColor = [UIColor redColor];
+        [cbtnItem setTitle:[NSString stringWithFormat:@"%d", i] forState:UIControlStateNormal];
         [cmutarrMenus addObject:cbtnItem];
     }
     [self.ccScrollviewPG setContentMenu:cmutarrMenus];
