@@ -16,7 +16,7 @@
     if (self) {
         // Initialization code
         //
-        self.backgroundColor = [UIColor clearColor];
+        self.backgroundColor = [UIColor whiteColor];
         [self addUIAvatar];
         self.clableName = [[UILabel alloc] init];
         self.clableName.textAlignment = NSTextAlignmentLeft;

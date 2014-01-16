@@ -15,4 +15,6 @@
 @property(strong, nonatomic) UIActionSheet* cactionSheetChangeAvatar;
 @property(strong, nonatomic) NSMutableArray* cmutarrContentMenu;
 -(void)actionChangeAvator:(UITapGestureRecognizer*)acTapGes;
+-(void)addUpBehavior;
+-(void)addDownBehavior;
 @end

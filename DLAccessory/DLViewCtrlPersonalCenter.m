@@ -20,6 +20,9 @@ typedef NS_ENUM (NSUInteger, T_ENUM_ACTION_SHEET_MODE){
 };
 @interface DLViewCtrlPersonalCenter () {
     T_ENUM_ACTION_SHEET_MODE _t_enum_action_sheet_mode;
+    CGRect _s_rect_pc_gallery_init;
+    CGRect _s_rect_pc_info_int;
+    UIDynamicAnimator* _c_dy_animator;
 }
 -(void)addUIGallery;
 -(void)addUIPersonalInformation;
@@ -32,6 +35,7 @@ typedef NS_ENUM (NSUInteger, T_ENUM_ACTION_SHEET_MODE){
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
+
     }
     return self;
 }
@@ -59,11 +63,14 @@ typedef NS_ENUM (NSUInteger, T_ENUM_ACTION_SHEET_MODE){
     [self addUIGallery];
     [self addUIPersonalInformation];
     
+    _c_dy_animator = [[UIDynamicAnimator alloc] initWithReferenceView:self.view];
+    
     
 }
 -(void)addUIGallery{
     // Do any additional setup after loading the view.
-    self.ccScrollviewPG = [[DLScrollViewPersonalGallery alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.view.bounds), CGRectGetHeight(self.view.bounds) * 0.4f)];
+    _s_rect_pc_gallery_init = CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.view.bounds), CGRectGetHeight(self.view.bounds) * 0.4f);
+    self.ccScrollviewPG = [[DLScrollViewPersonalGallery alloc] initWithFrame:_s_rect_pc_gallery_init];
 //    NSLog(@"--%@", NSStringFromCGRect(self.ccScrollviewPG.frame));
     //IMG_0414
     
@@ -148,11 +155,90 @@ typedef NS_ENUM (NSUInteger, T_ENUM_ACTION_SHEET_MODE){
     [cAlertMsg show];
 }
 -(void)actionChangeSignature:(id)aidSender {
+    CATransform3D tTransform3dPerspective = CATransform3DIdentity;
+    tTransform3dPerspective.m34 = 1.0/ -500;
+    CGRect srectFrame = self.ccScrollviewPG.frame;
+    self.ccScrollviewPG.layer.anchorPoint = CGPointMake(0.5f,1.0f);
+    self.ccScrollviewPG.frame = srectFrame;
+    CATransform3D tTransform3dRotateAroundX = CATransform3DRotate(tTransform3dPerspective, M_PI_2, 1.0f, 0.0f, 0.0f);
+    CGRect srectInfoFrame = self.ccViewPcInfo.frame;
+    srectInfoFrame.origin = CGPointMake(0.0f, 20.0f);
 
+    [self addUpBehavior];
+    
+    [UIView animateWithDuration:.8f animations:^(void){
+        self.ccScrollviewPG.layer.transform = tTransform3dRotateAroundX;
+//        self.ccViewPcInfo.frame = srectInfoFrame;
+        self.view.backgroundColor = [UIColor blackColor];
+        [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault animated:YES];
+
+    } completion:^(BOOL abFinished){
+        [self.ccViewPcInfo.ctextviewSignature setEditable:YES];
+       
+        [self.ccViewPcInfo.ctextviewSignature becomeFirstResponder];
+    }];
+    
    
 
 }
 
+-(void)addUpBehavior {
+    UIGravityBehavior* cGravityBe = [[UIGravityBehavior alloc] initWithItems:@[self.ccViewPcInfo]];
+    cGravityBe.gravityDirection = CGVectorMake(0, -1.0f);
+    
+    //    UIAttachmentBehavior* cAttachBe = [[UIAttachmentBehavior alloc] initWithItem:self.ccViewPcInfo attachedToAnchor:CGPointMake(CGRectGetWidth(self.view.bounds) * 0.5f, 20.0f)];
+    //    cAttachBe.length = 50.0f;
+    //    cAttachBe.damping = 0.8f;
+    //    cAttachBe.frequency = 20.0f;
+    
+    UICollisionBehavior* cCollisonBe = [[UICollisionBehavior alloc] initWithItems:@[self.ccViewPcInfo]];
+    cCollisonBe.translatesReferenceBoundsIntoBoundary = YES;
+    [cCollisonBe addBoundaryWithIdentifier:@"topBellowStatusBarSeperator" fromPoint:CGPointMake(0.0f, 20.0f) toPoint:CGPointMake(CGRectGetWidth(self.view.bounds), 20.0f)];
+    
+    UIDynamicItemBehavior* cdynItemBe = [[UIDynamicItemBehavior alloc] initWithItems:@[self.ccViewPcInfo]];
+    cdynItemBe.elasticity = 0.4f;
+    
+    cCollisonBe.collisionMode = UICollisionBehaviorModeBoundaries;
+    [_c_dy_animator addBehavior:cGravityBe];
+    [_c_dy_animator addBehavior:cCollisonBe];
+    [_c_dy_animator addBehavior:cdynItemBe];
+    //    [_c_dy_animator addBehavior:cAttachBe];
+}
+-(void)addDownBehavior {
+    UIGravityBehavior* cGravityBe = [[UIGravityBehavior alloc] initWithItems:@[self.ccViewPcInfo]];
+    
+    //    UIAttachmentBehavior* cAttachBe = [[UIAttachmentBehavior alloc] initWithItem:self.ccViewPcInfo attachedToAnchor:CGPointMake(CGRectGetWidth(self.view.bounds) * 0.5f, 20.0f)];
+    //    cAttachBe.length = 50.0f;
+    //    cAttachBe.damping = 0.8f;
+    //    cAttachBe.frequency = 20.0f;
+    
+    UICollisionBehavior* cCollisonBe = [[UICollisionBehavior alloc] initWithItems:@[self.ccViewPcInfo]];
+    cCollisonBe.translatesReferenceBoundsIntoBoundary = YES;
+    [cCollisonBe addBoundaryWithIdentifier:@"topBellowStatusBarSeperator" fromPoint:CGPointMake(0.0f, CGRectGetMaxY(_s_rect_pc_info_int)) toPoint:CGPointMake(CGRectGetWidth(self.view.bounds), CGRectGetMaxY(_s_rect_pc_info_int))];
+    
+    UIDynamicItemBehavior* cdynItemBe = [[UIDynamicItemBehavior alloc] initWithItems:@[self.ccViewPcInfo]];
+    cdynItemBe.elasticity = 0.4f;
+    
+    cCollisonBe.collisionMode = UICollisionBehaviorModeBoundaries;
+    [_c_dy_animator addBehavior:cGravityBe];
+    [_c_dy_animator addBehavior:cCollisonBe];
+    [_c_dy_animator addBehavior:cdynItemBe];
+}
+
+-(void)actionEndEdit:(id)aidSender {
+    [_c_dy_animator removeAllBehaviors];
+    [self addDownBehavior];
+    [UIView animateWithDuration:.8f animations:^(void){
+        self.view.backgroundColor = [UIColor whiteColor];
+        [self.ccViewPcInfo.ctextviewSignature resignFirstResponder];
+        [self.ccViewPcInfo.ctextviewSignature setEditable:NO];
+//        self.ccViewPcInfo.frame = _s_rect_pc_info_int;
+        self.ccScrollviewPG.layer.transform = CATransform3DIdentity;
+    } completion:^(BOOL abFinished){
+        [self.ccViewPcInfo.ctextviewSignature setEditable:YES];
+
+    }];
+}
 -(void)actionEditPicture:(id)aidSender {
     self.cactionSheetChangeAvatar.title = NSLocalizedString(@"k_pc_edit_picture", nil);
     _t_enum_action_sheet_mode = enum_mode_change_gallery_picture;
@@ -176,7 +262,8 @@ typedef NS_ENUM (NSUInteger, T_ENUM_ACTION_SHEET_MODE){
     [alertView dismissWithClickedButtonIndex:0 animated:YES];
 }
 -(void)addUIPersonalInformation {
-    self.ccViewPcInfo = [[DLViewPCInfo alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.ccScrollviewPG.frame), CGRectGetWidth(self.view.bounds), CGRectGetHeight(self.view.bounds) - CGRectGetMaxY(self.ccScrollviewPG.frame))];
+    _s_rect_pc_info_int = CGRectMake(0.0f, CGRectGetMaxY(self.ccScrollviewPG.frame), CGRectGetWidth(self.view.bounds), CGRectGetHeight(self.view.bounds) - CGRectGetMaxY(self.ccScrollviewPG.frame));
+    self.ccViewPcInfo = [[DLViewPCInfo alloc] initWithFrame:_s_rect_pc_info_int];
     UITapGestureRecognizer* ctapGes = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(actionChangeAvator:)];
     self.ccViewPcInfo.cimageviewAvator.userInteractionEnabled = YES;
     [self.ccViewPcInfo.cimageviewAvator addGestureRecognizer:ctapGes];
@@ -203,6 +290,12 @@ typedef NS_ENUM (NSUInteger, T_ENUM_ACTION_SHEET_MODE){
     [self.view addSubview:self.ccViewPcInfo];
 
     self.cactionSheetChangeAvatar = [[UIActionSheet alloc] initWithTitle:NSLocalizedString(@"k_pc_change_avatar", nil) delegate:self cancelButtonTitle:NSLocalizedString(@"k_cancel", nil) destructiveButtonTitle:nil otherButtonTitles:NSLocalizedString(@"k_pc_gallery", nil), NSLocalizedString(@"k_pc_camera", nil),nil];
+    
+    UIToolbar* cToobar = [[UIToolbar alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.view.bounds), 40.0f)];
+    UIBarButtonItem* cBarItemDone = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(actionEndEdit:)];
+    [cToobar setItems:@[cBarItemDone]];
+    self.ccViewPcInfo.ctextviewSignature.inputAccessoryView = cToobar;
+    
 
 }
 - (void)didReceiveMemoryWarning
@@ -295,8 +388,18 @@ typedef NS_ENUM (NSUInteger, T_ENUM_ACTION_SHEET_MODE){
             case enum_mode_change_avatar:
                 self.ccViewPcInfo.cimageviewAvator.image =  [UIImage imageWithData:cdataCaptured];
                 break;
-            case enum_mode_change_gallery_picture:
-                
+            case enum_mode_change_gallery_picture: {
+                NSTimeInterval iTime = [[NSDate date] timeIntervalSince1970];
+                NSString* cstrUserName = [[NSUserDefaults standardUserDefaults] objectForKey:k_peer_user_name];
+                NSString* cstrImageUrl = [NSHomeDirectory() stringByAppendingFormat:@"/Documents/%@-%f.jpg", cstrUserName, iTime];
+                BOOL bFlag = [cdataCaptured writeToFile:cstrImageUrl atomically:YES];
+                if (bFlag) {
+
+                    NSDictionary* cdicItem = @{k_image_url:cstrImageUrl, k_image_url_type:@(enum_scroll_view_image_url_file)};
+                    [self.cmutarrContentMenu replaceObjectAtIndex:self.ccScrollviewPG.cpageControl.currentPage withObject:cdicItem];
+                    [self.ccScrollviewPG feedImages:self.cmutarrContentMenu];
+                }
+            }
                 break;
             case enum_mode_add_picture_to_gallery:
             {
