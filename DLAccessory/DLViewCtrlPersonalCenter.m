@@ -12,7 +12,15 @@
 #import "DLViewPCInfo.h"
 #import <MobileCoreServices/MobileCoreServices.h>
 
-@interface DLViewCtrlPersonalCenter ()
+
+typedef NS_ENUM (NSUInteger, T_ENUM_ACTION_SHEET_MODE){
+    enum_mode_change_avatar,
+    enum_mode_add_picture_to_gallery,
+    enum_mode_change_gallery_picture
+};
+@interface DLViewCtrlPersonalCenter () {
+    T_ENUM_ACTION_SHEET_MODE _t_enum_action_sheet_mode;
+}
 -(void)addUIGallery;
 -(void)addUIPersonalInformation;
 @end
@@ -34,8 +42,11 @@
 -(void)viewWillLayoutSubviews {
     [super viewWillLayoutSubviews];
 
-    NSLog(@"view frame %@", NSStringFromCGRect(self.view.frame));
+//    NSLog(@"view frame %@", NSStringFromCGRect(self.view.frame));
 
+}
+-(UIStatusBarStyle)preferredStatusBarStyle {
+    return UIStatusBarStyleLightContent;
 }
 - (void)viewDidLoad
 {
@@ -53,7 +64,7 @@
 -(void)addUIGallery{
     // Do any additional setup after loading the view.
     self.ccScrollviewPG = [[DLScrollViewPersonalGallery alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.view.bounds), CGRectGetHeight(self.view.bounds) * 0.4f)];
-    NSLog(@"--%@", NSStringFromCGRect(self.ccScrollviewPG.frame));
+//    NSLog(@"--%@", NSStringFromCGRect(self.ccScrollviewPG.frame));
     //IMG_0414
     
     /*
@@ -64,8 +75,8 @@
      
      NSArray* carrImagesNetwork = @[cstrUrl0, cstrUrl1, cstrUrl2];
      */
-    NSMutableArray* cmutarrImages = [NSMutableArray array];
-    for (int i = 0; i < 3; i ++) {
+    self.cmutarrContentMenu = [NSMutableArray array];
+    for (int i = 0; i < 5; i ++) {
         
         NSDictionary* cdicItem  = nil;
         /*
@@ -76,22 +87,94 @@
          
          }*/
         cdicItem = @{k_image_url:[NSString stringWithFormat:@"%i.jpg", i], k_image_url_type:@(enum_scroll_view_image_url_app)};
-        [cmutarrImages addObject:cdicItem];
+        [self.cmutarrContentMenu addObject:cdicItem];
     }
-    [self.ccScrollviewPG feedImages:cmutarrImages];
+    [self.ccScrollviewPG feedImages:self.cmutarrContentMenu];
     [self.view addSubview:self.ccScrollviewPG];
     
-    NSMutableArray* cmutarrMenus = [NSMutableArray array];
+    /*
+     "add_picture"
+     "change_signature"
+     "delete_picture"
+     */
+   NSMutableArray* cmutarrContentMenus = [NSMutableArray array];
     for (int i = 0; i < 4; i ++) {
         UIButton* cbtnItem = [UIButton buttonWithType:UIButtonTypeCustom];
+        switch (i) {
+            case 0:
+                [cbtnItem setImage:[UIImage imageNamed:@"add_picture"] forState:UIControlStateNormal];
+                [cbtnItem setImage:[UIImage imageNamed:@"add_picture_h"] forState:UIControlStateHighlighted];
+                [cbtnItem addTarget:self action:@selector(actionAddPicture:) forControlEvents:UIControlEventTouchUpInside];
+                break;
+            case 1:
+                [cbtnItem setImage:[UIImage imageNamed:@"change_signature"] forState:UIControlStateNormal];
+                [cbtnItem setImage:[UIImage imageNamed:@"change_signature_h"] forState:UIControlStateHighlighted];
+                [cbtnItem addTarget:self action:@selector(actionEditPicture:) forControlEvents:UIControlEventTouchUpInside];
+
+                break;
+            case 2:
+                [cbtnItem setImage:[UIImage imageNamed:@"delete_picture"] forState:UIControlStateNormal];
+                [cbtnItem setImage:[UIImage imageNamed:@"delete_picture_h"] forState:UIControlStateHighlighted];
+                [cbtnItem addTarget:self action:@selector(actionDeletePicture:) forControlEvents:UIControlEventTouchUpInside];
+
+                break;
+            case 3:
+                [cbtnItem setImage:[UIImage imageNamed:@"edit"] forState:UIControlStateNormal];
+                [cbtnItem setImage:[UIImage imageNamed:@"edit-h"] forState:UIControlStateHighlighted];
+                [cbtnItem addTarget:self action:@selector(actionChangeSignature:) forControlEvents:UIControlEventTouchUpInside];
+
+                break;
+  
+            default:
+                break;
+        }
+         cbtnItem.tag = i + 1;
         cbtnItem.frame = CGRectMake(0.0f, 0.0f, 36.0f, 36.0f);
-        cbtnItem.backgroundColor = [UIColor redColor];
-        [cbtnItem setTitle:[NSString stringWithFormat:@"%d", i] forState:UIControlStateNormal];
-        [cmutarrMenus addObject:cbtnItem];
+        cbtnItem.backgroundColor = [UIColor clearColor];
+        [cmutarrContentMenus addObject:cbtnItem];
+//        [cbtnItem setTitle:[NSString stringWithFormat:@"%d", i] forState:UIControlStateNormal];
     }
-    [self.ccScrollviewPG setContentMenu:cmutarrMenus];
+    [self.ccScrollviewPG setContentMenu:cmutarrContentMenus];
+}
+-(void)actionAddPicture:(id)aidSender {
+    _t_enum_action_sheet_mode = enum_mode_add_picture_to_gallery;
+    self.cactionSheetChangeAvatar.title = NSLocalizedString(@"k_pc_add_picture", nil);
+    [self.cactionSheetChangeAvatar showFromTabBar:self.tabBarController.tabBar];
 }
 
+
+-(void)actionDeletePicture:(id)aidSender {
+    UIAlertView* cAlertMsg = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"k_delete_picture", nil) message:NSLocalizedString(@"k_msg_delete_picture", nil) delegate:self cancelButtonTitle:NSLocalizedString(@"k_cancel", nil) otherButtonTitles:NSLocalizedString(@"k_ok", nil), nil];
+    [cAlertMsg show];
+}
+-(void)actionChangeSignature:(id)aidSender {
+
+   
+
+}
+
+-(void)actionEditPicture:(id)aidSender {
+    self.cactionSheetChangeAvatar.title = NSLocalizedString(@"k_pc_edit_picture", nil);
+    _t_enum_action_sheet_mode = enum_mode_change_gallery_picture;
+    [self.cactionSheetChangeAvatar showFromTabBar:self.tabBarController.tabBar];
+}
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
+    if (buttonIndex == 1) {
+        NSLog(@"delete picture!");
+        if ([self.cmutarrContentMenu count] > 0) {
+            [self.cmutarrContentMenu removeObjectAtIndex:self.ccScrollviewPG.cpageControl.currentPage];
+            [self.ccScrollviewPG feedImages:self.cmutarrContentMenu];            
+        }
+    }
+    [alertView dismissWithClickedButtonIndex:0 animated:YES];
+}
+
+// Called when we cancel a view (eg. the user clicks the Home button). This is not called when the user clicks the cancel button.
+// If not defined in the delegate, we simulate a click in the cancel button
+- (void)alertViewCancel:(UIAlertView *)alertView {
+    [alertView dismissWithClickedButtonIndex:0 animated:YES];
+}
 -(void)addUIPersonalInformation {
     self.ccViewPcInfo = [[DLViewPCInfo alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.ccScrollviewPG.frame), CGRectGetWidth(self.view.bounds), CGRectGetHeight(self.view.bounds) - CGRectGetMaxY(self.ccScrollviewPG.frame))];
     UITapGestureRecognizer* ctapGes = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(actionChangeAvator:)];
@@ -129,6 +212,8 @@
 }
 #pragma mark - actionsheet
 -(void)actionChangeAvator:(UITapGestureRecognizer*)acTapGes {
+    _t_enum_action_sheet_mode = enum_mode_change_avatar;
+    self.cactionSheetChangeAvatar.title = NSLocalizedString(@"k_pc_change_avatar", nil);
     [self.cactionSheetChangeAvatar showFromTabBar:self.tabBarController.tabBar];
 }
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
@@ -206,7 +291,30 @@
             UIImage* cimageOriginal = [info objectForKey:UIImagePickerControllerOriginalImage];
             cdataCaptured = UIImageJPEGRepresentation(cimageOriginal, 0.5f);
         }
-        self.ccViewPcInfo.cimageviewAvator.image =  [UIImage imageWithData:cdataCaptured];
+        switch (_t_enum_action_sheet_mode) {
+            case enum_mode_change_avatar:
+                self.ccViewPcInfo.cimageviewAvator.image =  [UIImage imageWithData:cdataCaptured];
+                break;
+            case enum_mode_change_gallery_picture:
+                
+                break;
+            case enum_mode_add_picture_to_gallery:
+            {
+                NSTimeInterval iTime = [[NSDate date] timeIntervalSince1970];
+                NSString* cstrUserName = [[NSUserDefaults standardUserDefaults] objectForKey:k_peer_user_name];
+                NSString* cstrImageUrl = [NSHomeDirectory() stringByAppendingFormat:@"/Documents/%@-%f.jpg", cstrUserName, iTime];
+                BOOL bFlag = [cdataCaptured writeToFile:cstrImageUrl atomically:YES];
+                if (bFlag) {
+                    NSDictionary* cdicItem = @{k_image_url:cstrImageUrl, k_image_url_type:@(enum_scroll_view_image_url_file)};
+                    [self.cmutarrContentMenu addObject:cdicItem];
+                    [self.ccScrollviewPG feedImages:self.cmutarrContentMenu];
+                }
+                
+            }
+                break;
+            default:
+                break;
+        }
        
     }];
     

@@ -81,3 +81,9 @@
 "k_pc_change_avatar" = "修改头像";
 "k_pc_gallery" = "照片";
 "k_pc_camera" = "相机";
+
+"k_delete_picture" = "删除我的生活照";
+"k_msg_delete_picture" = "您要删除这一张生活照吗?";
+
+"k_pc_add_picture" = "添加新的生活照:";
+"k_pc_edit_picture" = "替换生活照片:";

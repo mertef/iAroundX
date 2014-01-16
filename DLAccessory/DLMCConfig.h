@@ -91,6 +91,7 @@
 #define k_image_url @"image_url"
 #define k_image_url_type @"url_type"
 
+#define k_peer_user_name @"k_peer_user_name"
 typedef NS_ENUM(int32_t, T_PACKAGE_TYPE) {
     enum_package_type_short_msg = 0x300,
     enum_package_type_image,

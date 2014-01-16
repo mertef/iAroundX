@@ -33,7 +33,13 @@
         self.cmutarrRemtoePeerIdsFound = [[NSMutableArray alloc] init];
 
         // Custom initialization
-       _cpeerId = [[MCPeerID alloc] initWithDisplayName:[[UIDevice currentDevice] name]];
+        NSString* cstrUserName = [[NSUserDefaults standardUserDefaults] objectForKey:k_peer_user_name];
+        if (!cstrUserName) {
+            cstrUserName = [[UIDevice currentDevice] name];
+            [[NSUserDefaults standardUserDefaults] setObject:cstrUserName forKey:k_peer_user_name];
+            
+        }        
+       _cpeerId = [[MCPeerID alloc] initWithDisplayName:cstrUserName];
        _csession= [[MCSession alloc] initWithPeer:_cpeerId];
         _csession.delegate =self;
         

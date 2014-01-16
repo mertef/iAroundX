@@ -9,12 +9,16 @@
 #import <UIKit/UIKit.h>
 #import "DLZoomableImageView.h"
 @interface DLScrollViewPersonalGallery : UIView<UIScrollViewDelegate, ProtoZoomableImageView>
+@property(strong, nonatomic) UIImageView* cimageviewBg;
 @property(strong, nonatomic) NSMutableArray* cmutarrImages;
+@property(strong, nonatomic) NSMutableArray* cmutarrImageViews;
+
 @property(strong, nonatomic) UIScrollView* cscrollviewImage;
 @property(strong, nonatomic) UIPageControl* cpageControl;
 @property(strong, nonatomic) UIButton* cbtnEdit;
 @property(strong, nonatomic) UIDynamicAnimator* cDyAni;
 @property(strong, nonatomic) UICollisionBehavior* cCollisionBe;
+
 -(void)feedImages:(NSMutableArray*)acmutArrImages;
 -(void)actionEdit:(id)aidSender;
 -(void)setContentMenu:(NSMutableArray*)acMutarrMenus;

@@ -14,7 +14,9 @@
 -(void)didSwipeRight:(DLZoomableImageView*)accZoomableImageView;
 
 @end
-@interface DLZoomableImageView : UIScrollView<UIScrollViewDelegate>
+@interface DLZoomableImageView : UIScrollView<UIScrollViewDelegate> {
+    CGRect _srect_content_fit;
+}
 @property(strong, nonatomic) UIImageView* cimageViewContent;
 @property(strong, nonatomic) UIButton* cbtnSave;
 @property(assign, nonatomic) CGRect srectFrom;

@@ -17,7 +17,7 @@
         self.backgroundColor = [UIColor blackColor];
         _cimageViewContent = [[UIImageView alloc] init];
         _cimageViewContent.contentMode = UIViewContentModeScaleAspectFit;
-        _cimageViewContent.backgroundColor = [UIColor blackColor];
+        _cimageViewContent.backgroundColor = [UIColor clearColor];
         self.contentInset = UIEdgeInsetsZero;
         [self addSubview:_cimageViewContent];
         self.delegate = self;
@@ -138,11 +138,30 @@
     self.cimageViewContent.frame = acRectFrom;
     self.alpha = 0.2f;
     [UIView animateWithDuration:.5f animations:^(void){
-        self.cimageViewContent.frame =[self getScalingRectAtZoomScale:1.0f];
+        self.cimageViewContent.frame = [self getScalingRectAtZoomScale:1.0f];
+        _srect_content_fit = self.cimageViewContent.frame;
         self.alpha = 1.0f;
     }completion:^(BOOL abFinished){
         
     }];
 }
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
+    
+    CGRect srectFrame = self.cimageViewContent.frame;
+    CGFloat fYOffset = CGRectGetHeight(self.frame) - CGRectGetMaxY(self.cimageViewContent.frame);
+    CGFloat fYOffsetHeight = CGRectGetHeight(self.frame) - CGRectGetHeight(self.cimageViewContent.frame);
 
+//    NSLog(@"offste --- %f", fYOffset);
+    if (fYOffset > 0) {
+        srectFrame.origin.y = (CGRectGetHeight(self.frame) - CGRectGetHeight(self.cimageViewContent.frame)) * 0.5f;
+    }else if(fYOffsetHeight > 0){
+        srectFrame.origin.y = 0.0f;
+    }
+    self.cimageViewContent.frame = srectFrame;
+
+//    NSLog(@"%@ %@" , NSStringFromCGRect(self.cimageViewContent.frame), NSStringFromCGSize(scrollView.contentSize));
+    
+ 
+
+}
 @end

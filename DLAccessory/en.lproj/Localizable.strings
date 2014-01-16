@@ -81,3 +81,9 @@
 "k_pc_gallery" = "Photo gallery";
 "k_pc_camera" = "Take Pickture";
 
+"k_delete_picture" = "Delete My pictrue";
+"k_msg_delete_picture" = "Are you sure delete this image?";
+
+"k_pc_add_picture" = "Add new Picture From:";
+"k_pc_edit_picture" = "Replace picture with:";
+

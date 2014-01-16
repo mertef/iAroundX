@@ -31,7 +31,11 @@
     if (self) {
         // Initialization code
         self.cmutarrImages = [[NSMutableArray alloc] init];
-
+        self.cimageviewBg = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"personal_bg@2x.jpg"]];
+        self.cimageviewBg.contentMode = UIViewContentModeScaleAspectFill;
+        self.cimageviewBg.backgroundColor = [UIColor clearColor];
+        [self addSubview:self.cimageviewBg];
+        
         CGRect srerctScroll  = CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.frame), CGRectGetHeight(self.frame));
 
         self.cscrollviewImage = [[UIScrollView alloc] initWithFrame:srerctScroll];
@@ -47,8 +51,11 @@
     
         self.cbtnEdit = [UIButton buttonWithType:UIButtonTypeCustom];
         
-        self.cbtnEdit.backgroundColor = [UIColor redColor];
-        self.cbtnEdit.frame = CGRectMake(CGRectGetWidth(self.bounds) - 40.0f, CGRectGetHeight(self.bounds) - 80.0f, 36.0f, 36.0f);
+        self.cbtnEdit.backgroundColor = [UIColor clearColor];
+        [self.cbtnEdit setImage:[UIImage imageNamed:@"option_menu"] forState:UIControlStateNormal];
+        [self.cbtnEdit setImage:[UIImage imageNamed:@"option_menu_h"] forState:UIControlStateHighlighted];
+
+        self.cbtnEdit.frame = CGRectMake(CGRectGetWidth(self.bounds) - 40.0f, CGRectGetHeight(self.bounds) - 36.0f, 36.0f, 36.0f);
         [self addSubview:self.cbtnEdit];
         [self.cbtnEdit addTarget:self action:@selector(actionEdit:) forControlEvents:UIControlEventTouchUpInside];
         self.clipsToBounds = YES;
@@ -56,7 +63,7 @@
         
 //        DLCircle* ccCircle = [[DLCircle alloc] initWithFrame:self.bounds];
 //        [self addSubview:ccCircle];
-
+        self.cmutarrImageViews = [[NSMutableArray alloc] init];
     }
     return self;
 }
@@ -69,7 +76,14 @@
 {
 }
 -(void)feedImages:(NSMutableArray*)acmutArrImages {
+
+    for (UIImageView* cimageviewItem in self.cmutarrImageViews) {
+        [cimageviewItem removeFromSuperview];
+    }
+    [self.cmutarrImageViews removeAllObjects];
+    
     [self.cmutarrImages removeAllObjects];
+    
     [self.cmutarrImages addObjectsFromArray:acmutArrImages];
     [self.cpageControl setNumberOfPages:[self.cmutarrImages count]];
     self.cpageControl.pageIndicatorTintColor = k_color_green;
@@ -115,6 +129,7 @@
         UITapGestureRecognizer* cTapGes = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(actionZoom:)];
         [cimageView addGestureRecognizer:cTapGes];
         cimageView.userInteractionEnabled = YES;
+        [self.cmutarrImageViews addObject:cimageView];
         [self.cscrollviewImage addSubview:cimageView];
         srect.origin.x += srect.size.width;
     }
@@ -128,7 +143,7 @@
     CGRect srectFrom = [self.cscrollviewImage convertRect:cViewTapped.frame toView:cWindow];
     DLZoomableImageView* ccZoomableImageView = [[DLZoomableImageView alloc] initWithFrame:cWindow.bounds];
     ccZoomableImageView.cimageViewContent.contentMode = UIViewContentModeScaleAspectFill;
-    ccZoomableImageView.clablePageNumber.text = [NSString stringWithFormat:@"%lu/%lu", self.cpageControl.currentPage + 1, self.cpageControl.numberOfPages];
+    ccZoomableImageView.clablePageNumber.text = [NSString stringWithFormat:@"%lu/%lu", (unsigned long)self.cpageControl.currentPage + 1, (unsigned long)self.cpageControl.numberOfPages];
     ccZoomableImageView.idProtoZoomableImageView = self;
     [cWindow addSubview:ccZoomableImageView];
     [ccZoomableImageView setImage:cimageViewTapped.image];
@@ -179,7 +194,7 @@
             });
         });
     }
-    accZoomableImageView.clablePageNumber.text = [NSString stringWithFormat:@"%lu/%lu", self.cpageControl.currentPage + 1, self.cpageControl.numberOfPages];
+    accZoomableImageView.clablePageNumber.text = [NSString stringWithFormat:@"%lu/%lu",(unsigned long) self.cpageControl.currentPage + 1, (unsigned long)self.cpageControl.numberOfPages];
 
 }
 -(void)didSwipeRight:(DLZoomableImageView*)accZoomableImageView {
@@ -216,7 +231,7 @@
             });
         });
     }
-    accZoomableImageView.clablePageNumber.text = [NSString stringWithFormat:@"%lu/%lu", self.cpageControl.currentPage + 1, self.cpageControl.numberOfPages];
+    accZoomableImageView.clablePageNumber.text = [NSString stringWithFormat:@"%lu/%lu",(unsigned long) self.cpageControl.currentPage + 1, (unsigned long)self.cpageControl.numberOfPages];
 
 }
 -(void)actionEdit:(id)aidSender {
@@ -242,8 +257,6 @@
     
     if (!self.cDyAni) {
         self.cDyAni = [[UIDynamicAnimator alloc] initWithReferenceView:self];
-
-       
     }
 
 }
@@ -258,11 +271,10 @@
         UIView* cviewObj = (UIView*)[cvalueObj pointerValue];
 
         if ([cstrAniName  isEqualToString:@"ani_move_along_a_path"]) {
-//            Class tBounceMeta = [CSAnimation classForAnimationType:CSAnimationTypeShake];
-//            [tBounceMeta performAnimationOnView:cviewObj duration:2.0f delay:0.0f];
+
+
+           
             
-            UIGravityBehavior* cgravityBe = [[UIGravityBehavior alloc] initWithItems:_c_mut_arr_content_menus];
-            [self.cDyAni addBehavior:cgravityBe];
             UIAttachmentBehavior* cattachementBe = [[UIAttachmentBehavior alloc] initWithItem:cviewObj offsetFromCenter:UIOffsetMake(0.0f, 0.0f) attachedToAnchor:cviewObj.center];
             [cattachementBe setLength:12];
             [cattachementBe setFrequency:6];
@@ -270,13 +282,22 @@
             
             [self.cDyAni addBehavior:cattachementBe];
             
+            
+            UIDynamicItemBehavior* cdyItemBe = [[UIDynamicItemBehavior alloc] initWithItems:@[cviewObj]];
+            cdyItemBe.elasticity = 0.8f;
+            [self.cDyAni addBehavior:cdyItemBe];
+            
+           
             if (!self.cCollisionBe) {
+                UIGravityBehavior* cgravityBe = [[UIGravityBehavior alloc] initWithItems:_c_mut_arr_content_menus];
+                [self.cDyAni addBehavior:cgravityBe];
                 self.cCollisionBe = [[UICollisionBehavior alloc] initWithItems:_c_mut_arr_content_menus];
                 self.cCollisionBe.collisionMode =  UICollisionBehaviorModeBoundaries;
                 [  self.cCollisionBe addBoundaryWithIdentifier:@"collision_boundary" fromPoint:CGPointMake(0.0f, CGRectGetHeight(self.bounds)) toPoint:CGPointMake(CGRectGetWidth(self.bounds), CGRectGetHeight(self.bounds))];
+                self.cCollisionBe.translatesReferenceBoundsIntoBoundary = YES;
                 [self.cDyAni addBehavior:  self.cCollisionBe];
             }
-            
+
 
         }
     }
@@ -349,7 +370,7 @@
     
     for (NSInteger i = 0 ; i < iMenuCount; i ++) {
         fAngleOffset = M_2_PI - (M_PI / (CGFloat)iMenuCount) *  (i + 1);
-        NSLog(@"angle offset %f", fAngleOffset);
+//        NSLog(@"angle offset %f", fAngleOffset);
         
         UIView* cviewItem = [_c_mut_arr_content_menus objectAtIndex: i];
         
