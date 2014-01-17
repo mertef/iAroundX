@@ -92,6 +92,16 @@
 #define k_image_url_type @"url_type"
 
 #define k_peer_user_name @"k_peer_user_name"
+
+#define k_file_attr @"k_file_attr"
+
+#define k_cell_id_music @"DLTableviewCellFolderMusic"
+#define k_cell_id_picture @"DLTableviewCellFolderPicture"
+#define k_cell_id_movie @"DLTableviewCellFolderMovie"
+#define k_cell_id_folder @"DLTableViewCellFolderDirectory"
+
+#define k_cell_id_general @"DLTableviewCellFolder"
+
 typedef NS_ENUM(int32_t, T_PACKAGE_TYPE) {
     enum_package_type_short_msg = 0x300,
     enum_package_type_image,
@@ -113,5 +123,10 @@ typedef NS_ENUM(NSUInteger, enum_scroll_view_image_url_type) {
     enum_scroll_view_image_url_file = 0x400,
     enum_scroll_view_image_url_network,
     enum_scroll_view_image_url_app
+};
+
+typedef NS_ENUM(NSUInteger, enum_folder_cell_option) {
+    enum_folder_cell_option_save_to_phone = 0x800,
+    enum_folder_cell_option_delete,
 };
 #endif

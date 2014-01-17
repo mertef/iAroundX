@@ -254,6 +254,7 @@ typedef NS_ENUM (NSUInteger, T_ENUM_ACTION_SHEET_MODE){
         }
     }
     [alertView dismissWithClickedButtonIndex:0 animated:YES];
+    
 }
 
 // Called when we cancel a view (eg. the user clicks the Home button). This is not called when the user clicks the cancel button.

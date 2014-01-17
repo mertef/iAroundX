@@ -23,8 +23,6 @@ static DLCache* g_cc_cache = nil;
         dispatch_once(&onceToken, ^{
             g_cc_cache = [ super alloc];
         });
-    }else {
-        @throw [NSException exceptionWithName:[NSString stringWithFormat:@"<%@:%p> double allocation issue", [g_cc_cache class], g_cc_cache]  reason:@"your can't allocate the singleton class twice or more." userInfo:nil];
     }
     return g_cc_cache;
 }
@@ -36,9 +34,6 @@ static DLCache* g_cc_cache = nil;
     @synchronized([DLCache class]){
         if (!g_cc_cache) {
             g_cc_cache = [super alloc];
-        }else {
-            @throw [NSException exceptionWithName:[NSString stringWithFormat:@"<%@:%p> double allocation issue", [g_cc_cache class], g_cc_cache]  reason:@"your can't allocate the singleton class twice or more." userInfo:nil];
-
         }
     }
     return g_cc_cache;

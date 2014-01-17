@@ -50,11 +50,6 @@
         _cnearbyServiceAdvertiser = [[MCNearbyServiceAdvertiser alloc] initWithPeer:_cpeerId discoveryInfo:nil serviceType:k_service_type];
         _cnearbyServiceAdvertiser.delegate = self;
         
-
-        
-       
-
-        
         
         _cnearbyServiceBrowser = [[MCNearbyServiceBrowser alloc] initWithPeer:_cpeerId serviceType:k_service_type];
         _cnearbyServiceBrowser.delegate = self;

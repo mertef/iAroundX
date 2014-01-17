@@ -87,3 +87,9 @@
 "k_pc_add_picture" = "Add new Picture From:";
 "k_pc_edit_picture" = "Replace picture with:";
 
+"k_folder_title" = "My File Folder";
+
+"k_save_to_phone" = "Save file to Mobile Storage";
+"k_save_to_phone_msg" = "Are your sure to Save into your mobile Phone storage?";
+"k_delete_file" = "Delete File";
+"k_delete_file_msg" = "Are you sure to delete the file ?";

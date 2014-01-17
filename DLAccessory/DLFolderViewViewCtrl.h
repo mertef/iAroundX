@@ -7,7 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
-
-@interface DLFolderViewViewCtrl : UIViewController
-
+#import "TUTreeViewCtrl.h"
+#import "DLTableViewCellFolder.h"
+@interface DLFolderViewViewCtrl : TUTreeViewCtrl <ProtoFolderCell, UIAlertViewDelegate>
+@property(weak, nonatomic) DLTableViewCellFolder* ctableviewCellSelected;
 @end

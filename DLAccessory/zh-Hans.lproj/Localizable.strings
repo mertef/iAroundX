@@ -87,3 +87,10 @@
 
 "k_pc_add_picture" = "添加新的生活照:";
 "k_pc_edit_picture" = "替换生活照片:";
+
+"k_folder_title" = "我的文件夹";
+
+"k_save_to_phone" = "保存到手机里";
+"k_save_to_phone_msg" = "确定保存到手机中的相册或者视频中?";
+"k_delete_file" = "删除文件";
+"k_delete_file_msg" = "确定删除文件 ?";
