@@ -14,6 +14,8 @@
 #import "DLTableviewCellFolderMovie.h"
 #import "DLTableViewCellFolderDirectory.h"
 #import "DLTableViewCellFolder.h"
+#import <CoreData/CoreData.h>
+#import "FileItem.h"
 
 @interface DLFolderViewViewCtrl () {
     dispatch_queue_t _dispatch_queue_scanning;
@@ -21,7 +23,7 @@
 }
 -(void)deleteSelectedItem ;
 -(void)saveSelectedItmIntoPhone;
-
+-(void)initPersistentStore;
 @end
 
 @implementation DLFolderViewViewCtrl
@@ -39,6 +41,7 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    [self initPersistentStore];
 	// Do any additional setup after loading the view.
     self.view.backgroundColor = [UIColor clearColor];
     self.title = NSLocalizedString(@"k_folder_title", nil);
@@ -46,18 +49,67 @@
     
     __weak DLFolderViewViewCtrl* wccSelf = self;
     dispatch_async(_dispatch_queue_scanning, ^(void){
+        
         NSString* cstrDocumentRoot = [NSHomeDirectory() stringByAppendingPathComponent:@"Documents"];
         [wccSelf scanDirectory:cstrDocumentRoot withParentId:@(0) andDisplayLevel:@(0)];
+        
+        NSError* cErrorFetch = nil;
+        NSPersistentStoreCoordinator* cPersistentStoreCoordinate = [self.cManagedObjectCtx persistentStoreCoordinator];
+        NSArray* carrrAffectedStores = [cPersistentStoreCoordinate persistentStores];
+        NSFetchRequest* cfetchRequst = [[NSFetchRequest alloc] initWithEntityName:k_table_file_item];
+        NSSortDescriptor *cSortDesc = [[NSSortDescriptor alloc]
+                                            initWithKey:@"file_created_date" ascending:NO];
+        [cfetchRequst setSortDescriptors:@[cSortDesc]];
+        
+        [cfetchRequst setFetchOffset:0];
+        [cfetchRequst setFetchLimit:10];
+        [cfetchRequst setAffectedStores: carrrAffectedStores];
+        NSArray* carrFiles = [self.cManagedObjectCtx executeFetchRequest:cfetchRequst error:&cErrorFetch];
+        if (cErrorFetch) {
+            NSLog(@"%@", [cErrorFetch description]);
+        }else {
+//            NSLog(@"----%@", [[carrFiles firstObject] description]);
+            NSLog(@"fetched object count %d", [carrFiles count]);
+            [self.cmutarrData addObjectsFromArray:carrFiles];
+        }
         dispatch_async(dispatch_get_main_queue(), ^(void){
             [self.cTableView reloadData];
         });
     });
 }
 
+-(void)initPersistentStore {
+    NSLog(@"%@ %@", NSHomeDirectory(), [[NSPersistentStoreCoordinator registeredStoreTypes] description]);
+    NSURL* curlModel = [[NSBundle mainBundle] URLForResource:@"Model.momd/init" withExtension:@"mom"];
+    NSManagedObjectModel* cMoM = [[NSManagedObjectModel alloc] initWithContentsOfURL:curlModel];
+    NSPersistentStoreCoordinator* cPersistentStoreCooridinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:cMoM];
+    NSError* cErrorStore = nil;
+    NSString* cstrSqlitePath = [NSHomeDirectory() stringByAppendingPathComponent:@"Library/x.sqlite"];
+    if ([[NSFileManager defaultManager] fileExistsAtPath:cstrSqlitePath]) {
+        
+        [cPersistentStoreCooridinator setURL:[NSURL fileURLWithPath:cstrSqlitePath] forPersistentStore:[cPersistentStoreCooridinator persistentStoreForURL:[NSURL fileURLWithPath:cstrSqlitePath]]];
+    }else {
+       [cPersistentStoreCooridinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:[NSURL fileURLWithPath:cstrSqlitePath] options:nil error:&cErrorStore];
+    }
+    if (cErrorStore) {
+        NSLog(@"%@", [cErrorStore description]);
+    }
+
+    
+//    NSDictionary* cdicOpiton = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:NO], NSReadOnlyPersistentStoreOption,nil];
+    NSError* cError = nil;
+    if (!cError) {
+         self.cManagedObjectCtx = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSConfinementConcurrencyType];
+        [self.cManagedObjectCtx setPersistentStoreCoordinator:cPersistentStoreCooridinator];
+      
+    }else {
+        NSLog(@"init persistent store error : %@", [cError description]);
+    }
+}
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSDictionary* cdicItem = [m_c_mut_arr_data objectAtIndex:[indexPath row]];
-    NSString* cstrIdCell  = [cdicItem objectForKey:k_id_cell];
+    FileItem* ccFileItem =[m_c_mut_arr_data objectAtIndex:[indexPath row]];
+    NSString* cstrIdCell  = ccFileItem.cell_id;
     DLTableViewCellFolder *cell = [tableView dequeueReusableCellWithIdentifier:cstrIdCell forIndexPath:indexPath];
     if ([[cell gestureRecognizers] count] == 0) {
         UIPanGestureRecognizer* cPanGes = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(actionBeginEdit:)];
@@ -65,8 +117,8 @@
         cPanGes.enabled = NO;
     }
     cell.idProtoFolderCell = self;
-    cell.indentationLevel = [cdicItem[k_level] integerValue];
-    [cell feedInfo:cdicItem];
+    cell.indentationLevel = [ccFileItem.level integerValue];
+    [cell feedInfo:ccFileItem];
     //    NSLog(@"%@", [cdicItem description]);
     
 //    cell.textLabel.text = cdicItem[k_content];
@@ -95,46 +147,82 @@
         while (cstrItem) {
 //            NSLog(@"%@", cstrItem);
             //get attributes
+            @autoreleasepool {
             NSString* cstrFilePath = [acstrDirectoryPath stringByAppendingPathComponent:cstrItem];
             NSDictionary* cdicAttribute = [cfileManagerDefault attributesOfItemAtPath:cstrFilePath error:&cError];
             if (cError) {
                 NSLog(@"can't read the file attribute:%@", cstrItem);
             }else {
+                NSDictionary* cdicEntityNames = [[[self.cManagedObjectCtx persistentStoreCoordinator] managedObjectModel] entitiesByName];
+//                NSLog(@"%@", [cdicEntityNames description]);
+                NSEntityDescription* cEntityDescription = [cdicEntityNames objectForKey:k_table_file_item];
+                
+                 FileItem* ccFileItem = [[FileItem alloc] initWithEntity: cEntityDescription insertIntoManagedObjectContext:self.cManagedObjectCtx];
 //                NSLog(@"%@", [cdicAttribute description]);
                 NSNumber* cnumberFileNumber = [cdicAttribute objectForKey:NSFileSystemFileNumber];
                 NSString* cstrFileType = [cdicAttribute objectForKey:NSFileType];
                 __weak DLFolderViewViewCtrl* wccSelf = self;
 
-                NSMutableDictionary* cmutdicItem = [NSMutableDictionary dictionary];
+//                NSMutableDictionary* cmutdicItem = [NSMutableDictionary dictionary];
                 NSString* cstrItemLowcase = [cstrItem lowercaseString];
 
                 if ([cstrFileType isEqualToString:NSFileTypeDirectory]) {
                     [wccSelf scanDirectory:cstrFilePath withParentId:acnumberParendId andDisplayLevel:[NSNumber numberWithInt:[acNumberDisplayLevel intValue] + 1]];
-                    [cmutdicItem setObject:k_cell_id_folder forKey:k_id_cell];
+//                    [cmutdicItem setObject:k_cell_id_folder forKey:k_id_cell];
+                    ccFileItem.cell_id = k_cell_id_folder;
                 }else if ([cstrItemLowcase hasSuffix:@"jpg"] || [cstrItemLowcase hasSuffix:@"png"] || [cstrItemLowcase hasSuffix:@"jpeg"]) {
-                    [cmutdicItem setObject:k_cell_id_picture forKey:k_id_cell];
+//                    [cmutdicItem setObject:k_cell_id_picture forKey:k_id_cell];
+                    ccFileItem.cell_id = k_cell_id_picture;
+
                 }else if([cstrItemLowcase hasSuffix:@"mov"]) {
-                    [cmutdicItem setObject:k_cell_id_movie forKey:k_id_cell];
+//                    [cmutdicItem setObject:k_cell_id_movie forKey:k_id_cell];
+                    ccFileItem.cell_id = k_cell_id_movie;
                 }else if([cstrItemLowcase hasSuffix:@"mp3"] ||
                          [cstrItemLowcase hasSuffix:@"aac"] ||
                          [cstrItemLowcase hasSuffix:@"mp4"]) {
-                        [cmutdicItem setObject:k_cell_id_music forKey:k_id_cell];
+//                        [cmutdicItem setObject:k_cell_id_music forKey:k_id_cell];
+                    ccFileItem.cell_id = k_cell_id_music;
+
 
                 }else {
-                        [cmutdicItem setObject:k_cell_id_general forKey:k_id_cell];
+//                        [cmutdicItem setObject:k_cell_id_general forKey:k_id_cell];
+                    ccFileItem.cell_id = k_cell_id_general;
+
                 }
-                
+                NSNumber* cnumberFileSize = [cdicAttribute objectForKey:NSFileSize];
+                NSDate* cdateCreated = [cdicAttribute objectForKey:NSFileCreationDate];
+                /*
+                [cmutdicItem setObject:cnumberFileSize forKey:k_file_size];
+                [cmutdicItem setObject:cdateCreated forKey:k_file_created_date];
                 [cmutdicItem setObject:cnumberFileNumber forKey:k_id];
                 [cmutdicItem setObject:acnumberParendId forKey:k_parent_id];
                 [cmutdicItem setObject:cstrItem forKey:k_content];
-                [cmutdicItem setObject:cdicAttribute forKey:k_file_attr];
+//                [cmutdicItem setObject:cdicAttribute forKey:k_file_attr];
                 [cmutdicItem setObject:acNumberDisplayLevel forKey:k_level];
                 [cmutdicItem setObject:@(uiOrder) forKey:k_order];
                 [cmutdicItem setObject:cstrFilePath forKey:k_path];
-                 uiOrder ++;
-                [self.cmutarrData addObject:cmutdicItem];
+//                [self.cmutarrData addObject:cmutdicItem];
+                */
+                uiOrder ++;
+
+                ccFileItem.content = cstrItem;
+                ccFileItem.file_id = cnumberFileNumber;
+                ccFileItem.parent_id = acnumberParendId;
+                ccFileItem.file_created_date = cdateCreated;
+                ccFileItem.file_size = cnumberFileSize;
+                ccFileItem.order = @(uiOrder);
+                ccFileItem.path = cstrFilePath;
+                ccFileItem.level = acNumberDisplayLevel;
+                
+                [self.cManagedObjectCtx assignObject:ccFileItem toPersistentStore:[[self.cManagedObjectCtx persistentStoreCoordinator].persistentStores firstObject]];
+                [self.cManagedObjectCtx insertObject:ccFileItem];
+
+//                if (ccFileItem.isInserted) {
+//                    NSLog(@"insert success!");
+//                }
             }
             cstrItem = cDirEnumerator.nextObject;
+            }
         }
     }
 }
@@ -165,17 +253,17 @@
 }
 -(void)deleteSelectedItem {
     NSLog(@"delete item");
+    FileItem* ccFileItem = self.ctableviewCellSelected.ccFileItem;
 
-    NSDictionary* cdicItem = self.ctableviewCellSelected.cdicInfo;
     [self.cTableView beginUpdates];
-    [self.cmutarrData removeObject:cdicItem];
+    [self.cmutarrData removeObject:ccFileItem];
     NSIndexPath* cIndexPath = [self.cTableView indexPathForCell:self.ctableviewCellSelected];
     [self.cTableView deleteRowsAtIndexPaths:@[cIndexPath] withRowAnimation:UITableViewRowAnimationRight];
     [self.cTableView endUpdates];
     self.ctableviewCellSelected = nil;
 }
 -(void)saveSelectedItmIntoPhone {
-    NSDictionary* cdicItem = self.ctableviewCellSelected.cdicInfo;
+    FileItem* ccFileItem = self.ctableviewCellSelected.ccFileItem;
     NSLog(@"save to phone");
     self.ctableviewCellSelected = nil;
 

@@ -11,6 +11,7 @@
 #import "TUTreeConfig.h"
 #import <AVFoundation/AVFoundation.h>
 #import "DLCache.h"
+#import "FileItem.h"
 
 @implementation DLTableviewCellFolderPicture
 
@@ -30,24 +31,23 @@
     // Configure the view for the selected state
 }
 
--(void)feedInfo:(NSDictionary*)acdicInfo; {
-    [super feedInfo:acdicInfo];
-    UIImage* cimageCache = [[DLCache sharedInstance] objectForKey:acdicInfo[k_path]];
+-(void)feedInfo:(FileItem*)accFileItem{
+    [super feedInfo:accFileItem];
+    UIImage* cimageCache = [[DLCache sharedInstance] objectForKey:accFileItem.path];
     if (cimageCache) {
         self.cimageView.image = cimageCache;
     }else {
 //        static dispatch_once_t onceToken;
 //        dispatch_once(&onceToken, ^{
             @autoreleasepool {
-                self.cimageView.image = [UIImage imageWithContentsOfFile:acdicInfo[k_path]];
-                NSString* cstrPath = [acdicInfo objectForKey:k_path];
+                self.cimageView.image = [UIImage imageWithContentsOfFile:accFileItem.path];
+                NSString* cstrPath = accFileItem.path;
                 if (cstrPath) {
                     [[DLCache sharedInstance] setObject:self.cimageView.image forKey:cstrPath];
                 }
             }
 //        });
     }
-    self.clableFileName.text = [self.cdicInfo objectForKey:k_content];
 
 }
 @end

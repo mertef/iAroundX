@@ -10,6 +10,7 @@
 #import "DLMCConfig.h"
 #import "TUTreeConfig.h"
 #import <AVFoundation/AVFoundation.h>
+#import "FileItem.h"
 
 @implementation DLTableViewCellFolder
 
@@ -54,9 +55,9 @@
     self.cimageView.frame = CGRectMake(4.0f, (fH  - 36.0f) * 0.5f, 36.0f, 36.0f);
     self.clableFileName.frame = CGRectMake(CGRectGetMaxX(self.cimageView.frame), (fH - 20.0f) * 0.5f, fW - CGRectGetMaxX(self.cimageView.frame) - 100.0f, 20.0f);
     UIImage* cimageNormal = [self.cbtnSaveToPhone imageForState:UIControlStateNormal];
-    self.cbtnSaveToPhone.frame = CGRectMake(CGRectGetMaxX(self.clableFileName.frame) + 8.0f, (fH - cimageNormal.size.height) * 0.5f, cimageNormal.size.width, cimageNormal.size.height);
-    NSLog(@"%@", NSStringFromCGRect(self.cbtnSaveToPhone.frame));
-    self.cbtnDelete.frame = CGRectMake(CGRectGetMaxX(self.cbtnSaveToPhone.frame) + 14.0f, (fH - cimageNormal.size.height) * 0.5f, cimageNormal.size.width, cimageNormal.size.height);
+    self.cbtnSaveToPhone.frame = CGRectMake(CGRectGetMaxX(self.clableFileName.frame) + 18.0f, (fH - cimageNormal.size.height) * 0.5f, cimageNormal.size.width, cimageNormal.size.height);
+//    NSLog(@"%@", NSStringFromCGRect(self.cbtnSaveToPhone.frame));
+    self.cbtnDelete.frame = CGRectMake(CGRectGetMaxX(self.cbtnSaveToPhone.frame) + 18.0f, (fH - cimageNormal.size.height) * 0.5f, cimageNormal.size.width, cimageNormal.size.height);
 
 }
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated
@@ -65,14 +66,14 @@
 
     // Configure the view for the selected state
 }
--(void)feedInfo:(NSDictionary*)acdicInfo {
-    self.cdicInfo = acdicInfo;
+-(void)feedInfo:(FileItem*)accFileItem {
+    self.ccFileItem = accFileItem;
 
     //    NSLog(@"%@", cstrPath);
     self.cimageView.image = nil;
     
     
-    self.clableFileName.text = [self.cdicInfo objectForKey:k_content];
+    self.clableFileName.text = self.ccFileItem.content;
     
 }
 -(void)actionDelete:(id)aidSender {

@@ -9,6 +9,8 @@
 #import <UIKit/UIKit.h>
 #import "TUTreeViewCtrl.h"
 #import "DLTableViewCellFolder.h"
+@class NSManagedObjectContext;
 @interface DLFolderViewViewCtrl : TUTreeViewCtrl <ProtoFolderCell, UIAlertViewDelegate>
 @property(weak, nonatomic) DLTableViewCellFolder* ctableviewCellSelected;
+@property(strong, nonatomic) NSManagedObjectContext* cManagedObjectCtx;
 @end

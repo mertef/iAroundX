@@ -102,6 +102,7 @@
 
 #define k_cell_id_general @"DLTableviewCellFolder"
 
+#define k_table_file_item @"FileItem"
 typedef NS_ENUM(int32_t, T_PACKAGE_TYPE) {
     enum_package_type_short_msg = 0x300,
     enum_package_type_image,

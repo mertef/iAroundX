@@ -17,4 +17,6 @@
 #define k_level @"level"
 #define k_id_cell @"id_cell"
 #define k_path @"path"
+#define k_file_size @"file_size"
+#define k_file_created_date @"file_created_date"
 #endif

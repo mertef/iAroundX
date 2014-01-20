@@ -11,6 +11,7 @@
 #import "DLMCConfig.h"
 #import "TUTreeConfig.h"
 #import "DLCache.h"
+#import "FileItem.h"
 
 @implementation DLTableviewCellFolderMovie
 
@@ -38,9 +39,9 @@
 
     // Configure the view for the selected state
 }
--(void)feedInfo:(NSDictionary*)acdicInfo; {
-    [super feedInfo:acdicInfo];
-    UIImage* cimageCache = [[DLCache sharedInstance] objectForKey:acdicInfo[k_path]];
+-(void)feedInfo:(FileItem*)accFileItem {
+    [super feedInfo:accFileItem];
+    UIImage* cimageCache = [[DLCache sharedInstance] objectForKey:accFileItem.path];
     if (cimageCache) {
         self.cimageView.image = cimageCache;
     }else {
@@ -48,7 +49,7 @@
 //        dispatch_once(&onceToken, ^{
             @autoreleasepool {
                 
-                AVAsset* casset = [AVAsset assetWithURL:[NSURL fileURLWithPath:[acdicInfo objectForKey:k_path]]];
+                AVAsset* casset = [AVAsset assetWithURL:[NSURL fileURLWithPath:accFileItem.path]];
                 AVAssetImageGenerator* cAssetImageGenerator = [AVAssetImageGenerator assetImageGeneratorWithAsset:casset];
                 CMTime tTimeActually;
                 NSError* cError = nil;
@@ -58,7 +59,7 @@
                 //                __weak DLTableViewCellFolder* wccFolderCell = self;
                 if (!cError) {
                     self.cimageView.image = cimageFirstFrame;
-                    NSString* cstrPath = [acdicInfo objectForKey:k_path];
+                    NSString* cstrPath = accFileItem.path;
                     if (cstrPath) {
                         [[DLCache sharedInstance] setObject:cimageFirstFrame forKey:cstrPath];
                     }
