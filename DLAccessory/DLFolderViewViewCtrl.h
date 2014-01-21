@@ -10,7 +10,21 @@
 #import "TUTreeViewCtrl.h"
 #import "DLTableViewCellFolder.h"
 @class NSManagedObjectContext;
+@class DLPage;
+@class DLViewTableFooterMore;
+@class DLViewTableHeader;
+@class MBProgressHUD;
 @interface DLFolderViewViewCtrl : TUTreeViewCtrl <ProtoFolderCell, UIAlertViewDelegate>
 @property(weak, nonatomic) DLTableViewCellFolder* ctableviewCellSelected;
+@property(strong, nonatomic) DLPage* ccPage;
 @property(strong, nonatomic) NSManagedObjectContext* cManagedObjectCtx;
+@property(strong, nonatomic) UIRefreshControl* crefreshCtrl;
+@property(strong, nonatomic) DLViewTableFooterMore* ccTableFooterMore;
+@property(strong, nonatomic) DLViewTableHeader* ccTableHeaderMore;
+@property(strong, nonatomic) MBProgressHUD* ctProgressHud;
+
+
+-(void)actionCreateFolder:(id)aidSender;
+-(void)actionReOrderFolder:(id)aidSender;
+-(void)actionRescanFolder:(id)aidSender;
 @end

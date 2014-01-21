@@ -32,6 +32,9 @@
     
     _ccMpViewCtrl = [[DLMPViewCtrl alloc] init];
     
+    UITabBarItem* cTabbarItemMp = [[UITabBarItem alloc] initWithTitle:NSLocalizedString(@"k_my_friend", nil) image:[[UIImage imageNamed:@"connections-h"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] selectedImage:[[UIImage imageNamed:@"connections"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]];
+    _ccMpViewCtrl.tabBarItem = cTabbarItemMp;
+    
     UINavigationController* cCenterNavCt = [[DLNavigationCtrl alloc] init];
     [cCenterNavCt pushViewController:_ccMpViewCtrl animated:YES];
 
@@ -44,20 +47,22 @@
     ccConversationNavCtrl.tabBarItem = self.ctabbarItemConverstaion;
     
     DLFolderViewViewCtrl* ccFolderViewCtrl = [[DLFolderViewViewCtrl alloc] init];
-    UINavigationController* ccNavCtrlFolder = [[DLNavigationCtrl alloc] initWithRootViewController:ccFolderViewCtrl];
+    UINavigationController* ccNavCtrlFolder = [[DLNavigationCtrl alloc] init];
      UITabBarItem* cTabbarItemFolder = [[UITabBarItem alloc] initWithTitle:NSLocalizedString(@"k_folder", nil) image:[[UIImage imageNamed:@"tabbar_bottom_folder_n"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] selectedImage:[[UIImage imageNamed:@"tabbar_bottom_folder_h"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]];
     ccNavCtrlFolder.tabBarItem = cTabbarItemFolder;
+    [ccNavCtrlFolder pushViewController:ccFolderViewCtrl animated:NO];
 
 
     DLViewCtrlPersonalCenter* ccSettingCtrl = [[DLViewCtrlPersonalCenter alloc] init];
-    UINavigationController* ccNaviCtrlSetting = [[DLNavigationCtrl alloc] initWithRootViewController:ccSettingCtrl];
+    UINavigationController* ccNaviCtrlSetting = [[DLNavigationCtrl alloc] init];
      UITabBarItem* cTabbarItemSetting = [[UITabBarItem alloc] initWithTitle:NSLocalizedString(@"k_setting", nil) image:[[UIImage imageNamed:@"tabbar_setting_n"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] selectedImage:[[UIImage imageNamed:@"tabbar_setting_h"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]];
     ccSettingCtrl.tabBarItem = cTabbarItemSetting;
-    
+    [ccNaviCtrlSetting pushViewController:ccSettingCtrl animated:NO];
+
     
     UITabBarController* cTabbarViewCtrl = [[DLTabbarViewCtr alloc] init];
     cTabbarViewCtrl.viewControllers = @[ccNavCtrlFolder, cCenterNavCt, ccConversationNavCtrl, ccNaviCtrlSetting];
-    cTabbarViewCtrl.selectedViewController = cCenterNavCt;
+//    cTabbarViewCtrl.selectedViewController = cCenterNavCt;
     self.window.rootViewController = cTabbarViewCtrl;
     
     

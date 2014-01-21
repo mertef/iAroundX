@@ -77,16 +77,8 @@
     [self setNeedsStatusBarAppearanceUpdate];
     
     self.edgesForExtendedLayout = UIRectEdgeAll;
-    UIImage* cimageNormal = [UIImage imageNamed:@"connections-h"];
-    cimageNormal = [cimageNormal imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
     
-    
-    UIImage* cimageSelected = [UIImage imageNamed:@"connections"];
-    cimageSelected = [cimageSelected imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
-    
-    UITabBarItem* cItem = [[UITabBarItem alloc] initWithTitle:NSLocalizedString(@"k_my_friend", nil) image:cimageNormal selectedImage:cimageSelected];
-    
-    self.tabBarItem = cItem;
+        
     
     
     self.cTableServiceList = [[UITableView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.view.frame), CGRectGetHeight(self.view.frame)) style:UITableViewStylePlain];

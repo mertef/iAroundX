@@ -14,7 +14,20 @@
 
 @implementation TUTreeViewCtrl
 @synthesize cmutarrData = m_c_mut_arr_data;
-
+- (id)init
+{
+    self = [super init];
+    if (self) {
+        m_c_mut_arr_data = [[NSMutableArray alloc] init];
+ 
+    }
+    return self;
+}
+-(void)viewWillLayoutSubviews {
+    [super viewWillLayoutSubviews];
+    
+    
+}
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -22,14 +35,15 @@
     self.edgesForExtendedLayout = UIRectEdgeNone;
     self.automaticallyAdjustsScrollViewInsets = NO;
     
-    m_c_mut_arr_data = [[NSMutableArray alloc] init];
+     CGRect srectViewFrame  = self.view.frame;
+     srectViewFrame.size.height -= (CGRectGetHeight(self.navigationController.navigationBar.frame) + CGRectGetHeight(self.tabBarController.tabBar.frame) + 20.0f);
+     self.view.frame = srectViewFrame;
 
 //    NSLog(@"before frame is %@", NSStringFromCGRect(self.view.frame));
-    CGRect srectViewFrame  = self.view.frame;
-    srectViewFrame.size.height -= (CGRectGetHeight(self.navigationController.navigationBar.frame) + CGRectGetHeight(self.tabBarController.tabBar.frame));
-    self.view.frame = srectViewFrame;
-    NSLog(@"end frame is %@", NSStringFromCGRect(self.view.frame));
+    
+//    NSLog(@"end frame is %@", NSStringFromCGRect(self.view.frame));
     self.cTableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStylePlain];
+    [self addUIPage];
     [self registerTableviewCells];
     
     self.cTableView.delaysContentTouches = YES;
@@ -46,6 +60,9 @@
  
     // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
     // self.navigationItem.rightBarButtonItem = self.editButtonItem;
+}
+
+-(void)addUIPage {
 }
 -(void)registerTableviewCells {
     [self.cTableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"id_cell"];
@@ -71,6 +88,7 @@
                         cellSelected = cellItem;
                         sPointSelected = cellItem.center;
                         iSelectedIndex = [[self.cTableView indexPathForCell:cellSelected] row];
+                        self.idObjectSelected = [self.cmutarrData objectAtIndex:iSelectedIndex];
                         break;
                     }
                 }
@@ -101,7 +119,7 @@
                     NSIndexPath* cindexpathFrom = [self.cTableView indexPathForCell:cellItem];
 //                    NSIndexPath* cindexpathTo =[self.tableView indexPathForCell:cellSelected];
 //                    NSLog(@"exchange index is %d  %d", [cindexpathFrom row], [cindexpathTo row]);
-                    
+                    [self exchanged:[cindexpathFrom row] with:iSelectedIndex];
                     [m_c_mut_arr_data exchangeObjectAtIndex:[cindexpathFrom row] withObjectAtIndex:iSelectedIndex];
                     iSelectedIndex = [cindexpathFrom row];
 
@@ -125,6 +143,10 @@
     }
     
 }
+-(void)exchanged:(NSUInteger)auiFrom with:(NSUInteger)auiTo {
+    
+}
+
 -(void)emulateData {
     
     NSDictionary* cdicItem = @{k_id:@1,
@@ -301,14 +323,7 @@
 - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath
 {
 
-    NSMutableDictionary* cmutdicItem0 = [m_c_mut_arr_data objectAtIndex:[fromIndexPath row]];
-    NSMutableDictionary* cmutdicItem1 = [m_c_mut_arr_data objectAtIndex:[fromIndexPath row]];
-    NSNumber* cnumberItem1Order = [cmutdicItem1 objectForKey:k_order];    
-    [cmutdicItem1 setObject:[cmutdicItem0 objectForKey:k_order] forKey:k_order];
-    [cmutdicItem0 setObject:cnumberItem1Order forKey:k_order];
-
-    [m_c_mut_arr_data exchangeObjectAtIndex:[toIndexPath row] withObjectAtIndex:[fromIndexPath row]];
-    [self.cTableView reloadData];
+   
 }
 
 

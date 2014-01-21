@@ -25,5 +25,6 @@
 -(void)feedInfo:(FileItem*)accFileItem;
 -(void)actionDelete:(id)aidSender;
 -(void)actionSave2Phone:(id)aidSender;
+-(void)selectCell:(BOOL)abFlag;
 
 @end

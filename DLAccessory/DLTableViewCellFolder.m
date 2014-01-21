@@ -47,6 +47,14 @@
     return self;
 }
 
+-(void)selectCell:(BOOL)abFlag {
+    if (abFlag) {
+        self.contentView.backgroundColor = k_colore_gradient_blue;
+    }else {
+        self.contentView.backgroundColor = [UIColor clearColor];
+    }
+}
+
 -(void)layoutSubviews {
     [super layoutSubviews];
     CGFloat fW = CGRectGetWidth(self.contentView.frame);
@@ -58,21 +66,20 @@
     self.cbtnSaveToPhone.frame = CGRectMake(CGRectGetMaxX(self.clableFileName.frame) + 18.0f, (fH - cimageNormal.size.height) * 0.5f, cimageNormal.size.width, cimageNormal.size.height);
 //    NSLog(@"%@", NSStringFromCGRect(self.cbtnSaveToPhone.frame));
     self.cbtnDelete.frame = CGRectMake(CGRectGetMaxX(self.cbtnSaveToPhone.frame) + 18.0f, (fH - cimageNormal.size.height) * 0.5f, cimageNormal.size.width, cimageNormal.size.height);
-
+    
 }
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated
 {
-    [super setSelected:selected animated:animated];
-
+    [super setSelected:selected animated:animated];    
     // Configure the view for the selected state
 }
+
+
+
 -(void)feedInfo:(FileItem*)accFileItem {
     self.ccFileItem = accFileItem;
-
     //    NSLog(@"%@", cstrPath);
     self.cimageView.image = nil;
-    
-    
     self.clableFileName.text = self.ccFileItem.content;
     
 }

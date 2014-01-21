@@ -93,3 +93,9 @@
 "k_save_to_phone_msg" = "Are your sure to Save into your mobile Phone storage?";
 "k_delete_file" = "Delete File";
 "k_delete_file_msg" = "Are you sure to delete the file ?";
+
+"k_load_more_file" = "Loading More";
+
+"k_new_foler"= "New Folder";
+"k_order_folder"="Order";
+"k_rescan" = "Scan";

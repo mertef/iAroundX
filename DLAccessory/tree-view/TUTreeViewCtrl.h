@@ -13,7 +13,10 @@
 }
 @property(strong,nonatomic) NSMutableArray* cmutarrData;
 @property(strong, nonatomic) UITableView* cTableView;
+@property(weak, nonatomic) id idObjectSelected;
 -(void)emulateData;
 -(void)registerTableviewCells;
+-(void)exchanged:(NSUInteger)auiFrom with:(NSUInteger)auiTo;
+-(void)addUIPage;
 
 @end
