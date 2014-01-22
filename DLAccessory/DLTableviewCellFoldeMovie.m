@@ -60,7 +60,7 @@
                 if (!cError) {
                     self.cimageView.image = cimageFirstFrame;
                     NSString* cstrPath = accFileItem.path;
-                    if (cstrPath) {
+                    if (cstrPath && self.cimageView.image) {
                         [[DLCache sharedInstance] setObject:cimageFirstFrame forKey:cstrPath];
                     }
                     CGImageRelease(rImageFirstFrame);

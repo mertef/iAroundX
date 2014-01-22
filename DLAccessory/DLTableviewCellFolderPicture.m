@@ -42,7 +42,7 @@
             @autoreleasepool {
                 self.cimageView.image = [UIImage imageWithContentsOfFile:accFileItem.path];
                 NSString* cstrPath = accFileItem.path;
-                if (cstrPath) {
+                if (cstrPath && self.cimageView.image) {
                     [[DLCache sharedInstance] setObject:self.cimageView.image forKey:cstrPath];
                 }
             }

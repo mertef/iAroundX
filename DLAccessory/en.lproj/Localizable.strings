@@ -99,3 +99,12 @@
 "k_new_foler"= "New Folder";
 "k_order_folder"="Order";
 "k_rescan" = "Scan";
+
+"k_rescanning_folder" = "Rescanning Folder";
+"k_sure_rescan_folder_msg" = "Are you sure to rescanning the Document Shared directory ?";
+
+"k_view" = "View Selected Item";
+"k_view_opiton" = "View";
+
+"k_create_new_folder" = "Create folder";
+"k_sure_create_folder_msg" = "Are you sure create a folder in the document directory ?";

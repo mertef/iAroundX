@@ -100,3 +100,12 @@
 "k_new_foler"= "新建文件夹";
 "k_order_folder"="调整顺序";
 "k_rescan" = "重新扫描";
+
+"k_rescanning_folder" = "重新扫描";
+"k_sure_rescan_folder_msg" = "确定重新扫描共享文档目录?";
+
+"k_view" = "查看选择项";
+"k_view_opiton" = "查看";
+
+"k_create_new_folder" = "创建文件夹";
+"k_sure_create_folder_msg" = "你确信在共享文件夹下创建新目录?";

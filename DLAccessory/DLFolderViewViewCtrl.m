@@ -20,10 +20,17 @@
 #import "DLViewTableFooterMore.h"
 #import "DLViewTableHeader.h"
 #import "MBProgressHUD.h"
+#import <MediaPlayer/MediaPlayer.h>
+#import <AVFoundation/AVFoundation.h>
+#import "DLZoomableImageView.h"
+#import "CSAnimation.h"
 
 @interface DLFolderViewViewCtrl () {
     dispatch_queue_t _dispatch_queue_scanning;
     enum_folder_cell_option _enum_folder_option;
+    BOOL _b_enable_scroll;
+    FileItem* _cc_file_item_selected;
+    CGRect _s_rect_selcted;
 }
 -(void)deleteSelectedItem ;
 -(void)saveSelectedItmIntoPhone;
@@ -31,7 +38,9 @@
 -(void)fetchDataFromOffset:(NSUInteger)auiFrom withLimit:(NSUInteger)auiLimit;
 -(void)syncFolder;
 -(void)scanningFolder;
+-(void)actionScan;
 -(void)addUIPage;
+-(void)enableScroll:(BOOL)abFlag;
 @end
 
 @implementation DLFolderViewViewCtrl
@@ -44,6 +53,7 @@
         _dispatch_queue_scanning = dispatch_queue_create("scanning", DISPATCH_QUEUE_SERIAL);
         self.ccPage = [[DLPage alloc] init];
         [self.ccPage reset];
+        _b_enable_scroll = NO;
     }
     return self;
 }
@@ -60,7 +70,7 @@
     }
     NSFetchRequest* cfetchRequst = [[NSFetchRequest alloc] initWithEntityName:k_table_file_item];
     NSSortDescriptor *cSortDesc0 = [[NSSortDescriptor alloc]
-                                   initWithKey:@"order" ascending:YES];
+                                   initWithKey:@"order" ascending:NO];
     NSSortDescriptor *cSortDesc = [[NSSortDescriptor alloc]
                                    initWithKey:@"file_created_date" ascending:NO];
     NSPredicate* cpredicate = [NSPredicate predicateWithFormat:@"%K != %@", @"content",k_ds_store];
@@ -116,10 +126,17 @@
         
         NSString* cstrDocumentRoot = [NSHomeDirectory() stringByAppendingPathComponent:@"Documents"];
         [wccSelf scanDirectory:cstrDocumentRoot withParentId:@(0) andDisplayLevel:@(0)];
-        
+        NSError* cErrorDelete = nil;
+        for (NSManagedObject* cmanagedObj in self.cmutarrData) {
+            [self.cManagedObjectCtx delete:cmanagedObj];
+            [self.cManagedObjectCtx save:&cErrorDelete];
+            if (cErrorDelete) {
+                NSLog(@"%@", [cErrorDelete description]);
+            }
+        }
         [self.cmutarrData removeAllObjects];
         [self.ccPage reset];
-        [self fetchDataFromOffset:0 withLimit:10];
+        [self fetchDataFromOffset:0 withLimit:141];
         dispatch_async(dispatch_get_main_queue(), ^(void){
             [self.cTableView reloadData];
             self.cTableView.userInteractionEnabled = YES;
@@ -135,6 +152,7 @@
 
     self.ccTableFooterMore = [[DLViewTableFooterMore alloc] initWithReuseIdentifier:@"id_footer_more"];
     self.ccTableFooterMore.frame = srectFrame;
+    [self.ccTableFooterMore.cbtnMore addTarget:self action:@selector(actionLoadMore:) forControlEvents:UIControlEventTouchUpInside];
     self.cTableView.tableFooterView  = self.ccTableFooterMore;
     
     CGRect srectFrameHeader = CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.cTableView.frame), 44.0f);
@@ -146,25 +164,69 @@
     [self.ccTableHeaderMore.cbtnReScan addTarget:self action:@selector(actionRescanFolder:) forControlEvents:UIControlEventTouchUpInside];
 
     self.ccTableHeaderMore.frame = srectFrameHeader;
-    self.cTableView.tableHeaderView  = self.ccTableHeaderMore;
 
     self.ctProgressHud = [[MBProgressHUD alloc] initWithView:self.view];
     self.ctProgressHud.removeFromSuperViewOnHide = YES;
     self.ctProgressHud.mode = MBProgressHUDModeIndeterminate;
 
 }
-
 -(void)actionCreateFolder:(id)aidSender {
-    
+    _enum_folder_option = enum_folder_cell_option_create_dir;
+    UIAlertView* calertMsg = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"k_create_new_folder", nil) message:NSLocalizedString(@"k_sure_create_folder_msg", nil) delegate:self cancelButtonTitle:NSLocalizedString(@"k_cancel", nil) otherButtonTitles:NSLocalizedString(@"k_ok", nil), nil];
+    [calertMsg show];
+}
+-(void)createFolder {
+    NSFileManager* cfileMangerDefault = [NSFileManager defaultManager];
+    NSError* cError = nil;
+    [cfileMangerDefault createDirectoryAtPath:[NSHomeDirectory() stringByAppendingPathComponent:@"Documents/xx"] withIntermediateDirectories:YES attributes:nil error:&cError];
+    if (cError) {
+        NSLog(@"%@", [cError description]);
+    }
+}
+
+-(void)enableScroll:(BOOL)abFlag {
+    NSArray* carrVisibleCells = [self.cTableView visibleCells];
+    for (UITableViewCell* cellItem in carrVisibleCells) {
+        [[cellItem gestureRecognizers].firstObject setEnabled:abFlag];
+    }
 }
 -(void)actionReOrderFolder:(id)aidSender {
-    self.cTableView.scrollEnabled =  !self.cTableView.scrollEnabled;
+    _b_enable_scroll = !_b_enable_scroll;
+    UIButton* cbtnSender = (UIButton*)aidSender;
+    Class tBounceMeta = [CSAnimation classForAnimationType:CSAnimationTypeShake];
+    [tBounceMeta performAnimationOnView:cbtnSender duration:1.0f delay:0.0f];
+    
+    UIButton* cbtn = (UIButton*)aidSender;
+    if (_b_enable_scroll) {
+        [self enableScroll:YES];
+        self.cTableView.scrollEnabled =  NO;
+        cbtn.selected = YES;
+    }else {
+        [self enableScroll:NO];
+        self.cTableView.scrollEnabled =  YES;
+        cbtn.selected = NO;
+    }
 }
 -(void)actionRescanFolder:(id)aidSender {
-    self.cTableView.userInteractionEnabled = NO;
-    [self scanningFolder];
+    _enum_folder_option = enum_folder_cell_option_rescanning;
+   
+    UIAlertView* calertMsg = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"k_rescanning_folder", nil) message:NSLocalizedString(@"k_sure_rescan_folder_msg", nil) delegate:self cancelButtonTitle:NSLocalizedString(@"k_cancel", nil) otherButtonTitles:NSLocalizedString(@"k_ok", nil), nil];
+    [calertMsg show];
+  
 
 }
+
+-(void)actionLoadMore:(id)aidSender {
+    [self fetchDataFromOffset:_ccPage.uiOffset withLimit:_ccPage.uiLimit];
+}
+
+-(void)actionScan {
+    self.cTableView.userInteractionEnabled = NO;
+    _cc_file_item_selected = nil;
+    _s_rect_selcted = CGRectZero;
+    [self scanningFolder];
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -175,6 +237,8 @@
     self.title = NSLocalizedString(@"k_folder_title", nil);
     
     [self scanningFolder];
+    
+    self.cactionSheetOption = [[UIActionSheet alloc] initWithTitle:NSLocalizedString(@"k_view", nil) delegate:self cancelButtonTitle:NSLocalizedString(@"k_cancel", nil) destructiveButtonTitle:nil otherButtonTitles:NSLocalizedString(@"k_view_opiton", nil), nil];
     
         /*
     self.crefreshCtrl = [[UIRefreshControl alloc] init];
@@ -213,18 +277,18 @@
         NSLog(@"init persistent store error : %@", [cError description]);
     }
 }
-/*
--(CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
+
+-(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
     return 44.0f;
 }
--(UIView*)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section {
+-(UIView*)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
     
-    return [tableView dequeueReusableHeaderFooterViewWithIdentifier:@"DLViewTableFooterMore"];
-}*/
+    return self.ccTableHeaderMore;
+}
 
 - (NSInteger)tableView:(UITableView *)tableView indentationLevelForRowAtIndexPath:(NSIndexPath *)indexPath {
     FileItem* ccFileItem =  [self.cmutarrData objectAtIndex:[indexPath row]];
-    
+    NSLog(@"indent level is %l", [ccFileItem.level longValue]);
     return [ccFileItem.level unsignedLongValue];
 }
 
@@ -239,8 +303,8 @@
         cell = (DLTableViewCellFolder*)[[NSClassFromString(cstrIdCell) alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cstrIdCell];
         UIPanGestureRecognizer* cPanGes = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(actionBeginEdit:)];
         [cell addGestureRecognizer:cPanGes];
-        cPanGes.enabled = NO;
         cell.idProtoFolderCell = self;
+        cPanGes.enabled = NO;
 
     }
     cell.indentationLevel = [ccFileItem.level integerValue];
@@ -250,10 +314,6 @@
         [cell selectCell:NO];
     }
     [cell feedInfo:ccFileItem];
-    //    NSLog(@"%@", [cdicItem description]);
-    
-//    cell.textLabel.text = cdicItem[k_content];
-    
     return cell;
 }
 
@@ -290,6 +350,7 @@
             //get attributes
             @autoreleasepool {
                 NSString* cstrFilePath = [acstrDirectoryPath stringByAppendingPathComponent:cstrItem];
+                NSLog(@"---%@", cstrFilePath);
                 NSDictionary* cdicAttribute = [cfileManagerDefault attributesOfItemAtPath:cstrFilePath error:&cError];
                 NSNumber* cnumberFileNumber = [cdicAttribute objectForKey:NSFileSystemFileNumber];
                 NSFetchRequest* cFetchReqExist = [[NSFetchRequest alloc] initWithEntityName:k_table_file_item];
@@ -311,6 +372,7 @@
                         NSString* cstrItemLowcase = [cstrItem lowercaseString];
                         
                         if ([cstrFileType isEqualToString:NSFileTypeDirectory]) {
+                            NSLog(@"directory!");
                             [wccSelf scanDirectory:cstrFilePath withParentId:acnumberParendId andDisplayLevel:[NSNumber numberWithInt:[acNumberDisplayLevel intValue] + 1]];
                             ccFileItem.cell_id = k_cell_id_folder;
                         }else if ([cstrItemLowcase hasSuffix:@"jpg"] || [cstrItemLowcase hasSuffix:@"png"] || [cstrItemLowcase hasSuffix:@"jpeg"]) {
@@ -406,6 +468,12 @@
             case enum_folder_cell_option_delete:
                 [self deleteSelectedItem];
                 break;
+            case enum_folder_cell_option_rescanning:
+                [self actionScan];
+                break;
+            case enum_folder_cell_option_create_dir:
+                [self createFolder];
+                break;
             default:
                 [self saveSelectedItmIntoPhone];
                 break;
@@ -433,5 +501,61 @@
 
 }
 
+#pragma mark - action option 
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    _cc_file_item_selected = [self.cmutarrData objectAtIndex:[indexPath row]];
+    UITableViewCell* cTableviewCell = [tableView cellForRowAtIndexPath:indexPath];
+    DLTableViewCellFolder* ccTableviewCell = (DLTableViewCellFolder*)cTableviewCell;
+    _s_rect_selcted = [self.view convertRect:ccTableviewCell.cimageView.frame fromView:ccTableviewCell.contentView];
+    [self.cactionSheetOption showFromTabBar:self.tabBarController.tabBar];
+}
+-(void)processSelectedTableCellOption {
+    NSLog(@"selected file path is %@", _cc_file_item_selected.path);
+    if (_cc_file_item_selected) {
+        if ([_cc_file_item_selected.cell_id isEqualToString:k_cell_id_folder]) {
+            
+        }else if([_cc_file_item_selected.cell_id isEqualToString:k_cell_id_movie]) {
+            MPMoviePlayerViewController* cMoviePlayerVeiwCtrl = [[MPMoviePlayerViewController alloc] initWithContentURL:[NSURL fileURLWithPath:_cc_file_item_selected.path]];
+            [self presentViewController:cMoviePlayerVeiwCtrl animated:YES completion:^(void){
+                [cMoviePlayerVeiwCtrl.moviePlayer play];
+            }];
+        }else if([_cc_file_item_selected.cell_id isEqualToString:k_cell_id_music]) {
+            MPMoviePlayerViewController* cMoviePlayerVeiwCtrl = [[MPMoviePlayerViewController alloc] initWithContentURL:[NSURL fileURLWithPath:_cc_file_item_selected.path]];
+            [self presentViewController:cMoviePlayerVeiwCtrl animated:YES completion:^(void){
+                [cMoviePlayerVeiwCtrl.moviePlayer play];
+            }];
+        }else if([_cc_file_item_selected.cell_id isEqualToString:k_cell_id_picture]) {
+//            NSString* cstrImagePath = [[NSBundle mainBundle] pathForResource:@"3" ofType:@"jpg"];
+            NSString* cstrImagePath = _cc_file_item_selected.path;
+            DLZoomableImageView* ccZoomableImageView = [[DLZoomableImageView alloc] initWithFrame:self.view.bounds];
+            ccZoomableImageView.clablePageNumber.hidden = YES;
+            UIImage* cimageFile = [UIImage imageWithContentsOfFile: cstrImagePath];
+            [ccZoomableImageView setImage:cimageFile];
+            [self.view addSubview:ccZoomableImageView];
+            [ccZoomableImageView appearAnimationFromRect:_s_rect_selcted];
+        }else if([_cc_file_item_selected.cell_id isEqualToString:k_cell_id_general]) {
+            
+        }
+    }
+}
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
+    [actionSheet dismissWithClickedButtonIndex:0 animated:YES];
+    switch (buttonIndex) {
+        case 0:
+        {
+            [self processSelectedTableCellOption];
+        }
+            break;
+            
+        default:
+            break;
+    }
+}
+
+// Called when we cancel a view (eg. the user clicks the Home button). This is not called when the user clicks the cancel button.
+// If not defined in the delegate, we simulate a click in the cancel button
+- (void)actionSheetCancel:(UIActionSheet *)actionSheet {
+    [actionSheet dismissWithClickedButtonIndex:0 animated:YES];
+}
 
 @end

@@ -337,17 +337,11 @@
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     
-    UITableViewCell* cell = [tableView cellForRowAtIndexPath:indexPath];
-    if ([cell gestureRecognizers]) {
-        [[[cell gestureRecognizers] firstObject] setEnabled:YES];
-    }
+    
 
 }
 -(void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell* cell = [tableView cellForRowAtIndexPath:indexPath];
-    if ([cell gestureRecognizers]) {
-        [[[cell gestureRecognizers] firstObject] setEnabled:NO];
-    }
+   
 }
 /*
 #pragma mark - Navigation

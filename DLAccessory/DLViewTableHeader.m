@@ -31,6 +31,8 @@
         self.cbtnEditOrder = [UIButton buttonWithType:UIButtonTypeCustom];
         [self.cbtnEditOrder setImage:[UIImage imageNamed:@"order"] forState:UIControlStateNormal];
         [self.cbtnEditOrder setImage:[UIImage imageNamed:@"order_h"] forState:UIControlStateHighlighted];
+        [self.cbtnEditOrder setImage:[UIImage imageNamed:@"order_s"] forState:UIControlStateSelected];
+
 
         [[self contentView] addSubview:self.cbtnEditOrder];
         //

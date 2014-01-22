@@ -7,6 +7,10 @@
 //
 
 #import "DLTableViewCellFolderDirectory.h"
+#import "DLMCConfig.h"
+#import "TUTreeConfig.h"
+#import "DLCache.h"
+#import "FileItem.h"
 
 @implementation DLTableViewCellFolderDirectory
 
@@ -27,5 +31,13 @@
     // Drawing code
 }
 */
-
+-(void)layoutSubviews {
+    [super layoutSubviews];
+}
+-(void)feedInfo:(FileItem*)accFileItem {
+    [super feedInfo:accFileItem];
+    self.cimageView.backgroundColor = [UIColor clearColor];
+    self.cimageView.image = [UIImage imageNamed:@"folder_dir"];
+    self.cbtnSaveToPhone.hidden = YES;
+}
 @end

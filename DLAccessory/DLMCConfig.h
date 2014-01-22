@@ -131,5 +131,7 @@ typedef NS_ENUM(NSUInteger, enum_scroll_view_image_url_type) {
 typedef NS_ENUM(NSUInteger, enum_folder_cell_option) {
     enum_folder_cell_option_save_to_phone = 0x800,
     enum_folder_cell_option_delete,
+    enum_folder_cell_option_rescanning,
+    enum_folder_cell_option_create_dir
 };
 #endif

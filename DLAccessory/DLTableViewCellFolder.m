@@ -20,8 +20,9 @@
     if (self) {
         // Initialization code
         self.cimageView = [[UIImageView alloc] init];
-        self.cimageView.backgroundColor = [UIColor blackColor];
+        self.cimageView.backgroundColor = [UIColor clearColor];
         self.cimageView.contentMode = UIViewContentModeScaleAspectFit;
+        self.cimageView.clipsToBounds = YES;
         [self.contentView addSubview:self.cimageView];
         
         self.clableFileName = [[UILabel alloc] init];
@@ -60,8 +61,8 @@
     CGFloat fW = CGRectGetWidth(self.contentView.frame);
     CGFloat fH = CGRectGetHeight(self.contentView.frame);
     
-    self.cimageView.frame = CGRectMake(4.0f, (fH  - 36.0f) * 0.5f, 36.0f, 36.0f);
-    self.clableFileName.frame = CGRectMake(CGRectGetMaxX(self.cimageView.frame), (fH - 20.0f) * 0.5f, fW - CGRectGetMaxX(self.cimageView.frame) - 100.0f, 20.0f);
+    self.cimageView.frame = CGRectMake(4.0f, (fH  - 32.0f) * 0.5f, 32.0f, 32.0f);
+    self.clableFileName.frame = CGRectMake(CGRectGetMaxX(self.cimageView.frame) + 4.0f, (fH - 20.0f) * 0.5f, fW - CGRectGetMaxX(self.cimageView.frame) - 100.0f, 20.0f);
     UIImage* cimageNormal = [self.cbtnSaveToPhone imageForState:UIControlStateNormal];
     self.cbtnSaveToPhone.frame = CGRectMake(CGRectGetMaxX(self.clableFileName.frame) + 18.0f, (fH - cimageNormal.size.height) * 0.5f, cimageNormal.size.width, cimageNormal.size.height);
 //    NSLog(@"%@", NSStringFromCGRect(self.cbtnSaveToPhone.frame));
@@ -70,7 +71,7 @@
 }
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated
 {
-    [super setSelected:selected animated:animated];    
+    [super setSelected:selected animated:animated];
     // Configure the view for the selected state
 }
 
