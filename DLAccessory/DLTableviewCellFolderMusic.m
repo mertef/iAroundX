@@ -25,5 +25,10 @@
 
     // Configure the view for the selected state
 }
-
+-(void)feedInfo:(FileItem*)accFileItem {
+    [super feedInfo:accFileItem];
+    self.cimageView.backgroundColor = [UIColor clearColor];
+    self.cimageView.image = [UIImage imageNamed:@"music"];
+     self.cimageView.highlightedImage = [UIImage imageNamed:@"music_h"];
+}
 @end

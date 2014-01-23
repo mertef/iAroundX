@@ -28,4 +28,5 @@
 -(void)actionReOrderFolder:(id)aidSender;
 -(void)actionRescanFolder:(id)aidSender;
 -(void)actionLoadMore:(id)aidSender;
+-(void)setModal;
 @end

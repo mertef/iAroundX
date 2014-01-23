@@ -22,6 +22,7 @@
 @property(retain, nonatomic) dispatch_queue_t tDispatchQueue;
 @property(strong, nonatomic) UIButton* cbtnDelete, *cbtnSaveToPhone;
 @property(assign, nonatomic) id<ProtoFolderCell> idProtoFolderCell;
+-(void)setModelCell;
 -(void)feedInfo:(FileItem*)accFileItem;
 -(void)actionDelete:(id)aidSender;
 -(void)actionSave2Phone:(id)aidSender;

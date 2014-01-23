@@ -108,3 +108,20 @@
 
 "k_create_new_folder" = "Create folder";
 "k_sure_create_folder_msg" = "Are you sure create a folder in the document directory ?";
+
+"k_save_file_error"="Save Fill error";
+"k_save_file_error_msg" = "Save File Error, File corrupted or has no write permission";
+
+"k_save_file_success" = "save file success";
+"k_save_file_succes_msg" = "Save success";
+
+"k_delete_file_msg_ok" = "Successfully delete the file";
+"k_delete_file_msg_failure" = "Delete file error!";
+
+"k_reg_age" = "Age:";
+"k_reg_name" = "Name:";
+"k_reg_email" = "Email:";
+"k_reg_sig" = "Signature:";
+"k_reg_sex_man" = "Male";
+"k_reg_sex_woman" = "Female";
+

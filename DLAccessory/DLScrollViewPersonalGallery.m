@@ -71,6 +71,7 @@
     [super layoutSubviews];
 //    self.cbtnEdit.frame = CGRectMake(CGRectGetWidth(self.bounds) - 60.0f + self.cscrollviewImage.contentOffset.x, CGRectGetHeight(self.bounds) - 60.0f, 60.0f, 60.0f);
     [self.cscrollviewImage bringSubviewToFront:self.cbtnEdit];
+
 }
 - (void)dealloc
 {
@@ -305,7 +306,7 @@
 
 -(void)showContentMenu{
    
-    NSLog(@"show contnet menu  %@", NSStringFromCGRect(self.bounds));
+//    NSLog(@"show contnet menu  %@", NSStringFromCGRect(self.bounds));
 
     
     CFIndex iMenuCount = [_c_mut_arr_content_menus count];

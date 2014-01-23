@@ -2,7 +2,7 @@
 //  FileItem.m
 //  DLAccessory
 //
-//  Created by Mertef on 1/20/14.
+//  Created by Mertef on 1/23/14.
 //  Copyright (c) 2014 Zhang Mertef. All rights reserved.
 //
 
@@ -13,12 +13,12 @@
 
 @dynamic cell_id;
 @dynamic content;
-@dynamic file_id;
-@dynamic parent_id;
 @dynamic file_created_date;
+@dynamic file_id;
 @dynamic file_size;
-@dynamic order;
 @dynamic level;
+@dynamic order;
+@dynamic parent_id;
 @dynamic path;
 
 @end

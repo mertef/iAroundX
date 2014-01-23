@@ -109,3 +109,20 @@
 
 "k_create_new_folder" = "创建文件夹";
 "k_sure_create_folder_msg" = "你确信在共享文件夹下创建新目录?";
+
+"k_save_file_error"="保存文件失败";
+"k_save_file_error_msg" = "文件损坏或者没有写文件权限";
+
+"k_save_file_success" = "保存文件成功";
+"k_save_file_succes_msg" = "保存成功了";
+
+"k_delete_file_msg_ok" = "删除文件成功";
+"k_delete_file_msg_failure" = "删除文件失败!";
+
+"k_reg_age" = "年龄:";
+"k_reg_name" = "笔名:";
+"k_reg_email" = "邮件地址:";
+"k_reg_sig" = "我的签名:";
+
+"k_reg_sex_man" = "男";
+"k_reg_sex_woman" = "女";

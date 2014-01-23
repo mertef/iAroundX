@@ -362,6 +362,12 @@
             cstrMediaUrl = [NSHomeDirectory() stringByAppendingFormat:@"/Documents/%ld.mov", lTime];
             [cmutData writeToFile:cstrMediaUrl atomically:NO];
             NSLog(@"----%@", cstrMediaUrl);
+        }else if(puPackage->_u_l_package_type == enum_package_type_audio) {
+            
+            NSLog(@"received video audio from %@ ", [peerID displayName]);
+            cstrMediaUrl = [NSHomeDirectory() stringByAppendingFormat:@"/Documents/%ld.aac", lTime];
+            [cmutData writeToFile:cstrMediaUrl atomically:NO];
+            NSLog(@"----%@", cstrMediaUrl);
         }
         
         NSDictionary* cdicChatItem = @{k_chat_from:peerID,

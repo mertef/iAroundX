@@ -100,7 +100,7 @@
 #define k_cell_id_movie @"DLTableviewCellFolderMovie"
 #define k_cell_id_folder @"DLTableViewCellFolderDirectory"
 
-#define k_cell_id_general @"DLTableviewCellFolder"
+#define k_cell_id_general @"DLTableViewCellFolder"
 
 #define k_table_file_item @"FileItem"
 #define k_ds_store @".DS_Store"

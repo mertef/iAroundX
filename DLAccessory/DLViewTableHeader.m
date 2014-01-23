@@ -21,11 +21,11 @@
     self = [super initWithReuseIdentifier:reuseIdentifier];
     if (self) {
         // Initialization code
-
+/*
         self.cbtnCreateFolder = [UIButton buttonWithType:UIButtonTypeCustom];
         [self.cbtnCreateFolder setImage:[UIImage imageNamed:@"create_folder"] forState:UIControlStateNormal];
         [self.cbtnCreateFolder setImage:[UIImage imageNamed:@"create_folder_h"] forState:UIControlStateHighlighted];
-
+*/
         [[self contentView] addSubview:self.cbtnCreateFolder];
         //
         self.cbtnEditOrder = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -36,9 +36,9 @@
 
         [[self contentView] addSubview:self.cbtnEditOrder];
         //
-        self.cbtnReScan = [UIButton buttonWithType:UIButtonTypeCustom];
-        [self.cbtnReScan setImage:[UIImage imageNamed:@"folder_refresh"] forState:UIControlStateNormal];
-        [self.cbtnReScan setImage:[UIImage imageNamed:@"folder_refresh_h"] forState:UIControlStateHighlighted];
+//        self.cbtnReScan = [UIButton buttonWithType:UIButtonTypeCustom];
+//        [self.cbtnReScan setImage:[UIImage imageNamed:@"folder_refresh"] forState:UIControlStateNormal];
+//        [self.cbtnReScan setImage:[UIImage imageNamed:@"folder_refresh_h"] forState:UIControlStateHighlighted];
 
         [[self contentView] addSubview:self.cbtnReScan];
     }

@@ -21,6 +21,7 @@
 #import "DLFolderViewViewCtrl.h"
 #import "DLLoginViewCtrl.h"
 #import "DLViewCtrlPersonalCenter.h"
+#import "DLViewCtrlRegister.h"
 
 
 @implementation DLAppDelegate
@@ -29,6 +30,13 @@
 {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     self.window.backgroundColor = [UIColor whiteColor];
+    DLViewCtrlRegister* ccViewCtrlRegister = [[DLViewCtrlRegister alloc] init];
+
+    DLNavigationCtrl* ccNaviCtrl = [[DLNavigationCtrl alloc] init];
+    [ccNaviCtrl pushViewController:ccViewCtrlRegister animated:YES];
+    
+    [self.window setRootViewController:ccNaviCtrl];
+    /*
     
     _ccMpViewCtrl = [[DLMPViewCtrl alloc] init];
     
@@ -68,7 +76,7 @@
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(actionNotiMsgReceive:) name:k_noti_chat_msg_decrease object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(actionNotiMsgReceive:) name:k_noti_chat_msg_increase object:nil];
-    
+    */
     [self.window makeKeyAndVisible];
 
     //[self testFilterNumber];

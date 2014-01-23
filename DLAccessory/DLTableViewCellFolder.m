@@ -60,8 +60,9 @@
     [super layoutSubviews];
     CGFloat fW = CGRectGetWidth(self.contentView.frame);
     CGFloat fH = CGRectGetHeight(self.contentView.frame);
+    NSInteger iLevel = [_ccFileItem.level integerValue];
     
-    self.cimageView.frame = CGRectMake(4.0f, (fH  - 32.0f) * 0.5f, 32.0f, 32.0f);
+    self.cimageView.frame = CGRectMake(4.0f + iLevel * 32.0f, (fH  - 32.0f) * 0.5f, 32.0f, 32.0f);
     self.clableFileName.frame = CGRectMake(CGRectGetMaxX(self.cimageView.frame) + 4.0f, (fH - 20.0f) * 0.5f, fW - CGRectGetMaxX(self.cimageView.frame) - 100.0f, 20.0f);
     UIImage* cimageNormal = [self.cbtnSaveToPhone imageForState:UIControlStateNormal];
     self.cbtnSaveToPhone.frame = CGRectMake(CGRectGetMaxX(self.clableFileName.frame) + 18.0f, (fH - cimageNormal.size.height) * 0.5f, cimageNormal.size.width, cimageNormal.size.height);
@@ -94,6 +95,8 @@
         [self.idProtoFolderCell didSave2PhoneSelected:self];
     }
     
+}
+-(void)setModelCell {
 }
 
 

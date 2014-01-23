@@ -176,7 +176,7 @@
     
     if (!_c_audio_recorder) {
         NSError* cerror = nil;
-        _c_str_audio_recording_path = [NSHomeDirectory() stringByAppendingFormat:@"/Documents/%@", k_default_recording_path];
+        _c_str_audio_recording_path = [NSHomeDirectory() stringByAppendingFormat:@"/tmp/%@", k_default_recording_path];
         _c_audio_recorder = [[AVAudioRecorder alloc] initWithURL:[NSURL fileURLWithPath:_c_str_audio_recording_path]
                                                         settings:@{
                                                                   AVFormatIDKey: @(kAudioFormatMPEG4AAC),
@@ -712,7 +712,7 @@
              NSString* cstrFileName = nil;
             NSTimeInterval iInterval = [[NSDate date] timeIntervalSince1970];
             cstrFileName = [NSString stringWithFormat:@"%f.mov", iInterval];
-            NSString* cstrMediaURl = [NSHomeDirectory() stringByAppendingFormat:@"/Documents/%@", cstrFileName];
+            NSString* cstrMediaURl = [NSHomeDirectory() stringByAppendingFormat:@"/tmp/%@", cstrFileName];
             NSError* cError = nil;
             [[NSFileManager defaultManager] copyItemAtURL:curlMovie toURL:[NSURL fileURLWithPath:cstrMediaURl] error:&cError];
             if (!cError) {
