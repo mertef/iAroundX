@@ -15,5 +15,6 @@
 @property(strong, nonatomic) UISwitch* cswitchSexuality;
 @property(strong, nonatomic) UIPickerView* cpickerViewAge;
 @property(strong, nonatomic) UILabel* clableSex;
+@property(strong, nonatomic) UIButton* cbtnCommit;
 -(void)actionChange:(id)aidSender;
 @end

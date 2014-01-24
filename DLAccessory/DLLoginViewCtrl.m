@@ -10,6 +10,7 @@
 #import "DLLoginTableCell.h"
 #import "DLMCConfig.h"
 #import "DLViewLoginFooter.h"
+#import "DLViewCtrlRegister.h"
 
 @interface DLLoginViewCtrl ()
 -(void)dismissKeyBoard;
@@ -59,6 +60,8 @@
     [self.ccViewLoginFooter.cbtnRegister addTarget:self action:@selector(actionRegister:) forControlEvents:UIControlEventTouchUpInside];
 
     [self.cTableview setTableFooterView:self.ccViewLoginFooter];
+    UITapGestureRecognizer* cTapGes =[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(actionDismissKeyboard:)];
+    [self.view addGestureRecognizer:cTapGes];
     
 //    self.cTableview.tableHeaderView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.cTableview.bounds), 44.0f)];
 //    self.cTableview.tableHeaderView.backgroundColor = [UIColor clearColor];
@@ -118,11 +121,25 @@
     NSString* cstrNameValue = [[self.cmutarrModel firstObject] objectForKey:k_login_value];
     NSString* cstrPwdValue = [[self.cmutarrModel lastObject] objectForKey:k_login_value];
     NSLog(@"%@:%@", cstrNameValue, cstrPwdValue);
+    
+    [[NSNotificationCenter defaultCenter]  postNotificationName:k_noti_login_success object:nil];
+
 }
 -(void)actionRegister:(id)aiSender {
-    NSString* cstrNameValue = [[self.cmutarrModel firstObject] objectForKey:k_login_value];
-    NSString* cstrPwdValue = [[self.cmutarrModel lastObject] objectForKey:k_login_value];
-    NSLog(@"%@:%@", cstrNameValue, cstrPwdValue);
+//    NSString* cstrNameValue = [[self.cmutarrModel firstObject] objectForKey:k_login_value];
+//    NSString* cstrPwdValue = [[self.cmutarrModel lastObject] objectForKey:k_login_value];
+//    NSLog(@"%@:%@", cstrNameValue, cstrPwdValue);
+    DLViewCtrlRegister* ccViewCtrl = [[DLViewCtrlRegister alloc] init];
+    [self.navigationController pushViewController:ccViewCtrl animated:YES];
+    
 }
-
+-(void)actionDismissKeyboard:(UITapGestureRecognizer*)acGesRecognizer {
+    NSArray* carrCells = [self.cTableview visibleCells];
+    for (DLLoginTableCell* ccLoginCell in carrCells) {
+        if ([ccLoginCell.ctextfieldInput isFirstResponder]) {
+            [ccLoginCell.ctextfieldInput resignFirstResponder];
+            break;
+        }
+    }
+}
 @end

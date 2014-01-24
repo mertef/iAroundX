@@ -40,7 +40,7 @@
 -(void)deleteSelectedItem ;
 -(void)saveSelectedItmIntoPhone;
 -(void)initPersistentStore;
--(void)fetchDataFromOffset:(NSUInteger)auiFrom withLimit:(NSUInteger)auiLimit;
+-(void)fetchDataFromOffset:(NSUInteger)auiFrom withLimit:(NSUInteger)auiLimit andParentId:(NSUInteger)auiParentId;
 -(void)syncFolder;
 -(void)scanningFolder;
 -(void)actionScan;
@@ -72,7 +72,7 @@
     if (!self.ccPage.uiCount) {
         NSFetchRequest* cfetchRequstCount = [[NSFetchRequest alloc] initWithEntityName:k_table_file_item];
         self.ccPage.uiCount = [self.cManagedObjectCtx countForFetchRequest:cfetchRequstCount error:&cErrorFetch];
-        NSLog(@"fetched object count %lu", self.ccPage.uiCount);
+        NSLog(@"fetched object count %lu", (unsigned long)self.ccPage.uiCount);
     }
     NSFetchRequest* cfetchRequst = [[NSFetchRequest alloc] initWithEntityName:k_table_file_item];
     NSSortDescriptor *cSortDesc0 = [[NSSortDescriptor alloc]
@@ -83,7 +83,7 @@
     NSPredicate* cpredicate = [NSPredicate predicateWithFormat:@"(%K != %@)", @"content",k_ds_store];
 
     [cfetchRequst setPredicate:cpredicate];
-    [cfetchRequst setSortDescriptors:@[cSortDesc0]];
+    [cfetchRequst setSortDescriptors:@[cSortDesc0, cSortDesc]];
     
     [cfetchRequst setFetchOffset:self.ccPage.uiOffset];
     [cfetchRequst setFetchLimit:self.ccPage.uiLimit];
@@ -303,9 +303,12 @@
     FileItem* ccFileItem =[m_c_mut_arr_data objectAtIndex:[indexPath row]];
     NSString* cstrIdCell  = ccFileItem.cell_id;
     DLTableViewCellFolder *cell = [tableView dequeueReusableCellWithIdentifier:cstrIdCell forIndexPath:indexPath];
-    
+    if (!cell) {
+        cell = (DLTableViewCellFolder*)[[NSClassFromString(cstrIdCell) alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cstrIdCell];
+    }
     if ([[cell gestureRecognizers] count] == 0) {
-        UIPanGestureRecognizer* cPanGes = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(actionBeginEdit:)];
+        TUTreeViewCtrl* ccTreeViewCtrl = (TUTreeViewCtrl*)self;
+        UIPanGestureRecognizer* cPanGes = [[UIPanGestureRecognizer alloc] initWithTarget:ccTreeViewCtrl action:@selector(actionBeginEdit:)];
         [cell addGestureRecognizer:cPanGes];
         cell.idProtoFolderCell = self;
         cPanGes.enabled = NO;
@@ -328,7 +331,7 @@
     [self.cTableView registerClass:[DLTableviewCellFolderPicture class] forCellReuseIdentifier:@"DLTableviewCellFolderPicture"];
     [self.cTableView registerClass:[DLTableviewCellFolderMovie class] forCellReuseIdentifier:@"DLTableviewCellFolderMovie"];
 
-    [self.cTableView registerClass:[DLTableViewCellFolder class] forCellReuseIdentifier:@"DLTableviewCellFolder"];
+    [self.cTableView registerClass:[DLTableViewCellFolder class] forCellReuseIdentifier:@"DLTableViewCellFolder"];
     [self.cTableView registerClass:[DLTableViewCellFolderDirectory class] forCellReuseIdentifier:@"DLTableViewCellFolderDirectory"];
     
     

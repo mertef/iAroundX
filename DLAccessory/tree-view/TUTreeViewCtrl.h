@@ -18,5 +18,6 @@
 -(void)registerTableviewCells;
 -(void)exchanged:(NSUInteger)auiFrom with:(NSUInteger)auiTo;
 -(void)addUIPage;
+-(void)actionBeginEdit:(UIPanGestureRecognizer*)acSwipeGes;
 
 @end

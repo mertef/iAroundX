@@ -17,7 +17,7 @@
     if (self) {
         // Initialization code
         self.cbtnRegister = [UIButton buttonWithType:UIButtonTypeCustom];
-        self.cbtnRegister.layer.borderColor = k_color_gray0.CGColor;
+        self.cbtnRegister.layer.borderColor = [k_colore_gradient_green CGColor];
 
         [self.cbtnRegister setTitleColor:k_color_gray1 forState:UIControlStateNormal];
         [self.cbtnRegister setTitleColor:k_color_green forState:UIControlStateHighlighted];

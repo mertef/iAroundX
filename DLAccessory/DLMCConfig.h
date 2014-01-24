@@ -105,6 +105,13 @@
 #define k_table_file_item @"FileItem"
 #define k_ds_store @".DS_Store"
 #define db_name @"file_node.sqlite"
+
+#define k_user_login @"user_login"
+#define k_user_register @"user_register"
+#define k_noti_register_success @"register_success"
+#define k_noti_login_success @"login_success"
+
+
 typedef NS_ENUM(int32_t, T_PACKAGE_TYPE) {
     enum_package_type_short_msg = 0x300,
     enum_package_type_image,

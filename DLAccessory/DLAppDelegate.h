@@ -20,5 +20,9 @@
 @property(strong, nonatomic) DLConversationListTableViewCtrl* ccTableViewCtrlConverstaion;
 
 -(void)actionNotiMsgReceive:(NSNotification*)acNoti;
+-(void)showLoginUI;
+-(void)showMainUI;
+-(void)actionNotiLogin:(NSNotification*)acNoti;
+-(void)actionNotiRegister:(NSNotification*)acNoti;
 
 @end

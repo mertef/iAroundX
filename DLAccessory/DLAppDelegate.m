@@ -30,14 +30,41 @@
 {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     self.window.backgroundColor = [UIColor whiteColor];
-    DLViewCtrlRegister* ccViewCtrlRegister = [[DLViewCtrlRegister alloc] init];
+    
+    NSNumber* cnumberRegister = [[NSUserDefaults standardUserDefaults] objectForKey:k_user_register];
+    [[NSNotificationCenter defaultCenter]  addObserver:self selector:@selector(actionNotiRegister:) name:k_noti_register_success object:nil];
+    [[NSNotificationCenter defaultCenter]  addObserver:self selector:@selector(actionNotiLogin:) name:k_noti_login_success object:nil];
 
+    if (cnumberRegister) {
+        [self showMainUI];
+    }else {
+        [self showRegisterUI];
+    }
+  
+    [self.window makeKeyAndVisible];
+    return YES;
+}
+
+-(void)showLoginUI {
+    
+    DLLoginViewCtrl* ccViewCtrlLogin = [[DLLoginViewCtrl alloc] init];
+    
+    DLNavigationCtrl* ccNaviCtrl = [[DLNavigationCtrl alloc] init];
+    [ccNaviCtrl pushViewController:ccViewCtrlLogin animated:YES];
+    
+    [self.window setRootViewController:ccNaviCtrl];
+    
+}
+-(void)showRegisterUI {
+    DLViewCtrlRegister* ccViewCtrlRegister = [[DLViewCtrlRegister alloc] init];
+    
     DLNavigationCtrl* ccNaviCtrl = [[DLNavigationCtrl alloc] init];
     [ccNaviCtrl pushViewController:ccViewCtrlRegister animated:YES];
     
     [self.window setRootViewController:ccNaviCtrl];
-    /*
-    
+}
+
+-(void)showMainUI {
     _ccMpViewCtrl = [[DLMPViewCtrl alloc] init];
     
     UITabBarItem* cTabbarItemMp = [[UITabBarItem alloc] initWithTitle:NSLocalizedString(@"k_my_friend", nil) image:[[UIImage imageNamed:@"connections-h"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] selectedImage:[[UIImage imageNamed:@"connections"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]];
@@ -45,7 +72,7 @@
     
     UINavigationController* cCenterNavCt = [[DLNavigationCtrl alloc] init];
     [cCenterNavCt pushViewController:_ccMpViewCtrl animated:YES];
-
+    
     self.ccTableViewCtrlConverstaion = [[DLConversationListTableViewCtrl alloc] init];
     UINavigationController* ccConversationNavCtrl = [[DLNavigationCtrl alloc] init];
     [ccConversationNavCtrl pushViewController:_ccTableViewCtrlConverstaion animated:YES];
@@ -56,31 +83,37 @@
     
     DLFolderViewViewCtrl* ccFolderViewCtrl = [[DLFolderViewViewCtrl alloc] init];
     UINavigationController* ccNavCtrlFolder = [[DLNavigationCtrl alloc] init];
-     UITabBarItem* cTabbarItemFolder = [[UITabBarItem alloc] initWithTitle:NSLocalizedString(@"k_folder", nil) image:[[UIImage imageNamed:@"tabbar_bottom_folder_n"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] selectedImage:[[UIImage imageNamed:@"tabbar_bottom_folder_h"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]];
+    UITabBarItem* cTabbarItemFolder = [[UITabBarItem alloc] initWithTitle:NSLocalizedString(@"k_folder", nil) image:[[UIImage imageNamed:@"tabbar_bottom_folder_n"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] selectedImage:[[UIImage imageNamed:@"tabbar_bottom_folder_h"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]];
     ccNavCtrlFolder.tabBarItem = cTabbarItemFolder;
     [ccNavCtrlFolder pushViewController:ccFolderViewCtrl animated:NO];
-
-
-    DLViewCtrlPersonalCenter* ccSettingCtrl = [[DLViewCtrlPersonalCenter alloc] init];
+    
+    
+    NSNumber* cnumberLogin = [[NSUserDefaults standardUserDefaults] objectForKey:k_user_login];
     UINavigationController* ccNaviCtrlSetting = [[DLNavigationCtrl alloc] init];
-     UITabBarItem* cTabbarItemSetting = [[UITabBarItem alloc] initWithTitle:NSLocalizedString(@"k_setting", nil) image:[[UIImage imageNamed:@"tabbar_setting_n"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] selectedImage:[[UIImage imageNamed:@"tabbar_setting_h"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]];
-    ccSettingCtrl.tabBarItem = cTabbarItemSetting;
-    [ccNaviCtrlSetting pushViewController:ccSettingCtrl animated:NO];
+    if (cnumberLogin) {
+        DLViewCtrlPersonalCenter* ccSettingCtrl = [[DLViewCtrlPersonalCenter alloc] init];
+        UITabBarItem* cTabbarItemSetting = [[UITabBarItem alloc] initWithTitle:NSLocalizedString(@"k_setting", nil) image:[[UIImage imageNamed:@"tabbar_setting_n"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] selectedImage:[[UIImage imageNamed:@"tabbar_setting_h"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]];
+        ccSettingCtrl.tabBarItem = cTabbarItemSetting;
+        [ccNaviCtrlSetting pushViewController:ccSettingCtrl animated:NO];
+    }else {
+        DLLoginViewCtrl* ccLoginViewCtrl = [[DLLoginViewCtrl alloc] init];
+        UITabBarItem* cTabbarItemSetting = [[UITabBarItem alloc] initWithTitle:NSLocalizedString(@"k_setting", nil) image:[[UIImage imageNamed:@"tabbar_setting_n"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] selectedImage:[[UIImage imageNamed:@"tabbar_setting_h"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]];
+        ccLoginViewCtrl.tabBarItem = cTabbarItemSetting;
+        
+        [ccNaviCtrlSetting pushViewController:ccLoginViewCtrl animated:NO];
 
+    }
+    
+    
     
     UITabBarController* cTabbarViewCtrl = [[DLTabbarViewCtr alloc] init];
     cTabbarViewCtrl.viewControllers = @[ccNavCtrlFolder, cCenterNavCt, ccConversationNavCtrl, ccNaviCtrlSetting];
-//    cTabbarViewCtrl.selectedViewController = cCenterNavCt;
+    //    cTabbarViewCtrl.selectedViewController = cCenterNavCt;
     self.window.rootViewController = cTabbarViewCtrl;
     
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(actionNotiMsgReceive:) name:k_noti_chat_msg_decrease object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(actionNotiMsgReceive:) name:k_noti_chat_msg_increase object:nil];
-    */
-    [self.window makeKeyAndVisible];
-
-    //[self testFilterNumber];
-    return YES;
 }
 -(void)actionNotiMsgReceive:(NSNotification*)acNoti {
     
@@ -231,6 +264,25 @@ typedef struct{
     }
    
     
+}
+#pragma mark user infomation
+-(void)actionNotiLogin:(NSNotification*)acNoti {
+    
+    if ([self.window.rootViewController isKindOfClass:[UITabBarController class]]) {
+        UITabBarController* cTabbarCtrl = (UITabBarController*)[self.window rootViewController];
+        UINavigationController* cNaviCtrl = [[cTabbarCtrl viewControllers] lastObject];
+        UIViewController* cviewCtrlBottom = [cNaviCtrl.viewControllers firstObject];
+        if (![cviewCtrlBottom isKindOfClass:[DLViewCtrlPersonalCenter class]]) {
+            DLViewCtrlPersonalCenter* ccSettingCtrl = [[DLViewCtrlPersonalCenter alloc] init];
+            UITabBarItem* cTabbarItemSetting = [[UITabBarItem alloc] initWithTitle:NSLocalizedString(@"k_setting", nil) image:[[UIImage imageNamed:@"tabbar_setting_n"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] selectedImage:[[UIImage imageNamed:@"tabbar_setting_h"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]];
+            ccSettingCtrl.tabBarItem = cTabbarItemSetting;
+            cNaviCtrl.viewControllers = @[ccSettingCtrl];
+        }
+    }
+}
+-(void)actionNotiRegister:(NSNotification*)acNoti {
+    self.window.rootViewController = nil;
+    [self showMainUI];
 }
 
 

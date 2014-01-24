@@ -126,3 +126,19 @@
 
 "k_reg_sex_man" = "男";
 "k_reg_sex_woman" = "女";
+"k_done" = "完成";
+"k_commit" = "提交";
+
+"k_reg_title" = "注册失败";
+"k_reg_error_name" = "笔名不能没有";
+"k_reg_error_age" = "您的年龄不能没有";
+"k_reg_error_email" = "邮件地址不能没有";
+"k_reg_error_signature" = "个性签名不能没有";
+"k_reg_error_sig_must_10_word" = "签名10个字以上!";
+"k_reg_error_name_must_4_word" = "笔名4个字以上!";
+"k_reg_error_avator_required"= "头像是需要的!";
+
+"k_select_avatar" = "选择头像";
+
+"k_register_title" = "注册";
+

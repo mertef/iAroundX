@@ -124,4 +124,17 @@
 "k_reg_sig" = "Signature:";
 "k_reg_sex_man" = "Male";
 "k_reg_sex_woman" = "Female";
+"k_done" = "Done";
+"k_commit" = "Commit";
 
+"k_reg_title" = "Register Error";
+"k_reg_error_name" = "Name required";
+"k_reg_error_age" = "Age required";
+"k_reg_error_email" = "Email required";
+"k_reg_error_signature" = "Signature required";
+"k_reg_error_sig_must_10_word" = "Signature must over 10 words!";
+"k_reg_error_name_must_4_word" = "Name must be over 4 words!";
+"k_reg_error_avator_required"= "Avatar requried!";
+
+"k_select_avatar" = "Select Avatar";
+"k_register_title" = "Register";
