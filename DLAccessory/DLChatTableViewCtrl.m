@@ -18,6 +18,7 @@
 #import <MapKit/MapKit.h>
 #import "DLMapViewCtrl.h"
 #import "DLZoomableImageView.h"
+#import "FileItem.h"
 
 @interface DLChatTableViewCtrl ()
 -(void)initAvAudioRecroder;
@@ -215,7 +216,7 @@
     _ctableViewChat = [[UITableView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.view.bounds),CGRectGetHeight(self.view.bounds) - k_height_input)];
     _ctableViewChat.delegate =self;
     _ctableViewChat.dataSource = self;
-    _ctableViewChat.backgroundColor = [UIColor colorWithRed:0.9098 green:0.9098 blue:0.9098 alpha:1.0f];
+    _ctableViewChat.backgroundColor =  [UIColor colorWithRed:0.9098 green:0.9098 blue:0.9098 alpha:1.0f];
     _ctableViewChat.separatorStyle = UITableViewCellSeparatorStyleNone;
 
     UITapGestureRecognizer* ctapGes = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyBoard:)];
@@ -226,6 +227,7 @@
     
     self.ccViewChatInput = [[DLViewChatInput alloc] initWithFrame:CGRectMake(0.0f,  CGRectGetHeight(self.view.bounds) - k_height_input, CGRectGetWidth(self.view.bounds),k_height_input)];
     _ccViewChatInput.idProtoViewChat = self;
+    _ccViewChatInput.backgroundColor = [UIColor clearColor];
 //    [_ccViewChatInput.ctextViewInput addObserver:self forKeyPath:@"sRectBoundContent" options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:nil];
     [self.view addSubview:_ccViewChatInput];
     
@@ -640,7 +642,12 @@
 
 }
 -(void)actionSelectFolder:(id)aidSender {
-    
+    DLFolderViewViewCtrl* ccFolderViewCtrl = [[DLFolderViewViewCtrl alloc] init];
+    [ccFolderViewCtrl setModal];
+    ccFolderViewCtrl.idTreeModel = self;
+    [self presentViewController:ccFolderViewCtrl animated:YES completion:^(void){
+        
+    }];
 }
 -(void)actionSelectLocation:(id)aidSender {
     if (![CLLocationManager locationServicesEnabled]) {
@@ -688,11 +695,11 @@
                 UIImage* cimageOriginal = [info objectForKey:UIImagePickerControllerOriginalImage];
                 cdataPicture = UIImageJPEGRepresentation(cimageOriginal, 0.5f);
             }
-            NSURL* curlImage = [info objectForKey:UIImagePickerControllerMediaURL];
+//            NSURL* curlImage = [info objectForKey:UIImagePickerControllerMediaURL];
             
 
-            /*
-             NSString* cstrFileName = nil;
+            
+            NSString* cstrFileName = nil;
             NSTimeInterval iInterval = [[NSDate date] timeIntervalSince1970];
             cstrFileName = [NSString stringWithFormat:@"%f.jpg", iInterval];
             
@@ -700,9 +707,9 @@
             [cdataPicture writeToURL:[NSURL fileURLWithPath:cstrMediaURl] atomically:YES];
 
 //            [self sendMedia:[NSURL fileURLWithPath:cstrMediaURl] toPeer:self.cdicPeerInfoTo[k_peer_id] withType:enum_package_type_image];
-             */
+            
 
-            [self sendData:cdataPicture toPeer:self.cdicPeerInfoTo[k_peer_id] withType:enum_package_type_image mediaPath:[curlImage path]];
+            [self sendData:cdataPicture toPeer:self.cdicPeerInfoTo[k_peer_id] withType:enum_package_type_image mediaPath:cstrMediaURl];
             
             NSLog(@"picture");
         }else if ([[info objectForKey:UIImagePickerControllerMediaType] isEqualToString:(__bridge NSString*)kUTTypeMovie]) {
@@ -850,6 +857,8 @@
         tPackageHeader._u_l_package_size = uiLength;
         tPackageHeader._u_l_package_type = atPackageType;
         tPackageHeader._u_l_msg_id = uiSessionId;
+        tPackageHeader._i8_msg_finished = -1;
+
         NSData* cdataHeader = [NSData dataWithBytes:&tPackageHeader length:sizeof(tPackageHeader)];
 
         [cmutdata appendData:cdataHeader];
@@ -873,6 +882,7 @@
         tPackageHeader._u_l_package_size = uiLength;
         tPackageHeader._u_l_package_type = atPackageType;
         tPackageHeader._u_l_msg_id = uiSessionId;
+        tPackageHeader._i8_msg_finished = 1;
 
         NSData* cdataHeader = [NSData dataWithBytes:&tPackageHeader length:sizeof(tPackageHeader)];
         [cmutdata appendData:cdataHeader];
@@ -894,15 +904,23 @@
     switch (atPackageType) {
         case enum_package_type_image:
             self.ctProgressView.labelText = NSLocalizedString(@"k_sending_image_end", nil);
-            cmutdicItem = [[NSMutableDictionary alloc] initWithObjectsAndKeys:self.cdicPeerInfoTo[k_peer_id], k_chat_to, self.cdicPeerInfoFrom[k_peer_id], k_chat_from, aData, k_chat_msg, [NSNumber numberWithDouble:[cdateNow timeIntervalSince1970]], k_chat_date, @(enum_package_type_image), k_chat_msg_type, aqcstrMediaPath, k_chat_msg_media_url, [NSNumber numberWithInt:uiSessionId],k_chat_msg_id,nil];
+            cmutdicItem = [[NSMutableDictionary alloc] initWithObjectsAndKeys:self.cdicPeerInfoTo[k_peer_id], k_chat_to, self.cdicPeerInfoFrom[k_peer_id], k_chat_from, aData, k_chat_msg, [NSNumber numberWithDouble:[cdateNow timeIntervalSince1970]], k_chat_date, @(enum_package_type_image), k_chat_msg_type, aqcstrMediaPath, k_chat_msg_media_url, [NSNumber numberWithInt:uiSessionId],k_chat_msg_id, [NSNumber numberWithInt:1],k_chat_msg_finished, nil];
             break;
         case enum_package_type_video:
             self.ctProgressView.labelText = NSLocalizedString(@"k_sending_video_end", nil);
-            cmutdicItem = [[NSMutableDictionary alloc] initWithObjectsAndKeys:self.cdicPeerInfoTo[k_peer_id], k_chat_to, self.cdicPeerInfoFrom[k_peer_id], k_chat_from, aData, k_chat_msg, [NSNumber numberWithDouble:[cdateNow timeIntervalSince1970]], k_chat_date, @(enum_package_type_video), k_chat_msg_type, aqcstrMediaPath, k_chat_msg_media_url,[NSNumber numberWithInt:uiSessionId],k_chat_msg_id,nil];
+            cmutdicItem = [[NSMutableDictionary alloc] initWithObjectsAndKeys:self.cdicPeerInfoTo[k_peer_id], k_chat_to, self.cdicPeerInfoFrom[k_peer_id], k_chat_from, aData, k_chat_msg, [NSNumber numberWithDouble:[cdateNow timeIntervalSince1970]], k_chat_date, @(enum_package_type_video), k_chat_msg_type, aqcstrMediaPath, k_chat_msg_media_url,[NSNumber numberWithInt:uiSessionId],k_chat_msg_id, [NSNumber numberWithInt:1],k_chat_msg_finished, nil];
+            break;
+        case enum_package_type_music:
+            self.ctProgressView.labelText = NSLocalizedString(@"k_sending_music_end", nil);
+            cmutdicItem = [[NSMutableDictionary alloc] initWithObjectsAndKeys:self.cdicPeerInfoTo[k_peer_id], k_chat_to, self.cdicPeerInfoFrom[k_peer_id], k_chat_from, aData, k_chat_msg, [NSNumber numberWithDouble:[cdateNow timeIntervalSince1970]], k_chat_date, @(enum_package_type_music), k_chat_msg_type, aqcstrMediaPath, k_chat_msg_media_url,[NSNumber numberWithInt:uiSessionId],k_chat_msg_id,[NSNumber numberWithInt:1],k_chat_msg_finished,nil];
+            break;
+        case enum_package_type_audio:
+            self.ctProgressView.labelText = NSLocalizedString(@"k_sending_video_end", nil);
+            cmutdicItem = [[NSMutableDictionary alloc] initWithObjectsAndKeys:self.cdicPeerInfoTo[k_peer_id], k_chat_to, self.cdicPeerInfoFrom[k_peer_id], k_chat_from, aData, k_chat_msg, [NSNumber numberWithDouble:[cdateNow timeIntervalSince1970]], k_chat_date, @(enum_package_type_audio), k_chat_msg_type, aqcstrMediaPath, k_chat_msg_media_url,[NSNumber numberWithInt:uiSessionId],k_chat_msg_id,[NSNumber numberWithInt:1],k_chat_msg_finished,nil];
             break;
         case enum_package_type_location:
             self.ctProgressView.labelText = NSLocalizedString(@"k_sending_video_end", nil);
-            cmutdicItem = [[NSMutableDictionary alloc] initWithObjectsAndKeys:self.cdicPeerInfoTo[k_peer_id], k_chat_to, self.cdicPeerInfoFrom[k_peer_id], k_chat_from, aData, k_chat_msg, [NSNumber numberWithDouble:[cdateNow timeIntervalSince1970]], k_chat_date, @(enum_package_type_location), k_chat_msg_type, aqcstrMediaPath, k_chat_msg_media_url,[NSNumber numberWithInt:uiSessionId],k_chat_msg_id,nil];
+            cmutdicItem = [[NSMutableDictionary alloc] initWithObjectsAndKeys:self.cdicPeerInfoTo[k_peer_id], k_chat_to, self.cdicPeerInfoFrom[k_peer_id], k_chat_from, aData, k_chat_msg, [NSNumber numberWithDouble:[cdateNow timeIntervalSince1970]], k_chat_date, @(enum_package_type_location), k_chat_msg_type, aqcstrMediaPath, k_chat_msg_media_url,[NSNumber numberWithInt:uiSessionId],k_chat_msg_id,[NSNumber numberWithInt:1],k_chat_msg_finished,nil];
 
             break;
         default:
@@ -910,7 +928,6 @@
     }
 
 
-    
     [self.cmutarrChatList addObject:cmutdicItem];
     dispatch_async(dispatch_get_main_queue(), ^(void){
         [self.ctableViewChat reloadData];
@@ -930,7 +947,6 @@
         return;
     }
     MPMoviePlayerViewController* cMoviePlayerViewCtrl = nil;;
-    NSLog(@"-----%@", acdicInfo[k_chat_msg_media_url]);
     NSURL* curl = [NSURL fileURLWithPath:acdicInfo[k_chat_msg_media_url]];
     
     cMoviePlayerViewCtrl = [[MPMoviePlayerViewController alloc] initWithContentURL:curl];
@@ -990,6 +1006,34 @@
 }
 -(void)locationManager:(CLLocationManager *)manager didFinishDeferredUpdatesWithError:(NSError *)error {
     
+}
+
+
+#pragma mark - folder modal callback 
+-(void)dismissModelWithSelectedItem:(FileItem*)accFileItem {
+    [self dismissViewControllerAnimated:YES completion:^(void){
+        if (![accFileItem isKindOfClass:[FileItem class]]) {
+            return ;
+        }        
+        if ([accFileItem.cell_id isEqualToString:k_cell_id_general]) {
+            UIAlertView* calertMsg = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"k_file_format_error", nil) message:NSLocalizedString(@"k_file_format_not_supported", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"k_cancel", nil) otherButtonTitles:nil, nil];
+            [calertMsg show];
+            return ;
+        }
+        NSString* cstrPath = accFileItem.path;
+        NSData* cdatePackage = [NSData dataWithContentsOfFile:cstrPath];
+        if ([accFileItem.cell_id isEqualToString:k_cell_id_general]) {
+            [self sendData:cdatePackage toPeer:self.cdicPeerInfoTo[k_peer_id] withType:enum_package_type_other mediaPath:cstrPath];
+        }else if([accFileItem.cell_id isEqualToString:k_cell_id_movie]) {
+            [self sendData:cdatePackage toPeer:self.cdicPeerInfoTo[k_peer_id] withType:enum_package_type_video mediaPath:cstrPath];
+        }else if([accFileItem.cell_id isEqualToString:k_cell_id_music]) {
+            [self sendData:cdatePackage toPeer:self.cdicPeerInfoTo[k_peer_id] withType:enum_package_type_music mediaPath:cstrPath];
+
+        }else if([accFileItem.cell_id isEqualToString:k_cell_id_picture]) {
+            [self sendData:cdatePackage toPeer:self.cdicPeerInfoTo[k_peer_id] withType:enum_package_type_image mediaPath:cstrPath];
+
+        }
+    }];
 }
 
 @end

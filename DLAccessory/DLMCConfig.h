@@ -39,6 +39,7 @@
 #define k_chat_msg_length  @"chat_msg_length"
 #define k_chat_msg_size  @"chat_msg_size"
 #define k_chat_msg_current_size  @"chat_msg_current_size"
+#define k_chat_msg_finished @"msg_finished"
 
 
 #define k_chat_msg_media_url  @"chat_msg_media_url"
@@ -46,7 +47,6 @@
 #define k_chat_msg_type @"msg_type"
 #define k_chat_date @"chat_date"
 #define k_chat_from_header_icon @"chat_from_header_icon"
-
 #define k_people_icon_default @"people_icon_default"
 #define k_people_icon_default_right @"people_default_r"
 
@@ -111,6 +111,7 @@
 #define k_noti_register_success @"register_success"
 #define k_noti_login_success @"login_success"
 
+#define k_table_name_msg_item @"MsgItem"
 
 typedef NS_ENUM(int32_t, T_PACKAGE_TYPE) {
     enum_package_type_short_msg = 0x300,
@@ -119,6 +120,7 @@ typedef NS_ENUM(int32_t, T_PACKAGE_TYPE) {
     enum_package_type_video,
     enum_package_type_stream,
     enum_package_type_location,
+    enum_package_type_music,
     enum_package_type_other
 };
 typedef struct {
@@ -127,6 +129,7 @@ typedef struct {
        u_int32_t _u_l_package_length;
        u_int32_t _u_l_current_offset;
        u_int32_t _u_l_msg_id;
+       int8_t    _i8_msg_finished;
 }T_PACKAGE_HEADER;
 
 typedef NS_ENUM(NSUInteger, enum_scroll_view_image_url_type) {

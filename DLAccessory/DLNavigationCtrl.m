@@ -27,9 +27,9 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-//    self.navigationBar.tintColor = [UIColor colorWithRed:137.0f/255.0f green:172.0f/255.0f blue:20.0f/255.0f alpha:1.0f];
+//    self.navigationBar.barTintColor = [UIColor colorWithRed:97.0f/255.0f green:174.0f/255.0f blue:239.0f/255.0f alpha:1.0f];
     [self.navigationBar setBackgroundImage:[UIImage imageNamed:@"chatinput"] forBarMetrics:UIBarMetricsDefault];
-//    self.navigationBar.barTintColor = [UIColor orangeColor];
+//    self.navigationBar.barTintColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"blue0_hl"]];
     self.navigationBar.titleTextAttributes  = @{NSFontAttributeName:[UIFont fontWithName:@"Palatino-Roman" size:18.0], NSTextEffectAttributeName: NSTextEffectLetterpressStyle, NSForegroundColorAttributeName:k_colore_blue};
 
 	// Do any additional setup after loading the view.

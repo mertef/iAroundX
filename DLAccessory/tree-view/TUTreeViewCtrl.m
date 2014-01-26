@@ -36,6 +36,9 @@
     self.automaticallyAdjustsScrollViewInsets = NO;
     
      CGRect srectViewFrame  = self.view.frame;
+    if (!self.navigationController) {
+        srectViewFrame.origin.y = 20.0f;
+    }
      srectViewFrame.size.height -= (CGRectGetHeight(self.navigationController.navigationBar.frame) + CGRectGetHeight(self.tabBarController.tabBar.frame) + 20.0f);
      self.view.frame = srectViewFrame;
 

@@ -138,3 +138,8 @@
 
 "k_select_avatar" = "Select Avatar";
 "k_register_title" = "Register";
+"k_receiving_music_begin" = "Receive music begin";
+"k_receiving_music_end" = "Receive music end";
+"k_file_format_error" = "File Format Error!";
+"k_file_format_not_supported" = "Sorry, this file format current not supported!";
+"k_sending_music_end" = "Sending music end";

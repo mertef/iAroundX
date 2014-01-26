@@ -97,6 +97,7 @@
     
 }
 -(void)setModelCell {
+    self.cbtnSaveToPhone.hidden = YES;
 }
 
 

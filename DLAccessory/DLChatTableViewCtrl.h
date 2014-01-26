@@ -11,11 +11,12 @@
 #import <AVFoundation/AVFoundation.h>
 #import "DLTableCellChat.h"
 #import <CoreLocation/CoreLocation.h>
+#import "DLFolderViewViewCtrl.h"
 
 @class MCSession;
 @class DLViewMore;
 @class MBProgressHUD;
-@interface DLChatTableViewCtrl : UIViewController<UITableViewDelegate, UITableViewDataSource, DLViewChatInputProto, AVAudioRecorderDelegate, UIGestureRecognizerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, DLTableCellChatProto, CLLocationManagerDelegate>{
+@interface DLChatTableViewCtrl : UIViewController<UITableViewDelegate, UITableViewDataSource, DLViewChatInputProto, AVAudioRecorderDelegate, UIGestureRecognizerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, DLTableCellChatProto, CLLocationManagerDelegate, ProtoTreeViewModel>{
     AVAudioRecorder* _c_audio_recorder;
     NSString* _c_str_audio_recording_path;
     

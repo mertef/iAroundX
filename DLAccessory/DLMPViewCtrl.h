@@ -11,10 +11,11 @@
 #import "DLItemTableViewCell.h"
 #import "DLViewChatInput.h"
 
-
+#import <CoreData/CoreData.h>
 
 @class MBProgressHUD;
 @class PulsingHaloLayer;
+
 @interface DLMPViewCtrl : UIViewController<MCSessionDelegate, MCNearbyServiceBrowserDelegate,MCNearbyServiceAdvertiserDelegate, UITableViewDataSource, UITableViewDelegate,DLCellPopoutProto, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIAlertViewDelegate, UIViewControllerTransitioningDelegate>
 @property(nonatomic, strong) MCSession* csession;
 @property(nonatomic, strong) MCPeerID* cpeerId;
@@ -42,7 +43,6 @@
 @property(strong, nonatomic) UIButton* cbtnLogin, * cbtnFolder;
 
 @property(strong, nonatomic) NSMutableDictionary* cmutdicPeerMap;
-
 -(void)actionStartBrowserNearbyUsers:(id)aidSender;
 -(void)actionDismissServiceBrowser:(id)aidsender;
 -(void)actionSwipe:(UISwipeGestureRecognizer*)aswipeGes;

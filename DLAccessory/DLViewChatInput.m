@@ -20,21 +20,21 @@
     self = [super initWithFrame:frame];
     if (self) {
         // Initialization code
-        UIImage* cimageBg = [UIImage imageNamed:@"chatinput"];
+        UIImage* cimageBg = [UIImage imageNamed:@"blue0"];
         cimageBg = [cimageBg resizableImageWithCapInsets:UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 0.0f) resizingMode:UIImageResizingModeStretch];
         _cimageviewBg = [[UIImageView alloc] initWithImage:cimageBg];
         _cimageviewBg.frame = self.bounds;
-        _cimageviewBg.contentMode = UIViewContentModeScaleAspectFill;
-        _cimageviewBg.backgroundColor = [UIColor clearColor];
+        _cimageviewBg.contentMode = UIViewContentModeScaleToFill;
+//        _cimageviewBg.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"blue0"]];
         _cimageviewBg.clipsToBounds = YES;
         [self addSubview:_cimageviewBg];
         
         _ctextViewInput = [[UITextView alloc] init];
-        _ctextViewInput.layer.cornerRadius = 6.0f;
+        _ctextViewInput.layer.cornerRadius = 4.0f;
         
         _ctextViewInput.textContainerInset = UIEdgeInsetsMake(2.0f, 2.0f, 2.0f, 2.0f);
         _ctextViewInput.contentInset = UIEdgeInsetsMake(1.0f, 1.0f, 1.0f, 1.0f);
-        _ctextViewInput.layer.borderColor = [UIColor darkGrayColor].CGColor;
+        _ctextViewInput.layer.borderColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"pink"]].CGColor;
         _ctextViewInput.font = [[UIFont preferredFontForTextStyle:UIFontTextStyleBody] fontWithSize:20.0f];
         _ctextViewInput.layer.borderWidth = 1.0f;
         _ctextViewInput.returnKeyType = UIReturnKeySend;

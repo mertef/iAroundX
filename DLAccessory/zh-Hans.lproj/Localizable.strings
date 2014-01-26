@@ -142,3 +142,9 @@
 
 "k_register_title" = "注册";
 
+"k_receiving_music_begin" = "开始接收音乐文件";
+"k_receiving_music_end" = "接收音乐文件结束";
+
+"k_file_format_error" = "文件格式错误!";
+"k_file_format_not_supported" = "对不起，目前这种格式不支持!";
+"k_sending_music_end" = "音乐文件接收结束";

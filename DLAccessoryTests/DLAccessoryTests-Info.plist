@@ -22,5 +22,9 @@
 	<false/>
 	<key>CFBundleVersion</key>
 	<string>1</string>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
 </dict>
 </plist>

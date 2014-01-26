@@ -27,7 +27,7 @@
 #import "DLZoomableImageView.h"
 #import "CSAnimation.h"
 #import <AssetsLibrary/AssetsLibrary.h>
-
+#import "DLModel.h"
 
 @interface DLFolderViewViewCtrl () {
     dispatch_queue_t _dispatch_queue_scanning;
@@ -39,7 +39,6 @@
 }
 -(void)deleteSelectedItem ;
 -(void)saveSelectedItmIntoPhone;
--(void)initPersistentStore;
 -(void)fetchDataFromOffset:(NSUInteger)auiFrom withLimit:(NSUInteger)auiLimit andParentId:(NSUInteger)auiParentId;
 -(void)syncFolder;
 -(void)scanningFolder;
@@ -165,14 +164,30 @@
     [self.ccTableFooterMore.cbtnMore addTarget:self action:@selector(actionLoadMore:) forControlEvents:UIControlEventTouchUpInside];
     self.cTableView.tableFooterView  = self.ccTableFooterMore;
     
-    CGRect srectFrameHeader = CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.cTableView.frame), 44.0f);
     
-    
+    CGRect srectFrameHeader = CGRectZero;
     self.ccTableHeaderMore = [[DLViewTableHeader alloc] initWithReuseIdentifier:@"id_header_more"];
-    [self.ccTableHeaderMore.cbtnCreateFolder addTarget:self action:@selector(actionCreateFolder:) forControlEvents:UIControlEventTouchUpInside];
-    [self.ccTableHeaderMore.cbtnEditOrder addTarget:self action:@selector(actionReOrderFolder:) forControlEvents:UIControlEventTouchUpInside];
-    [self.ccTableHeaderMore.cbtnReScan addTarget:self action:@selector(actionRescanFolder:) forControlEvents:UIControlEventTouchUpInside];
+    if (_b_is_modal) {
+         srectFrameHeader = CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.cTableView.frame), 80.0f);
+        if ([self.idTreeModel respondsToSelector:@selector(dismissModelWithSelectedItem:)]) {
+            [self.ccTableHeaderMore.cbtnEditOrder addTarget:self.idTreeModel action:@selector(dismissModelWithSelectedItem:) forControlEvents:UIControlEventTouchUpInside];
+        }
+        [self.ccTableHeaderMore.cbtnEditOrder setImage: nil forState:UIControlStateNormal];
+        [self.ccTableHeaderMore.cbtnEditOrder setImage: nil forState:UIControlStateSelected];
+        [self.ccTableHeaderMore.cbtnEditOrder setImage: nil forState:UIControlStateHighlighted];
+        [self.ccTableHeaderMore.cbtnEditOrder setTitle:NSLocalizedString(@"k_cancel", nil) forState:UIControlStateNormal];
+        [self.ccTableHeaderMore.cbtnEditOrder setTitleColor:k_colore_gradient_green forState:UIControlStateHighlighted];
+        [self.ccTableHeaderMore.cbtnEditOrder setTitleColor:k_colore_blue forState:UIControlStateNormal];
 
+        self.ccTableHeaderMore.cbtnCreateFolder.hidden = YES;
+        self.ccTableHeaderMore.cbtnReScan.hidden = YES;
+        self.ccTableHeaderMore.contentView.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"blue0"]];
+    }else {
+         srectFrameHeader = CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.cTableView.frame), 44.0f);
+        [self.ccTableHeaderMore.cbtnCreateFolder addTarget:self action:@selector(actionCreateFolder:) forControlEvents:UIControlEventTouchUpInside];
+        [self.ccTableHeaderMore.cbtnEditOrder addTarget:self action:@selector(actionReOrderFolder:) forControlEvents:UIControlEventTouchUpInside];
+        [self.ccTableHeaderMore.cbtnReScan addTarget:self action:@selector(actionRescanFolder:) forControlEvents:UIControlEventTouchUpInside];
+    }
     self.ccTableHeaderMore.frame = srectFrameHeader;
 
     self.ctProgressHud = [[MBProgressHUD alloc] initWithView:self.view];
@@ -240,8 +255,9 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
     [self addUIPage];
-    [self initPersistentStore];
+    self.cManagedObjectCtx = [DLModel ManagedObjCtx];
 	// Do any additional setup after loading the view.
     self.view.backgroundColor = [UIColor clearColor];
     self.title = NSLocalizedString(@"k_folder_title", nil);
@@ -263,36 +279,14 @@
    
 }
 
--(void)initPersistentStore {
-    NSLog(@"%@ %@", NSHomeDirectory(), [[NSPersistentStoreCoordinator registeredStoreTypes] description]);
-    NSURL* curlModel = [[NSBundle mainBundle] URLForResource:@"Model.momd/init" withExtension:@"mom"];
-    NSManagedObjectModel* cMoM = [[NSManagedObjectModel alloc] initWithContentsOfURL:curlModel];
-    NSPersistentStoreCoordinator* cPersistentStoreCooridinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:cMoM];
-    NSError* cErrorStore = nil;
-    NSString* cstrSqlitePath = [NSHomeDirectory() stringByAppendingFormat:@"/Library/%@", db_name];
-//    NSString* cstrBinaryPath = [NSHomeDirectory() stringByAppendingPathComponent:@"Library/x.binary"];
-
-    [cPersistentStoreCooridinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:[NSURL fileURLWithPath:cstrSqlitePath] options:@{NSSQLitePragmasOption: @{@"journal_mode": @"delete"}}   error:&cErrorStore];
-//    [cPersistentStoreCooridinator addPersistentStoreWithType:NSBinaryStoreType configuration:nil URL:[NSURL fileURLWithPath:cstrBinaryPath] options:nil error:&cErrorStore];
-
-    if (cErrorStore) {
-        NSLog(@"%@", [cErrorStore description]);
-    }
-    NSError* cError = nil;
-    if (!cError) {
-         self.cManagedObjectCtx = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSConfinementConcurrencyType];
-        [self.cManagedObjectCtx setPersistentStoreCoordinator:cPersistentStoreCooridinator];
-      
-    }else {
-        NSLog(@"init persistent store error : %@", [cError description]);
-    }
-}
 
 -(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
+    if (_b_is_modal) {
+        return 80.0f;
+    }
     return 44.0f;
 }
 -(UIView*)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
-    
     return self.ccTableHeaderMore;
 }
 
@@ -318,6 +312,7 @@
     }else {
         [cell selectCell:NO];
     }
+    [cell setModelCell];
     [cell feedInfo:ccFileItem];
     return cell;
 }
@@ -563,11 +558,15 @@
 
 #pragma mark - action option 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    _cc_file_item_selected = [self.cmutarrData objectAtIndex:[indexPath row]];
-    UITableViewCell* cTableviewCell = [tableView cellForRowAtIndexPath:indexPath];
-    DLTableViewCellFolder* ccTableviewCell = (DLTableViewCellFolder*)cTableviewCell;
-    _s_rect_selcted = [self.view convertRect:ccTableviewCell.cimageView.frame fromView:ccTableviewCell.contentView];
-    [self.cactionSheetOption showFromTabBar:self.tabBarController.tabBar];
+    if (_b_is_modal && [self.idTreeModel respondsToSelector:@selector(dismissModelWithSelectedItem:)]) {
+        [self.idTreeModel dismissModelWithSelectedItem:[self.cmutarrData objectAtIndex:[indexPath row]]];
+    }else {
+        _cc_file_item_selected = [self.cmutarrData objectAtIndex:[indexPath row]];
+        UITableViewCell* cTableviewCell = [tableView cellForRowAtIndexPath:indexPath];
+        DLTableViewCellFolder* ccTableviewCell = (DLTableViewCellFolder*)cTableviewCell;
+        _s_rect_selcted = [self.view convertRect:ccTableviewCell.cimageView.frame fromView:ccTableviewCell.contentView];
+        [self.cactionSheetOption showFromTabBar:self.tabBarController.tabBar];
+    }
 }
 -(void)processSelectedTableCellOption {
     NSLog(@"selected file path is %@", _cc_file_item_selected.path);
@@ -619,7 +618,9 @@
 }
 
 -(void)setModal {
+    
     _b_is_modal = YES;
+    
 }
 
 @end

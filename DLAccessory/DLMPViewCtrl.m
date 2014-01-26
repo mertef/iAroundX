@@ -18,7 +18,7 @@
 #import "DLFolderViewViewCtrl.h"
 #import "DLChatTableViewCtrl.h"
 #import "MBProgressHUD.h"
-
+#import "DLModel.h"
 @interface DLMPViewCtrl ()
 
 @end
@@ -73,7 +73,6 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
- 
     [self setNeedsStatusBarAppearanceUpdate];
     
     self.edgesForExtendedLayout = UIRectEdgeAll;
@@ -276,9 +275,11 @@
         
         puPackage->_u_l_package_type == enum_package_type_audio ||
         puPackage->_u_l_package_type == enum_package_type_video ||
-        puPackage->_u_l_package_type == enum_package_type_image) {
+        puPackage->_u_l_package_type == enum_package_type_image ||
+        puPackage->_u_l_package_type == enum_package_type_music
+        ) {
         NSData* cdataMsg = [data subdataWithRange:NSMakeRange(sizeof(T_PACKAGE_HEADER), puPackage->_u_l_package_length)];
-        
+        NSLog(@"finisehd is %d", puPackage->_i8_msg_finished);
         if (!cmutdata) {
             cmutdata = [[NSMutableData alloc] init];
             [cmutdata setLength:0];
@@ -287,7 +288,8 @@
                                            k_chat_to:self.cpeerId,
                                            k_chat_msg_type:@(puPackage->_u_l_package_type),
                                            k_chat_date: @([[NSDate date] timeIntervalSince1970]),
-                                           k_chat_msg_id:@(puPackage->_u_l_msg_id)
+                                           k_chat_msg_id:@(puPackage->_u_l_msg_id),
+                                           k_chat_msg_finished:@(puPackage->_i8_msg_finished)
                                            };
             [[NSNotificationCenter defaultCenter] postNotificationName:k_noti_chat_msg_increase object:nil userInfo:cdicChatItem];
             [[NSNotificationCenter defaultCenter] postNotificationName:k_noti_chat_msg object:nil userInfo:cdicChatItem];
@@ -306,7 +308,9 @@
                                                k_chat_date: @([[NSDate date] timeIntervalSince1970]),
                                                k_chat_msg_id:@(puPackage->_u_l_msg_id),
                                                k_chat_msg_size:@(puPackage->_u_l_package_size),
-                                               k_chat_msg_current_size:@([cmutdata length])
+                                               k_chat_msg_current_size:@([cmutdata length]),
+                                               k_chat_msg_finished:@(puPackage->_i8_msg_finished)
+
                                                };
         [[NSNotificationCenter defaultCenter] postNotificationName:k_noti_chat_msg_receive_progress object:nil userInfo:cdicChatItemProgress];
         
@@ -339,6 +343,12 @@
         CGFloat fSize = (CGFloat)puPackage->_u_l_package_size / (CGFloat)(1024.0  * 1024.0f);
         self.ctProgressHud.labelText = [NSString stringWithFormat:@"%@:%0.2f%%",NSLocalizedString(@"k_receiving_video_begin", nil), fProgress * 100.0f];
         self.ctProgressHud.detailsLabelText = [NSString stringWithFormat:@"%@ %0.2fM", NSLocalizedString(@"k_receiving_file_size", nil), fSize];
+    }else if (puPackage->_u_l_package_type == enum_package_type_music){
+        CGFloat fProgress = [cmutdata length] / (CGFloat)puPackage->_u_l_package_size;
+        self.ctProgressHud.progress = fProgress;
+        CGFloat fSize = (CGFloat)puPackage->_u_l_package_size / (CGFloat)(1024.0  * 1024.0f);
+        self.ctProgressHud.labelText = [NSString stringWithFormat:@"%@:%0.2f%%",NSLocalizedString(@"k_receiving_music_begin", nil), fProgress * 100.0f];
+        self.ctProgressHud.detailsLabelText = [NSString stringWithFormat:@"%@ %0.2fM", NSLocalizedString(@"k_receiving_file_size", nil), fSize];
     }
 
     
@@ -368,6 +378,12 @@
             cstrMediaUrl = [NSHomeDirectory() stringByAppendingFormat:@"/Documents/%ld.aac", lTime];
             [cmutData writeToFile:cstrMediaUrl atomically:NO];
             NSLog(@"----%@", cstrMediaUrl);
+        }else if(puPackage->_u_l_package_type == enum_package_type_music) {
+            
+            NSLog(@"received video music from %@ ", [peerID displayName]);
+            cstrMediaUrl = [NSHomeDirectory() stringByAppendingFormat:@"/Documents/%ld.mp3", lTime];
+            [cmutData writeToFile:cstrMediaUrl atomically:NO];
+            NSLog(@"----%@", cstrMediaUrl);
         }
         
         NSDictionary* cdicChatItem = @{k_chat_from:peerID,
@@ -376,8 +392,10 @@
                                        k_chat_msg_type:@(puPackage->_u_l_package_type),
                                        k_chat_date: @([[NSDate date] timeIntervalSince1970]),
                                        k_chat_msg_media_url:cstrMediaUrl,
-                                       k_chat_msg_id:@(puPackage->_u_l_msg_id)
+                                       k_chat_msg_id:@(puPackage->_u_l_msg_id),
+                                       k_chat_msg_finished:@(puPackage->_i8_msg_finished)
                                        };
+        [DLModel SaveMsgItem:cdicChatItem];
 //        [[NSNotificationCenter defaultCenter] postNotificationName:k_noti_chat_msg_increase object:nil userInfo:cdicChatItem];
         [[NSNotificationCenter defaultCenter] postNotificationName:k_noti_chat_msg object:nil userInfo:cdicChatItem];
 
@@ -392,6 +410,9 @@
                 }else if(puPackage->_u_l_package_type == enum_package_type_image) {
                     self.ctProgressHud.labelText = NSLocalizedString(@"k_receiving_image_end", nil);
 
+                }else if(puPackage->_u_l_package_type == enum_package_type_music) {
+                    self.ctProgressHud.labelText = NSLocalizedString(@"k_receiving_music_end", nil);
+                    
                 }
                 [self.ctProgressHud hide:YES afterDelay:1.0f];
             });
@@ -489,7 +510,9 @@
                                            k_chat_msg:cmutdata,
                                            k_chat_msg_type:@(enum_package_type_video),
                                            k_chat_date: @([[NSDate date] timeIntervalSince1970]),
-                                           k_chat_msg_media_url:cstrMediaUrl
+                                           k_chat_msg_media_url:cstrMediaUrl,
+                                           k_chat_msg_finished:@(1)
+
                                            };
         }else if([resourceName hasSuffix:k_file_type_image]) {
              cdicChatItem = @{
@@ -499,7 +522,9 @@
                                            k_chat_msg:cmutdata,
                                            k_chat_msg_type:@(enum_package_type_image),
                                            k_chat_date: @([[NSDate date] timeIntervalSince1970]),
-                                           k_chat_msg_media_url:cstrMediaUrl
+                                           k_chat_msg_media_url:cstrMediaUrl,
+                                           k_chat_msg_finished:@(1)
+
                                            };
         }else {
             cdicChatItem = @{
@@ -509,9 +534,13 @@
                                            k_chat_msg:cmutdata,
                                            k_chat_msg_type:@(enum_package_type_other),
                                            k_chat_date: @([[NSDate date] timeIntervalSince1970]),
-                                           k_chat_msg_media_url:cstrMediaUrl
+                                           k_chat_msg_media_url:cstrMediaUrl,
+                                           k_chat_msg_finished:@(1)
                                            };
         }
+        
+        [DLModel SaveMsgItem:cdicChatItem];
+
         [[NSNotificationCenter defaultCenter] postNotificationName:k_noti_chat_msg_increase object:nil userInfo:cdicChatItem];
         [[NSNotificationCenter defaultCenter] postNotificationName:k_noti_chat_msg object:nil userInfo:cdicChatItem];
         [self.cmutdicPeerMap removeObjectForKey:[peerID displayName]];

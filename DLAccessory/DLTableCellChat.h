@@ -30,6 +30,8 @@
 @property(strong, nonatomic) UIImageView* cimageViewMsgVideo;
 @property(strong, nonatomic) UIImageView* cimageViewMsgVideoFirstFrame;
 @property(strong, nonatomic) UIImageView* cimageViewMsgLocation;
+@property(strong, nonatomic) UIImageView* cimageViewMsgMusic;
+
 @property(strong, nonatomic) DLProgressView* ccProgressIndicator;
 @property(assign, nonatomic) id<DLTableCellChatProto> idChatProto;
 

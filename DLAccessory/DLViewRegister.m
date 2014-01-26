@@ -79,7 +79,7 @@
         //avatar
         self.cimageViewAvatar = [[UIImageView alloc] init];
         self.cimageViewAvatar.image = [UIImage imageNamed:@"avatar"];
-        self.cimageViewAvatar.backgroundColor = k_colore_gradient_green;
+        self.cimageViewAvatar.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"blue0"]];
         self.cimageViewAvatar.userInteractionEnabled = YES;
         CAShapeLayer* cshapeMask = [CAShapeLayer layer];
         cshapeMask.path =  [UIBezierPath bezierPathWithOvalInRect:CGRectMake(0.0f, 0.0f, 60.0f, 60.0f)].CGPath;
