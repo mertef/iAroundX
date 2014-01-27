@@ -31,16 +31,18 @@
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     self.window.backgroundColor = [UIColor whiteColor];
     
-    NSNumber* cnumberRegister = [[NSUserDefaults standardUserDefaults] objectForKey:k_user_register];
+//    NSNumber* cnumberRegister = [[NSUserDefaults standardUserDefaults] objectForKey:k_user_register];
     [[NSNotificationCenter defaultCenter]  addObserver:self selector:@selector(actionNotiRegister:) name:k_noti_register_success object:nil];
     [[NSNotificationCenter defaultCenter]  addObserver:self selector:@selector(actionNotiLogin:) name:k_noti_login_success object:nil];
+    [self showMainUI];
 
+    /*
     if (cnumberRegister) {
         [self showMainUI];
     }else {
         [self showRegisterUI];
     }
-  
+    */
     [self.window makeKeyAndVisible];
     return YES;
 }

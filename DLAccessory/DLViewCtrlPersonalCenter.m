@@ -183,6 +183,8 @@ typedef NS_ENUM (NSUInteger, T_ENUM_ACTION_SHEET_MODE){
 }
 
 -(void)addUpBehavior {
+    [_c_dy_animator removeAllBehaviors];
+    
     UIGravityBehavior* cGravityBe = [[UIGravityBehavior alloc] initWithItems:@[self.ccViewPcInfo]];
     cGravityBe.gravityDirection = CGVectorMake(0, -1.0f);
     
@@ -205,6 +207,7 @@ typedef NS_ENUM (NSUInteger, T_ENUM_ACTION_SHEET_MODE){
     //    [_c_dy_animator addBehavior:cAttachBe];
 }
 -(void)addDownBehavior {
+    [_c_dy_animator removeAllBehaviors];
     UIGravityBehavior* cGravityBe = [[UIGravityBehavior alloc] initWithItems:@[self.ccViewPcInfo]];
     
     //    UIAttachmentBehavior* cAttachBe = [[UIAttachmentBehavior alloc] initWithItem:self.ccViewPcInfo attachedToAnchor:CGPointMake(CGRectGetWidth(self.view.bounds) * 0.5f, 20.0f)];
