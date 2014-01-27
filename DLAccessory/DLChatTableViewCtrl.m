@@ -89,7 +89,7 @@
     [UIView animateWithDuration:0.5f animations:^(void){
         self.ctableViewChat.frame = CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.view.bounds), CGRectGetHeight(self.view.bounds) - CGRectGetHeight(srectFrameEnd) - CGRectGetHeight(self.ccViewChatInput.frame));
         CGRect srectFrameInput = self.ccViewChatInput.frame;
-        srectFrameInput.origin.y = CGRectGetMinY(srectFrameEnd) - CGRectGetHeight(srectFrameInput);
+        srectFrameInput.origin.y =  CGRectGetMaxY(self.ctableViewChat.frame);//CGRectGetMinY(srectFrameEnd) - CGRectGetHeight(srectFrameInput);
         self.ccViewChatInput.frame = srectFrameInput;
         CGRect srectMore = self.ccViewMore.frame;
         srectMore.origin.y = CGRectGetHeight(self.view.bounds);
@@ -128,6 +128,7 @@
 
 
 -(void)didKeyBoardFrameChange:(NSNotification*)acNotifi {
+
     if (self.ccViewChatInput.ctextViewInput.isFirstResponder) {
         self.bIsInputMode = YES;
         NSDictionary* cdicInfo = acNotifi.userInfo;
@@ -136,7 +137,7 @@
         [UIView animateWithDuration:0.5f animations:^(void){
             self.ctableViewChat.frame = CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.view.bounds), CGRectGetHeight(self.view.bounds) - CGRectGetHeight(srectFrameEnd) - CGRectGetHeight(self.ccViewChatInput.frame));
             CGRect srectFrameInput = self.ccViewChatInput.frame;
-            srectFrameInput.origin.y = CGRectGetMinY(srectFrameEnd) - CGRectGetHeight(srectFrameInput);
+            srectFrameInput.origin.y = CGRectGetMaxY(self.ctableViewChat.frame);
             self.ccViewChatInput.frame = srectFrameInput;
 
         } completion:^(BOOL abFinished){
@@ -145,6 +146,7 @@
     }else {
         self.bIsInputMode = NO;
     }
+
 }
 
 -(void)viewWillDisappear:(BOOL)animated {
@@ -200,8 +202,8 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    [self initAvAudioRecroder];
-
+    [self performSelectorInBackground:@selector(initAvAudioRecroder) withObject:nil];
+    self.edgesForExtendedLayout = UIRectEdgeBottom;
     self.tabBarController.tabBar.hidden = YES;
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didKeyBoardAppear:) name:UIKeyboardWillShowNotification object:nil];
@@ -211,12 +213,24 @@
     
     self.title = NSLocalizedString(@"k_chat_room", nil);
     self.view.backgroundColor = [UIColor whiteColor];
-    self.edgesForExtendedLayout = UIRectEdgeAll;
     self.extendedLayoutIncludesOpaqueBars = NO;
-    _ctableViewChat = [[UITableView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.view.bounds),CGRectGetHeight(self.view.bounds) - k_height_input)];
+    CGRect srectViewFrame = CGRectMake(0.0f,0.0f, CGRectGetWidth(self.view.bounds),CGRectGetHeight(self.view.bounds) - 20.0f);
+    if (!self.navigationController.navigationBarHidden) {
+        srectViewFrame.size.height-= self.navigationController.navigationBar.frame.size.height;
+    }
+    if (!self.tabBarController.tabBar.isHidden) {
+        srectViewFrame.size.height-= self.tabBarController.tabBar.frame.size.height;
+    }
+    NSLog(@"view frame is %@", NSStringFromCGRect(self.view.frame));
+    self.view.frame  = srectViewFrame;
+    NSLog(@"view frame after is %@", NSStringFromCGRect(self.view.frame));
+
+    srectViewFrame.size.height-= k_height_input;
+    _ctableViewChat = [[UITableView alloc] initWithFrame:srectViewFrame];
+//    NSLog(@"view frame is %@", NSStringFromCGRect(_ctableViewChat.frame));
     _ctableViewChat.delegate =self;
     _ctableViewChat.dataSource = self;
-    _ctableViewChat.backgroundColor =  [UIColor colorWithRed:0.9098 green:0.9098 blue:0.9098 alpha:1.0f];
+    _ctableViewChat.backgroundColor = [UIColor colorWithRed:0.9098 green:0.9098 blue:0.9098 alpha:1.0f];
     _ctableViewChat.separatorStyle = UITableViewCellSeparatorStyleNone;
 
     UITapGestureRecognizer* ctapGes = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyBoard:)];
@@ -225,9 +239,9 @@
     
     [self.view addSubview:_ctableViewChat];
     
-    self.ccViewChatInput = [[DLViewChatInput alloc] initWithFrame:CGRectMake(0.0f,  CGRectGetHeight(self.view.bounds) - k_height_input, CGRectGetWidth(self.view.bounds),k_height_input)];
+    self.ccViewChatInput = [[DLViewChatInput alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.ctableViewChat.frame), CGRectGetWidth(self.view.bounds),k_height_input)];
     _ccViewChatInput.idProtoViewChat = self;
-    _ccViewChatInput.backgroundColor = [UIColor clearColor];
+    _ccViewChatInput.backgroundColor = [UIColor whiteColor];
 //    [_ccViewChatInput.ctextViewInput addObserver:self forKeyPath:@"sRectBoundContent" options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:nil];
     [self.view addSubview:_ccViewChatInput];
     
@@ -481,10 +495,13 @@
     
 }
 -(void)scrollChatToBottom {
-    if ([self.ctableViewChat contentSize].height >= CGRectGetHeight(self.ctableViewChat.bounds)  - k_height_keyboard) {
-        NSIndexPath* cIndexPath = [NSIndexPath indexPathForRow: [self.cmutarrChatList count] - 1 inSection: 0];
-        [self.ctableViewChat scrollToRowAtIndexPath: cIndexPath atScrollPosition: UITableViewScrollPositionBottom animated: YES];
-    }        
+    if ([self.cmutarrChatList count] > 0) {
+        if ([self.ctableViewChat contentSize].height >= CGRectGetHeight(self.ctableViewChat.bounds)  - k_height_keyboard) {
+            NSIndexPath* cIndexPath = [NSIndexPath indexPathForRow: [self.cmutarrChatList count] - 1 inSection: 0];
+            [self.ctableViewChat scrollToRowAtIndexPath: cIndexPath atScrollPosition: UITableViewScrollPositionBottom animated: YES];
+        }
+    }
+    
 }
 
 -(void)didStartRecording:(DLViewChatInput*)accViewChatInput {

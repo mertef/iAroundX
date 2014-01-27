@@ -45,6 +45,9 @@
 -(void)actionScan;
 -(void)addUIPage;
 -(void)enableScroll:(BOOL)abFlag;
+- (void) rotateViewAnimated:(UIView*)view
+               withDuration:(CFTimeInterval)duration
+                    byAngle:(CGFloat)angle;
 @end
 
 @implementation DLFolderViewViewCtrl
@@ -126,6 +129,8 @@
     }
 }
 -(void)scanningFolder {
+    
+
     __weak DLFolderViewViewCtrl* wccSelf = self;
     [self.view addSubview:self.ctProgressHud];
     [self.ctProgressHud show:YES];
@@ -147,6 +152,9 @@
             [self.cTableView reloadData];
             self.cTableView.userInteractionEnabled = YES;
             [self.ctProgressHud hide:YES];
+            UIButton* cbtnScan = (UIButton*)self.navigationItem.rightBarButtonItem.customView;
+            cbtnScan.highlighted = NO;
+            [cbtnScan.layer removeAllAnimations];
         });
         
     });
@@ -154,7 +162,12 @@
 
 -(void)addUIPage {
 
-    UIBarButtonItem* cbarbtnItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"folder_refresh"] style:UIBarButtonItemStylePlain target:self action:@selector(actionRescanFolder:)];
+    UIButton* cbtnScan = [UIButton buttonWithType:UIButtonTypeCustom];
+    cbtnScan.frame = CGRectMake(0.0f, 0.0f, 32.0f, 32.0f);
+    [cbtnScan setImage:[UIImage imageNamed:@"folder_refresh"] forState:UIControlStateNormal];
+    [cbtnScan setImage:[UIImage imageNamed:@"folder_refresh_h"] forState:UIControlStateHighlighted];
+    [cbtnScan addTarget:self action:@selector(actionRescanFolder:) forControlEvents:UIControlEventTouchUpInside];
+    UIBarButtonItem* cbarbtnItem = [[UIBarButtonItem alloc] initWithCustomView:cbtnScan];
     self.navigationItem.rightBarButtonItem = cbarbtnItem;
     
     CGRect srectFrame = CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.cTableView.frame), 44.0f);
@@ -232,12 +245,36 @@
         cbtn.selected = NO;
     }
 }
+-(void)animationDidStop:(NSString *)animationID finished:(NSNumber *)finished context:(void *)context {
+    if ([animationID isEqualToString:@"ani_rotate"]) {
+        
+    }
+}
+
+- (void) rotateViewAnimated:(UIView*)view withDuration:(CFTimeInterval)duration byAngle:(CGFloat)angle
+{
+    dispatch_async(dispatch_get_main_queue(), ^(void){
+        CABasicAnimation *rotationAnimation;
+        rotationAnimation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
+        rotationAnimation.fromValue = 0;
+        rotationAnimation.toValue = [NSNumber numberWithFloat:angle];
+        rotationAnimation.duration = duration;
+        rotationAnimation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+        [rotationAnimation setRemovedOnCompletion:NO];
+        [rotationAnimation setFillMode:kCAFillModeForwards];
+        rotationAnimation.repeatCount = MAXFLOAT;
+        [view.layer addAnimation:rotationAnimation forKey:@"rotationAnimation"];
+    });
+    
+}
+
+
 -(void)actionRescanFolder:(id)aidSender {
     _enum_folder_option = enum_folder_cell_option_rescanning;
-   
+    [self rotateViewAnimated:self.navigationItem.rightBarButtonItem.customView withDuration:.5f byAngle:M_PI * 2.0f];
+
     UIAlertView* calertMsg = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"k_rescanning_folder", nil) message:NSLocalizedString(@"k_sure_rescan_folder_msg", nil) delegate:self cancelButtonTitle:NSLocalizedString(@"k_cancel", nil) otherButtonTitles:NSLocalizedString(@"k_ok", nil), nil];
     [calertMsg show];
-  
 
 }
 
@@ -535,6 +572,8 @@
         }
     }
     [alertView dismissWithClickedButtonIndex:0 animated:YES];
+    UIButton* cbtnScan = (UIButton*)self.navigationItem.rightBarButtonItem.customView;
+    [cbtnScan.layer removeAllAnimations];
 
 }
 
@@ -542,6 +581,8 @@
 // If not defined in the delegate, we simulate a click in the cancel button
 - (void)alertViewCancel:(UIAlertView *)alertView {
     [alertView dismissWithClickedButtonIndex:0 animated:YES];
+    UIButton* cbtnScan = (UIButton*)self.navigationItem.rightBarButtonItem.customView;
+    [cbtnScan.layer removeAllAnimations];
 }
 -(void)exchanged:(NSUInteger)auiFrom with:(NSUInteger)auiTo {
     

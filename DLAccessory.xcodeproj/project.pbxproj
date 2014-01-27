@@ -147,6 +147,7 @@
 		0BC90AA7186D7B7A005BA005 /* DLViewMore.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BC90AA6186D7B7A005BA005 /* DLViewMore.m */; };
 		0BC9F7E51868376E00B91CC1 /* DLChatTableViewCtrl.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BC9F7E41868376E00B91CC1 /* DLChatTableViewCtrl.m */; };
 		0BC9F7E81868382200B91CC1 /* DLTableCellChat.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BC9F7E71868382200B91CC1 /* DLTableCellChat.m */; };
+		0BD4231A18964E59009D3340 /* PendulumView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BD4231918964E59009D3340 /* PendulumView.m */; };
 		0BD9976218866DFF00C3BF7B /* TLAlertView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BD9976118866DFF00C3BF7B /* TLAlertView.m */; };
 		0BD9D415186C1D8400315607 /* Common.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BD9D414186C1D8400315607 /* Common.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		0BD9D424186C1E4300315607 /* NSObject+SBJSON.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BD9D419186C1E4300315607 /* NSObject+SBJSON.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
@@ -380,6 +381,8 @@
 		0BC9F7E41868376E00B91CC1 /* DLChatTableViewCtrl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLChatTableViewCtrl.m; sourceTree = "<group>"; };
 		0BC9F7E61868382200B91CC1 /* DLTableCellChat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLTableCellChat.h; sourceTree = "<group>"; };
 		0BC9F7E71868382200B91CC1 /* DLTableCellChat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLTableCellChat.m; sourceTree = "<group>"; };
+		0BD4231818964E59009D3340 /* PendulumView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PendulumView.h; sourceTree = "<group>"; };
+		0BD4231918964E59009D3340 /* PendulumView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PendulumView.m; sourceTree = "<group>"; };
 		0BD9976018866DFF00C3BF7B /* TLAlertView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLAlertView.h; sourceTree = "<group>"; };
 		0BD9976118866DFF00C3BF7B /* TLAlertView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLAlertView.m; sourceTree = "<group>"; };
 		0BD9D413186C1D8400315607 /* Common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Common.h; sourceTree = "<group>"; };
@@ -624,6 +627,7 @@
 		0B7C9244185080F600452712 /* library */ = {
 			isa = PBXGroup;
 			children = (
+				0BD4231718964E59009D3340 /* PendulumView */,
 				0BD9975F18866DFF00C3BF7B /* TLAlertView */,
 				0BA2F2361872CA8F003D15F0 /* ProgressHUD */,
 				0BD9D416186C1E4300315607 /* JSON */,
@@ -733,6 +737,15 @@
 			name = chat;
 			sourceTree = "<group>";
 		};
+		0BD4231718964E59009D3340 /* PendulumView */ = {
+			isa = PBXGroup;
+			children = (
+				0BD4231818964E59009D3340 /* PendulumView.h */,
+				0BD4231918964E59009D3340 /* PendulumView.m */,
+			);
+			path = PendulumView;
+			sourceTree = "<group>";
+		};
 		0BD9975F18866DFF00C3BF7B /* TLAlertView */ = {
 			isa = PBXGroup;
 			children = (
@@ -827,8 +840,6 @@
 				0BE8AD21184C39A7007EDE88 /* DLAppDelegate.m */,
 				0BE8AD23184C39A7007EDE88 /* Images.xcassets */,
 				0BE8AD18184C39A7007EDE88 /* Supporting Files */,
-				0BE8AD44184C59AA007EDE88 /* DLMPViewCtrl.h */,
-				0BE8AD45184C59AA007EDE88 /* DLMPViewCtrl.m */,
 				0BDD5778186AB86900EFE4DF /* DLTableViewCellConversation.h */,
 				0BDD5779186AB86900EFE4DF /* DLTableViewCellConversation.m */,
 				0BB65FD718698B8900C60CB0 /* DLConversationListTableViewCtrl.h */,
@@ -837,18 +848,20 @@
 				0BDD5776186A8C8500EFE4DF /* DLNavigationCtrl.m */,
 				0B816359187FDB230025EEF4 /* DLTabbarViewCtr.h */,
 				0B81635A187FDB230025EEF4 /* DLTabbarViewCtr.m */,
-				5DE72AB318824AD5006B89E1 /* login */,
-				0BC90AA8186D7B8E005BA005 /* chat */,
-				0BAEF52618890A82006F845F /* folder */,
 				0BE8AD47184C5B30007EDE88 /* DLMCConfig.h */,
 				0BE8AD53184C8BAB007EDE88 /* DLImageViewCtrl.h */,
 				0BE8AD54184C8BAB007EDE88 /* DLImageViewCtrl.m */,
+				0BE8AD44184C59AA007EDE88 /* DLMPViewCtrl.h */,
+				0BE8AD45184C59AA007EDE88 /* DLMPViewCtrl.m */,
 				0B7C923F18502BB800452712 /* DLItemTableViewCell.h */,
 				0B7C924018502BB800452712 /* DLItemTableViewCell.m */,
 				0B6152401856E76F00C9145B /* DLTableCellPopoutView.h */,
 				0B6152411856E76F00C9145B /* DLTableCellPopoutView.m */,
 				0B3731ED18556BC2000CBB8C /* DLPerson.h */,
 				0B3731EE18556BC2000CBB8C /* DLPerson.m */,
+				5DE72AB318824AD5006B89E1 /* login */,
+				0BC90AA8186D7B8E005BA005 /* chat */,
+				0BAEF52618890A82006F845F /* folder */,
 			);
 			path = DLAccessory;
 			sourceTree = "<group>";
@@ -1142,6 +1155,7 @@
 				0BD9D425186C1E4300315607 /* NSString+SBJSON.m in Sources */,
 				0BAEF52F18890ACF006F845F /* DLTableviewCellFoldeMovie.m in Sources */,
 				0B81635B187FDB230025EEF4 /* DLTabbarViewCtr.m in Sources */,
+				0BD4231A18964E59009D3340 /* PendulumView.m in Sources */,
 				0BDED347188E5E8F00D99DC6 /* DLViewTableHeader.m in Sources */,
 				0BC04987185EDFF400F13240 /* CSAnimationView.m in Sources */,
 				0BC0498B185EDFF400F13240 /* UILabel+TCCustomFont.m in Sources */,

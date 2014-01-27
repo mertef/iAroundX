@@ -10,11 +10,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "DLAccessory/DLChatTableViewCtrl.m"
-            timestampString = "412418427.658643"
+            timestampString = "412494091.697451"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "800"
-            endingLineNumber = "800"
+            startingLineNumber = "817"
+            endingLineNumber = "817"
             landmarkName = "-sendData:toPeer:withType:mediaPath:"
             landmarkType = "5">
          </BreakpointContent>

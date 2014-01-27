@@ -18,7 +18,7 @@
 
 @end
 @class DLTableCellPopoutView;
-
+@class PendulumView;
 @interface DLItemTableViewCell : UITableViewCell
 @property(nonatomic, strong) UILabel* clableName;
 @property(nonatomic, strong) UIButton* cbtnAction;
@@ -26,12 +26,13 @@
 @property(nonatomic, strong) DLTableCellPopoutView* ccPopoutAction;
 @property(nonatomic, weak) id<DLCellPopoutProto> idCellUpdateCB;
 @property(nonatomic, strong) NSDictionary* cdicInfo;
-
+@property(nonatomic, strong) PendulumView* ctPendulumView;
 -(void)feedInfo:(NSDictionary*)acdicInfo;
 -(void)showAction:(BOOL)abFlag finished: ( void(^)(BOOL abFinished) )finished ;
 +(CGFloat)HeightForCell:(NSDictionary*)acdic;
 -(void)actionShowGallery:(id)aidSender;
 -(void)actionShowCamera:(id)aidSender;
 -(void)actionShowChat:(id)aidSender;
-
+-(void)startPendulumAnimation;
+-(void)stopPendulumAnimation ;
 @end

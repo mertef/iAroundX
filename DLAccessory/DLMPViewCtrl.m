@@ -30,7 +30,6 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         self.cmutarrRemtoePeerIdsConnected = [[NSMutableArray alloc] init];
-        self.cmutarrRemtoePeerIdsFound = [[NSMutableArray alloc] init];
 
         // Custom initialization
         NSString* cstrUserName = [[NSUserDefaults standardUserDefaults] objectForKey:k_peer_user_name];
@@ -210,27 +209,27 @@
       
     }
     NSLog(@"sesion did change state %d", [@(state) intValue]);
+    NSPredicate* cprediate = [NSPredicate predicateWithFormat:@"(%K == %@)" , k_peer_id_name, [peerID displayName]];
+    NSArray* carrList = [self.cmutarrRemtoePeerIdsConnected filteredArrayUsingPredicate:cprediate];
+    
     if (state == MCSessionStateConnected) {
-        NSPredicate* cprediate = [NSPredicate predicateWithFormat:@"(%K == %@)" , k_peer_id_name, [peerID displayName]];
-        NSArray* carrList = [self.cmutarrRemtoePeerIdsConnected filteredArrayUsingPredicate:cprediate];
         if ([carrList count] == 0 ) {
-            [self.cmutarrRemtoePeerIdsConnected addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:peerID,k_peer_id,[peerID displayName],k_peer_id_name,nil]];
+            [self.cmutarrRemtoePeerIdsConnected addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:peerID,k_peer_id,[peerID displayName],k_peer_id_name, @(enum_peer_status_connected), k_peer_status, nil]];
+           
+        }else {
+            NSMutableDictionary* cmutdicItem = (NSMutableDictionary*)[carrList firstObject];
+            [cmutdicItem setObject:@(enum_peer_status_connected) forKey:k_peer_status];
         }
     }else if(state == MCSessionStateNotConnected){
-        NSPredicate* cprediate = [NSPredicate predicateWithFormat:@"(%K == %@)" , k_peer_id_name, [peerID displayName]];
-
-        NSArray* carrList = [self.cmutarrRemtoePeerIdsConnected filteredArrayUsingPredicate:cprediate];
         if ([carrList count] > 0) {
-            [self.cmutarrRemtoePeerIdsConnected removeObjectsInArray:carrList];
+            NSMutableDictionary* cmutdicItem = (NSMutableDictionary*)[carrList firstObject];
+            [cmutdicItem setObject:@(enum_peer_status_not_connected) forKey:k_peer_status];
         }
-       
     }else if(state == MCSessionStateConnecting) {
-     
-    }else if(state == MCSessionSendDataReliable) {
-
-
-    }else if(state == MCSessionSendDataUnreliable) {
-       
+        if ([carrList count] > 0) {
+            NSMutableDictionary* cmutdicItem = (NSMutableDictionary*)[carrList firstObject];
+            [cmutdicItem setObject:@(enum_peer_status_connecting) forKey:k_peer_status];
+        }
     }
     
     dispatch_async(dispatch_get_main_queue(), ^(void){
@@ -569,17 +568,20 @@
 //    NSLog(@"found peer %@ %@", [peerID displayName], [info description]);
     
 //    NSLog(@"found %@", [self.cmutarrRemtoePeerIdsFound description]);
-   
+    if (!peerID) {
+        return;
+    }
     NSPredicate* cprediate = [NSPredicate predicateWithFormat:@"(%K == %@)" , k_peer_id_name, [peerID displayName]];
 
-    NSArray* carrList = [self.cmutarrRemtoePeerIdsFound filteredArrayUsingPredicate:cprediate];
+    NSArray* carrList = [self.cmutarrRemtoePeerIdsConnected filteredArrayUsingPredicate:cprediate];
     
     if ([carrList count] == 0) {
-        [self.cmutarrRemtoePeerIdsFound addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:peerID,k_peer_id, [peerID displayName], k_peer_id_name, nil]];
+        [self.cmutarrRemtoePeerIdsConnected addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:peerID,k_peer_id, [peerID displayName], k_peer_id_name, @(enum_peer_status_not_connected), k_peer_status, nil]];
+        dispatch_async(dispatch_get_main_queue(), ^(void){
+            [self.cTableServiceList reloadData];
+        });
     }
-    dispatch_async(dispatch_get_main_queue(), ^(void){
-        [self.cTableServiceList reloadData];
-    });
+   
     [browser invitePeer:peerID toSession:_csession withContext:nil timeout:30.0f];
     
 }
@@ -592,13 +594,11 @@
     NSPredicate* cprediate = [NSPredicate predicateWithFormat:@"(%K == %@)" , k_peer_id_name, [peerID displayName]];
 
     
-    NSArray* carrListFound = [self.cmutarrRemtoePeerIdsFound filteredArrayUsingPredicate:cprediate];
     NSArray* carrListConnected = [self.cmutarrRemtoePeerIdsConnected filteredArrayUsingPredicate:cprediate];
     
-    if ([carrListFound count] > 0) {
-        [self.cmutarrRemtoePeerIdsFound removeObjectsInArray:carrListFound];
-    }else if([carrListConnected count] > 0) {
-        [self.cmutarrRemtoePeerIdsConnected removeObjectsInArray:carrListConnected];
+    if ([carrListConnected count] > 0) {
+        NSMutableDictionary* cmutdicPeerItem = [carrListConnected firstObject];
+        [cmutdicPeerItem setObject:[NSNumber numberWithInt:enum_peer_status_not_connected] forKey:k_peer_status];
     }
     dispatch_async(dispatch_get_main_queue(), ^(void){
         [self.cTableServiceList reloadData];
@@ -617,9 +617,25 @@
 #pragma mark - nearby advertise callback
 - (void)advertiser:(MCNearbyServiceAdvertiser *)advertiser didReceiveInvitationFromPeer:(MCPeerID *)peerID withContext:(NSData *)context invitationHandler:(void(^)(BOOL accept, MCSession *session))invitationHandler {
     NSLog(@"didReceiveInvitationFromPeer %@", [peerID displayName]);
-    if (![_csession.connectedPeers containsObject:peerID]) {
+
+    NSPredicate* cpredicateFilter = [NSPredicate predicateWithFormat:@"(%K == %@)", k_peer_id_name, [peerID displayName]];
+    NSArray* carrrConnected = [self.cmutarrRemtoePeerIdsConnected filteredArrayUsingPredicate:cpredicateFilter];
+    if ([carrrConnected count] > 0) {
+        NSDictionary* cdicConnected = [carrrConnected firstObject];
+        NSNumber* cnumberStatus = [cdicConnected objectForKey:k_peer_status];
+        if ([cnumberStatus unsignedIntValue] == enum_peer_status_not_connected) {
+            invitationHandler(YES, _csession);
+        }
+    }else {
+        [self.cmutarrRemtoePeerIdsConnected addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:peerID,k_peer_id, [peerID displayName], k_peer_id_name, @(enum_peer_status_not_connected), k_peer_status, nil]];
+        
         invitationHandler(YES, _csession);
+
     }
+    dispatch_async(dispatch_get_main_queue(), ^(void){
+        [self.cTableServiceList reloadData];
+    });
+    
 }
 
 
@@ -659,32 +675,19 @@
 }
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     CGFloat fHeight = 0.0f;
-    switch ([indexPath section]) {
-        case 0:
-            fHeight = [DLItemTableViewCell HeightForCell:[self.cmutarrRemtoePeerIdsConnected objectAtIndex:[indexPath row]]];
-            break;
-            
-        default:
-            fHeight = [DLItemTableViewCell HeightForCell:[self.cmutarrRemtoePeerIdsFound objectAtIndex:[indexPath row]]];
-            break;
-    }
+
+    fHeight = [DLItemTableViewCell HeightForCell:[self.cmutarrRemtoePeerIdsConnected objectAtIndex:[indexPath row]]];
+
+
     return  fHeight;
 }
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 2;
+    return 1;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     NSInteger iNumber = 0;
-    switch (section) {
-        case 0:
-            iNumber = [self.cmutarrRemtoePeerIdsConnected count];
-            break;
-            
-        default:
-            iNumber = [self.cmutarrRemtoePeerIdsFound count];
-            break;
-    }
+    iNumber = [self.cmutarrRemtoePeerIdsConnected count];
     return iNumber;
 
 }
@@ -699,21 +702,11 @@
         ccCellItem.idCellUpdateCB = self;
     }
     [ccCellItem ccPopoutAction].layer.transform = CATransform3DIdentity;
-    switch ([indexPath section]) {
-        case 0: {
-            NSDictionary* cdicItem = [self.cmutarrRemtoePeerIdsConnected objectAtIndex:[indexPath row]];
-            ccCellItem.bIsConnected = YES;
-            [ccCellItem feedInfo:cdicItem];
-            break;
-        }
-            
-        default: {
-            NSDictionary* cdicItem = [self.cmutarrRemtoePeerIdsFound objectAtIndex:[indexPath row]];
-            ccCellItem.bIsConnected = NO;
-            [ccCellItem feedInfo:cdicItem];
-            break;
-        }
-    }
+    
+    NSDictionary* cdicItem = [self.cmutarrRemtoePeerIdsConnected objectAtIndex:[indexPath row]];
+    ccCellItem.bIsConnected = YES;
+    [ccCellItem feedInfo:cdicItem];
+    
     return ccCellItem;
 }
 
@@ -856,32 +849,26 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    DLItemTableViewCell* ccItemTableviewCell = (DLItemTableViewCell*)[tableView cellForRowAtIndexPath:indexPath];
+    
+    NSMutableDictionary* cmutdicPeerItem = (NSMutableDictionary*)[self.cmutarrRemtoePeerIdsConnected objectAtIndex:[indexPath row]];
+    MCPeerID* cPeerId = cmutdicPeerItem[k_peer_id];
+    NSNumber* cnumberStatus = [cmutdicPeerItem objectForKey:k_peer_status];
+    
+    
+    if ([cnumberStatus unsignedIntValue] == enum_peer_status_not_connected ) {
+        self.cpeerIdGoingtoConnect = cPeerId;
+        
+        [cmutdicPeerItem setObject:@(enum_peer_status_try_connecting) forKey:k_peer_status];
+        [ccItemTableviewCell setNeedsDisplay];
 
-    switch ([indexPath section]) {
-        case 0://send file
-        {
-           
-        }
-            break;
-            
-        default: //connect
-        {
-            NSDictionary* cdicPeerItem = [self.cmutarrRemtoePeerIdsFound objectAtIndex:[indexPath row]];
-            MCPeerID* cPeerId = cdicPeerItem[k_peer_id];
-            NSPredicate* cPredicate = [NSPredicate predicateWithFormat:@"(%K ==  %@)",k_peer_id,[cPeerId displayName]];
-            NSArray* carrList = [self.cmutarrRemtoePeerIdsConnected filteredArrayUsingPredicate:cPredicate];
-            if ([carrList count] == 0 ) {
-                self.cpeerIdGoingtoConnect = cPeerId;
-
-                [_cnearbyServiceBrowser invitePeer:cdicPeerItem[k_peer_id] toSession:_csession withContext:nil timeout:10.0f];
-            }else {
-                self.cpeerIdGoingtoConnect = nil;
-            }
-            
-            
-        }
-            break;
+        
+        [_cnearbyServiceBrowser invitePeer: self.cpeerIdGoingtoConnect toSession:_csession withContext:nil timeout:30.0f];
+        
+    }else {
+        self.cpeerIdGoingtoConnect = nil;
     }
+
 }
 
 #pragma mark - alert callback 

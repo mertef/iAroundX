@@ -585,7 +585,7 @@
     CGFloat fSizeMbCurrent = [cnumberSizeCurrent floatValue] / (1024.0f * 1024.0f) ;
     
     CGFloat fProgress = [cnumberSizeCurrent floatValue] / [cnumberSize floatValue];
-    NSLog(@"progress is %f", fProgress);
+//    NSLog(@"progress is %f", fProgress);
    
     dispatch_async(dispatch_get_main_queue(), ^(void){
         [self.ccProgressIndicator.cProgressIndicator setProgress:fProgress animated:YES];

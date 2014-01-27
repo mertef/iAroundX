@@ -18,6 +18,7 @@
 #define k_peer_id @"peer_id"
 #define k_peer_id_name @"peer_id_name"
 #define k_show_action @"show_action"
+#define k_peer_status @"peer_status"
 
 #define k_poput_height 60.0f
 
@@ -143,5 +144,12 @@ typedef NS_ENUM(NSUInteger, enum_folder_cell_option) {
     enum_folder_cell_option_delete,
     enum_folder_cell_option_rescanning,
     enum_folder_cell_option_create_dir
+};
+
+typedef NS_ENUM(NSUInteger, enum_peer_status) {
+    enum_peer_status_connected = 0x800,
+    enum_peer_status_not_connected,
+    enum_peer_status_connecting,
+    enum_peer_status_try_connecting
 };
 #endif

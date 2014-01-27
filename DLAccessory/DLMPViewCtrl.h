@@ -23,7 +23,6 @@
 @property(nonatomic, strong) MCNearbyServiceBrowser* cnearbyServiceBrowser;
 @property(nonatomic, strong) MCNearbyServiceAdvertiser* cnearbyServiceAdvertiser;
 @property(nonatomic, strong) NSMutableArray* cmutarrRemtoePeerIdsConnected;
-@property(nonatomic, strong) NSMutableArray* cmutarrRemtoePeerIdsFound;
 
 @property(nonatomic, strong) UITableView* cTableServiceList;
 @property(nonatomic, strong) MBProgressHUD* ctProgressHud;
