@@ -209,6 +209,7 @@
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemPause target:self action:@selector(actionDismissServiceBrowser:)];
     self.navigationItem.leftBarButtonItem.enabled = NO;
     
+    
 //    UISwipeGestureRecognizer* cSwipeGes = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(actionSwipe:)];
 //    [self.view addGestureRecognizer:cSwipeGes];
     

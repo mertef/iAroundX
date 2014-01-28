@@ -20,6 +20,10 @@
 
 @implementation DLItemTableViewCell
 
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
 {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
@@ -47,10 +51,20 @@
         UIColor *ballColor = [UIColor colorWithRed:0.47 green:0.60 blue:0.89 alpha:1];
        self.ctPendulumView = [[PendulumView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 60.0f, 44.0f)  ballColor:ballColor ballDiameter:12];
         [self.contentView addSubview:self.ctPendulumView];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(actionDisableMe:) name:k_noti_disable_me object:nil];
     }
     return self;
 }
+-(void)actionDisableMe:(NSNotification*)acNoti {
+    MCPeerID* cpeerid = [[acNoti userInfo] objectForKey:k_peer_id];
+    MCPeerID* cpeeridMe = [self.cdicInfo objectForKey:k_peer_id];
 
+    if ([[cpeerid displayName] isEqualToString:[cpeeridMe displayName]]) {
+        return;
+    }else {
+        [(NSMutableDictionary*)self.cdicInfo setObject:[NSNumber numberWithBool:NO] forKey:k_show_action];
+    }
+}
 -(void)actionShowGallery:(id)aidSender {
     if ([self.idCellUpdateCB respondsToSelector:@selector(didGallerySelected:)]) {
         [self.idCellUpdateCB performSelector:@selector(didGallerySelected:) withObject:self];
@@ -177,18 +191,20 @@
         }
         return;
     }
-    
     NSNumber* cnumberShowAction = [cdicItem objectForKey:k_show_action];
     BOOL abShow = ![cnumberShowAction boolValue];
     if (abShow) {
         
         [(NSMutableDictionary*)cdicItem setObject:@YES forKey:k_show_action];
+        [[NSNotificationCenter defaultCenter] postNotificationName:k_noti_disable_me object:nil userInfo:self.cdicInfo];
         if ([self.idCellUpdateCB respondsToSelector:@selector(didCellUpdated:)]) {
             [self.idCellUpdateCB performSelector:@selector(didCellUpdated:) withObject:self];
         }
         
     }else {
         [(NSMutableDictionary*)cdicItem setObject:@NO forKey:k_show_action];
+        [[NSNotificationCenter defaultCenter] postNotificationName:k_noti_disable_me object:nil userInfo:self.cdicInfo];
+
         [self showAction:NO finished:^(BOOL abFinished){
             if ([self.idCellUpdateCB respondsToSelector:@selector(didCellUpdated:)]) {
                 [self.idCellUpdateCB performSelector:@selector(didCellUpdated:) withObject:self];
