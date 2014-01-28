@@ -53,7 +53,8 @@
 
 #define k_noti_chat_msg @"chat_msg_item"
 #define k_noti_chat_msg_receive_progress @"chat_msg_receive_progress"
-
+#define k_noti_msg_delete @"msg_deleted"
+#define k_obj_delete @"k_obj_deleted"
 #define k_noti_chat_msg_increase @"chat_msg_item_increase"
 #define k_noti_chat_msg_decrease @"chat_msg_item_decrease"
 #define k_msg_cout @"msg_count"

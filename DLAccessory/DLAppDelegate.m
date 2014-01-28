@@ -88,7 +88,7 @@
     ccNavCtrlFolder.tabBarItem = cTabbarItemFolder;
     [ccNavCtrlFolder pushViewController:ccFolderViewCtrl animated:NO];
     
-    
+    /*
     NSNumber* cnumberLogin = [[NSUserDefaults standardUserDefaults] objectForKey:k_user_login];
     UINavigationController* ccNaviCtrlSetting = [[DLNavigationCtrl alloc] init];
     if (cnumberLogin) {
@@ -104,11 +104,11 @@
         [ccNaviCtrlSetting pushViewController:ccLoginViewCtrl animated:NO];
 
     }
-    
+    */
     
     
     UITabBarController* cTabbarViewCtrl = [[DLTabbarViewCtr alloc] init];
-    cTabbarViewCtrl.viewControllers = @[ccNavCtrlFolder, cCenterNavCt, ccConversationNavCtrl, ccNaviCtrlSetting];
+    cTabbarViewCtrl.viewControllers = @[ccNavCtrlFolder, cCenterNavCt, ccConversationNavCtrl];
     cTabbarViewCtrl.selectedViewController = cCenterNavCt;
     self.window.rootViewController = cTabbarViewCtrl;
     

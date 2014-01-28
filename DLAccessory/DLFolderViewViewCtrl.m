@@ -499,7 +499,24 @@
         self.idObjectSelected = nil;
     }
     NSError* cError = nil;
-    [[NSFileManager defaultManager]  removeItemAtPath:ccFileItem.path error:&cError];
+    [self.cManagedObjectCtx lock];
+    [self.cManagedObjectCtx deleteObject:ccFileItem];
+    BOOL bFlag = [DLModel DeleteMsgItemByMediaPath:ccFileItem.path];
+    BOOL bSuccess = YES;
+    if (ccFileItem.isDeleted && bFlag) {
+        [self.cManagedObjectCtx save:&cError];
+        if (cError) {
+            bSuccess = NO;
+            NSLog(@"deleteSelectedItem %@", [cError description]);
+            [self.cManagedObjectCtx rollback];
+        }else {
+            bFlag = [[NSFileManager defaultManager]  removeItemAtPath:ccFileItem.path error:&cError];
+        }
+    }else {
+        [self.cManagedObjectCtx rollback];
+    }
+    [self.cManagedObjectCtx unlock];
+    
     if (cError) {
         UIAlertView* cAlertMsg = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"k_delete_file", nil) message:NSLocalizedString(@"k_delete_file_msg_failure", nil) delegate:self cancelButtonTitle:NSLocalizedString(@"k_cancel", nil) otherButtonTitles:nil, nil];
         [cAlertMsg show];
@@ -610,7 +627,7 @@
     }
 }
 -(void)processSelectedTableCellOption {
-    NSLog(@"selected file path is %@", _cc_file_item_selected.path);
+//    NSLog(@"selected file path is %@", _cc_file_item_selected.path);
     if (_cc_file_item_selected) {
         if ([_cc_file_item_selected.cell_id isEqualToString:k_cell_id_folder]) {
             

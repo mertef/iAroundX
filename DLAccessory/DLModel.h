@@ -8,7 +8,10 @@
 
 #import <Foundation/Foundation.h>
 @class MsgItem;
+@class MCPeerID;
 @interface DLModel : NSObject
 +(NSManagedObjectContext*)ManagedObjCtx;
 +(void)SaveMsgItem:(NSDictionary*)acdicMsgItem;
++(NSMutableArray*)GetChatListFrom:(MCPeerID*)acPeerIdFrom to:(MCPeerID*)acPeerIdTo;
++(BOOL)DeleteMsgItemByMediaPath:(NSString*)acstrMediaPath;
 @end

@@ -19,6 +19,8 @@
 #import "DLMapViewCtrl.h"
 #import "DLZoomableImageView.h"
 #import "FileItem.h"
+#import "DLModel.h"
+#import "MsgItem.h"
 
 @interface DLChatTableViewCtrl ()
 -(void)initAvAudioRecroder;
@@ -35,11 +37,54 @@
         // Custom initialization
         self.cmutarrChatList = [[NSMutableArray alloc] init];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(actionNotiNewMsgArrived:) name:k_noti_chat_msg object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(actionNotiMsgDeleted:) name:k_noti_msg_delete object:nil];
+
+        
         self.self.bIsInputMode = YES;
     }
     return self;
 }
-
+-(void)actionNotiMsgDeleted:(NSNotification*)acNoti {
+    [self.cmutarrChatList removeAllObjects];
+    if (self.cdicPeerInfoFrom && self.cdicPeerInfoTo) {
+        NSMutableArray* cmutArrlist = [DLModel GetChatListFrom:self.cdicPeerInfoFrom[k_peer_id] to:self.cdicPeerInfoTo[k_peer_id]];
+        if ([cmutArrlist count] > 0) {
+            [self.cmutarrChatList addObjectsFromArray:cmutArrlist];
+        }
+    }
+       /*
+    NSDictionary* cdicUserInfo = [acNoti userInfo];
+    MsgItem* cmsgItem = [cdicUserInfo objectForKey:k_obj_delete];
+    NSDictionary* cdicItemDelete = nil;
+    if (cmsgItem) {
+        for (NSDictionary* cdicItem in self.cmutarrChatList) {
+            NSNumber* cnumberMsgId = [cdicItem objectForKey:k_chat_msg_id];
+            if ([cnumberMsgId isEqualToNumber:cmsgItem.msg_id]) {
+                cdicItemDelete = cdicItem;
+            }
+        }
+        if (cdicItemDelete) {
+            NSArray* carrVisibleCell = [self.ctableViewChat visibleCells];
+            NSIndexPath* cIndexPathDelete = nil;
+            for (DLTableCellChat* ccChatItem in carrVisibleCell) {
+                NSDictionary* cdicItem = ccChatItem.cdicInfo;
+                if ([cdicItem isEqualToDictionary:cdicItemDelete]) {
+                    cIndexPathDelete = [self.ctableViewChat indexPathForCell:ccChatItem];
+                    break;
+                }
+            }
+            [self.cmutarrChatList removeObject:cdicItemDelete];
+            if (cIndexPathDelete) {
+                [self.ctableViewChat beginUpdates];
+                [self.ctableViewChat deleteRowsAtIndexPaths:@[cIndexPathDelete] withRowAnimation:UITableViewRowAnimationLeft];
+                [self.ctableViewChat endUpdates];
+            }
+           
+        }
+        
+    }*/
+   
+}
 -(void)actionNotiNewMsgArrived:(NSNotification*)acNoti {
     if ([acNoti.name isEqualToString:k_noti_chat_msg]) {
         NSDictionary* cdicUserInfo = acNoti.userInfo;
@@ -249,6 +294,11 @@
     [cviewBg setBackgroundColor:[UIColor clearColor]];
     self.ctableViewChat.tableFooterView = cviewBg;
 	// Do any additional setup after loading the view.
+    
+    NSMutableArray* cmutArrlist = [DLModel GetChatListFrom:self.cdicPeerInfoFrom[k_peer_id] to:self.cdicPeerInfoTo[k_peer_id]];
+    if ([cmutArrlist count] > 0) {
+        [self.cmutarrChatList addObjectsFromArray:cmutArrlist];
+    }
 }
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
     return YES;

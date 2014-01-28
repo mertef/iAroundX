@@ -88,5 +88,70 @@ static NSManagedObjectContext* g_c_managed_obj_ctx = nil;
 
     
 }
++(NSMutableArray*)GetChatListFrom:(MCPeerID*)acPeerIdFrom to:(MCPeerID*)acPeerIdTo {
+    NSMutableArray* cmutArrlist = [[NSMutableArray alloc] init];
+    NSManagedObjectContext* cmanagedObjCtx = [DLModel ManagedObjCtx];
+//    NSPersistentStoreCoordinator* cPersistentStoreCoordinate = [cmanagedObjCtx persistentStoreCoordinator];
+//    NSEntityDescription* centityDescription = [[[cPersistentStoreCoordinate managedObjectModel] entitiesByName] objectForKey:k_table_name_msg_item];
+    NSError* cError = nil;
+    NSFetchRequest* cfetchReq = [[NSFetchRequest alloc] initWithEntityName:k_table_name_msg_item];
+    NSString* cstrFrom = [acPeerIdFrom displayName];
+    NSString* cstrTo = [acPeerIdTo displayName];
+    
+    NSPredicate* cpredate = [NSPredicate predicateWithFormat:@"(%K = %@ and %K = %@)", k_chat_from, cstrFrom, k_chat_to, cstrTo];
+    NSSortDescriptor* cSortDescriptor = [NSSortDescriptor sortDescriptorWithKey:k_chat_date ascending:YES];
+    cfetchReq.predicate = cpredate;
+    cfetchReq.sortDescriptors = @[cSortDescriptor];
+    
+    NSArray* carrMsgs = [cmanagedObjCtx executeFetchRequest:cfetchReq error:&cError];
+    if (cError) {
+        NSLog(@"GetChatListFrom %@", [cError description]);
+    }else {
+        for (MsgItem* cmsgItem in carrMsgs) {
+            NSMutableDictionary* cmutdicInfo = [[NSMutableDictionary alloc] init];
+            [cmutdicInfo setObject:[[MCPeerID alloc] initWithDisplayName:cmsgItem.chat_from] forKey:k_chat_from];
+            [cmutdicInfo setObject:[[MCPeerID alloc] initWithDisplayName:cmsgItem.chat_to] forKey:k_chat_to];
+            [cmutdicInfo setObject:cmsgItem.chat_msg forKey:k_chat_msg];
+            [cmutdicInfo setObject:cmsgItem.chat_msg_type forKey:k_chat_msg_type];
+            [cmutdicInfo setObject:cmsgItem.chat_date forKey:k_chat_date];
+            [cmutdicInfo setObject:cmsgItem.chat_media_url forKey:k_chat_msg_media_url];
+            [cmutdicInfo setObject:cmsgItem.msg_id forKey:k_chat_msg_id];
+            [cmutdicInfo setObject:cmsgItem.chat_msg_finished forKey:k_chat_msg_finished];
+
+            [cmutArrlist addObject:cmutdicInfo];
+        }
+    }
+    return cmutArrlist;
+}
+
++(BOOL)DeleteMsgItemByMediaPath:(NSString*)acstrMediaPath {
+    BOOL bFlag = YES;
+    NSManagedObjectContext* cmanagedObjCtx = [DLModel ManagedObjCtx];
+    //    NSPersistentStoreCoordinator* cPersistentStoreCoordinate = [cmanagedObjCtx persistentStoreCoordinator];
+    //    NSEntityDescription* centityDescription = [[[cPersistentStoreCoordinate managedObjectModel] entitiesByName] objectForKey:k_table_name_msg_item];
+    NSError* cError = nil;
+    NSFetchRequest* cfetchReq = [[NSFetchRequest alloc] initWithEntityName:k_table_name_msg_item];
+    NSPredicate* cpredate = [NSPredicate predicateWithFormat:@"(%K = %@)", @"chat_media_url", acstrMediaPath];
+    cfetchReq.predicate = cpredate;
+    NSArray* carrMsgs = [cmanagedObjCtx executeFetchRequest:cfetchReq error:&cError];
+    if (cError) {
+        NSLog(@"DeleteMsgItemByMediaPath %@", [cError description]);
+        bFlag = NO;
+    }else if([carrMsgs count] > 0){
+        MsgItem* ccMsgItem = [carrMsgs firstObject];
+        [cmanagedObjCtx deleteObject:ccMsgItem];
+        if (ccMsgItem.isDeleted) {
+            [cmanagedObjCtx save:&cError];
+            [[NSNotificationCenter defaultCenter] postNotificationName:k_noti_msg_delete object:nil userInfo:@{k_obj_delete:ccMsgItem }];
+            if (cError) {
+                bFlag = NO;
+            }
+        }
+        
+    }
+
+    return bFlag;
+}
+
 
 @end
