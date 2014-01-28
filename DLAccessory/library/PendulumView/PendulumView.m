@@ -231,12 +231,14 @@ static const float ballPendulateAngle = M_PI_2 / 1;
     }
     _animating = YES;
     _shouldAnimate = YES;
-    
+    self.alpha = 1.0f;
+
     [self leftBallPendulate];
 }
 
 - (void)stopAnimating
 {
+    NSLog(@"stop animatiing!");
     if (!_animating)
     {
         return;
@@ -251,7 +253,7 @@ static const float ballPendulateAngle = M_PI_2 / 1;
         [UIView animateWithDuration:0.2 animations:^{
             self.alpha = 0.0f;
         } completion:^(BOOL finished) {
-            [self removeFromSuperview];
+            //[self removeFromSuperview];
         }];
     }
 }

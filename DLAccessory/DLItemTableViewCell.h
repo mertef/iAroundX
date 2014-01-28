@@ -15,7 +15,7 @@
 -(void)didGallerySelected:(UITableViewCell*)acTableviewCell;
 -(void)didCameraSelected:(UITableViewCell*)acTableviewCell;
 -(void)didChatSelected:(UITableViewCell*)acTableviewCell;
-
+-(void)shouldConnectToPeer:(UITableViewCell*)acTableviewCell;
 @end
 @class DLTableCellPopoutView;
 @class PendulumView;

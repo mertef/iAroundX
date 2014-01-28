@@ -17,13 +17,13 @@
 @class PulsingHaloLayer;
 
 @interface DLMPViewCtrl : UIViewController<MCSessionDelegate, MCNearbyServiceBrowserDelegate,MCNearbyServiceAdvertiserDelegate, UITableViewDataSource, UITableViewDelegate,DLCellPopoutProto, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIAlertViewDelegate, UIViewControllerTransitioningDelegate>
-@property(nonatomic, strong) MCSession* csession;
+//@property(nonatomic, strong) MCSession* csession;
 @property(nonatomic, strong) MCPeerID* cpeerId;
 
 @property(nonatomic, strong) MCNearbyServiceBrowser* cnearbyServiceBrowser;
 @property(nonatomic, strong) MCNearbyServiceAdvertiser* cnearbyServiceAdvertiser;
 @property(nonatomic, strong) NSMutableArray* cmutarrRemtoePeerIdsConnected;
-
+@property(nonatomic, strong) NSMutableArray* cmutarrRemoteSessions;
 @property(nonatomic, strong) UITableView* cTableServiceList;
 @property(nonatomic, strong) MBProgressHUD* ctProgressHud;
 
@@ -49,6 +49,8 @@
 -(void)pushFolderViewCtrl;
 -(void)actionLogin:(id)aidSender;
 -(void)actionShowFolderManager:(id)aidSender;
+-(MCSession*)findRemoteSession:(MCPeerID*)acRemotePeerId;
+
 @end
 
 @interface DLInteractiveTransitioner : NSObject<UIViewControllerAnimatedTransitioning>

@@ -11,7 +11,6 @@
 #import <MultipeerConnectivity/MultipeerConnectivity.h>
 #import "DLMPViewCtrl.h"
 #import "DLMCConfig.h"
-#import "DLPerson.h"
 #import "DLAudio.h"
 
 #import "DLFolderViewViewCtrl.h"
@@ -110,7 +109,7 @@
     
     UITabBarController* cTabbarViewCtrl = [[DLTabbarViewCtr alloc] init];
     cTabbarViewCtrl.viewControllers = @[ccNavCtrlFolder, cCenterNavCt, ccConversationNavCtrl, ccNaviCtrlSetting];
-    //    cTabbarViewCtrl.selectedViewController = cCenterNavCt;
+    cTabbarViewCtrl.selectedViewController = cCenterNavCt;
     self.window.rootViewController = cTabbarViewCtrl;
     
     
@@ -121,7 +120,8 @@
     
     dispatch_async(dispatch_get_main_queue(), ^(void){
         if (!self.ccTableViewCtrlConverstaion.cSession){
-            self.ccTableViewCtrlConverstaion.cSession = self.ccMpViewCtrl.csession;
+            MCPeerID* cpeerIdFrom = [[acNoti userInfo] objectForKey:k_chat_from];
+            self.ccTableViewCtrlConverstaion.cSession = [self.ccMpViewCtrl findRemoteSession:cpeerIdFrom];
             self.ccTableViewCtrlConverstaion.cpeerIdFrom = self.ccMpViewCtrl.cpeerId;
         }
         if ([acNoti.name isEqualToString:k_noti_chat_msg_increase]) {
@@ -180,6 +180,7 @@
 -(void)testMultipeerConnectivity {
    
 }
+/*
 -(void)testARC{
     DLPerson* __strong cperson = [[DLPerson alloc] init];
     cperson.cstrName = @"mertef";
@@ -187,7 +188,7 @@
     cperson.cstrTel = @"18696681549";
     NSLog(@"person:%@", [cperson description]);
     
-}
+}*/
 -(void)testPredicate {
     NSDictionary* cdic0 = @{k_peer_id:@"joe0"};
     NSDictionary* cdic1 = @{k_peer_id:@"joe1"};

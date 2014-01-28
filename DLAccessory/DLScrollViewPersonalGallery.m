@@ -195,6 +195,7 @@
             });
         });
     }
+    accZoomableImageView.clablePageNumber.hidden = NO;
     accZoomableImageView.clablePageNumber.text = [NSString stringWithFormat:@"%lu/%lu",(unsigned long) self.cpageControl.currentPage + 1, (unsigned long)self.cpageControl.numberOfPages];
 
 }
@@ -232,6 +233,7 @@
             });
         });
     }
+    accZoomableImageView.clablePageNumber.hidden = NO;
     accZoomableImageView.clablePageNumber.text = [NSString stringWithFormat:@"%lu/%lu",(unsigned long) self.cpageControl.currentPage + 1, (unsigned long)self.cpageControl.numberOfPages];
 
 }

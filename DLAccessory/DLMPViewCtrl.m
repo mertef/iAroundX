@@ -8,7 +8,6 @@
 
 #import "DLMPViewCtrl.h"
 #import "DLMCConfig.h"
-#import "DLImageViewCtrl.h"
 #import "DLItemTableViewCell.h"
 #import <QuartzCore/QuartzCore.h>
 #import "DLTableCellPopoutView.h"
@@ -20,7 +19,10 @@
 #import "MBProgressHUD.h"
 #import "DLModel.h"
 @interface DLMPViewCtrl ()
-
+-(void)removeFromRemotePeerId:(MCPeerID*)acRemotePeerId;
+-(MCSession*)addToRemotePeerId:(MCPeerID*)acRemotePeerId;
+-(MCSession*)findRemoteSession:(MCPeerID*)acRemotePeerId;
+-(void)restartScanning;
 @end
 
 @implementation DLMPViewCtrl
@@ -39,11 +41,10 @@
             
         }        
        _cpeerId = [[MCPeerID alloc] initWithDisplayName:cstrUserName];
-       _csession= [[MCSession alloc] initWithPeer:_cpeerId];
-        _csession.delegate =self;
+//       _csession= [[MCSession alloc] initWithPeer:_cpeerId];
+//       _csession.delegate =self;
         
-       
-        
+        self.cmutarrRemoteSessions = [[NSMutableArray alloc] init];
 
 
         _cnearbyServiceAdvertiser = [[MCNearbyServiceAdvertiser alloc] initWithPeer:_cpeerId discoveryInfo:nil serviceType:k_service_type];
@@ -62,6 +63,60 @@
     }
     return self;
 }
+
+
+-(MCSession*)addToRemotePeerId:(MCPeerID*)acRemotePeerId{
+    
+    NSString* cstrRightPeerId = acRemotePeerId.displayName;
+    BOOL bFag = YES;
+    MCSession* csession = nil;
+    for (NSMutableDictionary* cmutdicItem in self.cmutarrRemoteSessions) {
+        if ([[cmutdicItem objectForKey:k_session_right_peer_id] isEqualToString:cstrRightPeerId]) {
+            bFag = NO;
+            csession = [cmutdicItem objectForKey:k_session];
+            break;
+        }
+        
+    }
+    if (bFag) {
+        NSMutableDictionary* cmutdic = [[NSMutableDictionary alloc] init];
+        csession = [[MCSession alloc] initWithPeer:self.cpeerId];
+        csession.delegate = self;
+        [cmutdic setObject:csession forKey:k_session];
+        [cmutdic setObject:cstrRightPeerId forKey:k_session_right_peer_id];
+        [self.cmutarrRemoteSessions addObject:cmutdic];
+    }
+    return csession;
+}
+
+-(void)removeFromRemotePeerId:(MCPeerID*)acRemotePeerId {
+    NSString* cstrRightPeerId = acRemotePeerId.displayName;
+    NSDictionary* cdicItemFound = nil;
+    for (NSMutableDictionary* cmutdicItem in self.cmutarrRemoteSessions) {
+        if ([[cmutdicItem objectForKey:k_session_right_peer_id] isEqualToString:cstrRightPeerId]) {
+            cdicItemFound = cmutdicItem;
+            break;
+        }
+    }
+    if (cdicItemFound) {
+        [self.cmutarrRemoteSessions removeObject:cdicItemFound];
+    }
+}
+
+-(MCSession*)findRemoteSession:(MCPeerID*)acRemotePeerId {
+    NSString* cstrRightPeerId = acRemotePeerId.displayName;
+
+    MCSession* csession = nil;
+    for (NSMutableDictionary* cmutdicItem in self.cmutarrRemoteSessions) {
+        if ([[cmutdicItem objectForKey:k_session_right_peer_id] isEqualToString:cstrRightPeerId]) {
+            csession = [cmutdicItem objectForKey:k_session];
+            break;
+        }
+        
+    }
+    return csession;
+}
+
 
 -(UIStatusBarStyle)preferredStatusBarStyle {
     return UIStatusBarStyleLightContent;
@@ -169,6 +224,12 @@
 - (void)dealloc
 {
     
+    for (NSDictionary* cdicItem in self.cmutarrRemoteSessions) {
+        MCSession* csession = [cdicItem objectForKey:k_session];
+        [csession disconnect];
+    }
+    [self.cmutarrRemoteSessions removeAllObjects];
+    
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [self actionDismissServiceBrowser:nil];
     
@@ -201,13 +262,31 @@
 }
 
 
+- (void) encodeRestorableStateWithCoder:(NSCoder *)coder {
+    NSLog(@"encodeRestorableStateWithCoder");
+    [super encodeRestorableStateWithCoder:coder];
+}
+- (void) decodeRestorableStateWithCoder:(NSCoder *)coder {
+    NSLog(@"decodeRestorableStateWithCoder");
+    [super decodeRestorableStateWithCoder:coder];
+}
+- (void) applicationFinishedRestoringState {
+    NSLog(@"applicationFinishedRestoringState");
+    [super applicationFinishedRestoringState];
+}
+
 
 #pragma mark - session callback 
 // Remote peer changed state
+-(void)restartScanning {
+    [self.cnearbyServiceAdvertiser stopAdvertisingPeer];
+    [self.cnearbyServiceBrowser stopBrowsingForPeers];
+    
+    [self.cnearbyServiceAdvertiser startAdvertisingPeer];
+    [self.cnearbyServiceBrowser startBrowsingForPeers];
+}
 - (void)session:(MCSession *)session peer:(MCPeerID *)peerID didChangeState:(MCSessionState)state {
-    if (self.cpeerIdGoingtoConnect && [peerID isEqual:self.cpeerIdGoingtoConnect]) {
-      
-    }
+    
     NSLog(@"sesion did change state %d", [@(state) intValue]);
     NSPredicate* cprediate = [NSPredicate predicateWithFormat:@"(%K == %@)" , k_peer_id_name, [peerID displayName]];
     NSArray* carrList = [self.cmutarrRemtoePeerIdsConnected filteredArrayUsingPredicate:cprediate];
@@ -225,6 +304,7 @@
             NSMutableDictionary* cmutdicItem = (NSMutableDictionary*)[carrList firstObject];
             [cmutdicItem setObject:@(enum_peer_status_not_connected) forKey:k_peer_status];
         }
+        
     }else if(state == MCSessionStateConnecting) {
         if ([carrList count] > 0) {
             NSMutableDictionary* cmutdicItem = (NSMutableDictionary*)[carrList firstObject];
@@ -576,13 +656,14 @@
     NSArray* carrList = [self.cmutarrRemtoePeerIdsConnected filteredArrayUsingPredicate:cprediate];
     
     if ([carrList count] == 0) {
-        [self.cmutarrRemtoePeerIdsConnected addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:peerID,k_peer_id, [peerID displayName], k_peer_id_name, @(enum_peer_status_not_connected), k_peer_status, nil]];
+        [self.cmutarrRemtoePeerIdsConnected addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:peerID,k_peer_id, [peerID displayName], k_peer_id_name, @(enum_peer_status_try_connecting), k_peer_status, nil]];
         dispatch_async(dispatch_get_main_queue(), ^(void){
             [self.cTableServiceList reloadData];
         });
     }
    
-    [browser invitePeer:peerID toSession:_csession withContext:nil timeout:30.0f];
+    MCSession* csession = [self addToRemotePeerId:peerID];
+    [browser invitePeer:peerID toSession:csession withContext:nil timeout:30.0f];
     
 }
 
@@ -591,6 +672,9 @@
     NSLog(@"lost peer %@", [peerID displayName]);
     
 
+    //remove session from session list
+    [self removeFromRemotePeerId:peerID];
+    
     NSPredicate* cprediate = [NSPredicate predicateWithFormat:@"(%K == %@)" , k_peer_id_name, [peerID displayName]];
 
     
@@ -620,17 +704,23 @@
 
     NSPredicate* cpredicateFilter = [NSPredicate predicateWithFormat:@"(%K == %@)", k_peer_id_name, [peerID displayName]];
     NSArray* carrrConnected = [self.cmutarrRemtoePeerIdsConnected filteredArrayUsingPredicate:cpredicateFilter];
+    
+  
+    
     if ([carrrConnected count] > 0) {
         NSDictionary* cdicConnected = [carrrConnected firstObject];
         NSNumber* cnumberStatus = [cdicConnected objectForKey:k_peer_status];
-        if ([cnumberStatus unsignedIntValue] == enum_peer_status_not_connected) {
-            invitationHandler(YES, _csession);
+        if ([cnumberStatus unsignedIntValue] != enum_peer_status_connected) {
+            MCSession* csessionNew = [[MCSession alloc] initWithPeer:self.cpeerId];
+            csessionNew.delegate = self;
+            MCSession* csession = [self addToRemotePeerId:peerID];
+            invitationHandler(YES, csession);
         }
     }else {
-        [self.cmutarrRemtoePeerIdsConnected addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:peerID,k_peer_id, [peerID displayName], k_peer_id_name, @(enum_peer_status_not_connected), k_peer_status, nil]];
+        [self.cmutarrRemtoePeerIdsConnected addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:peerID,k_peer_id, [peerID displayName], k_peer_id_name, @(enum_peer_status_try_connecting), k_peer_status, nil]];
         
-        invitationHandler(YES, _csession);
-
+        MCSession* csession = [self addToRemotePeerId:peerID];
+        invitationHandler(YES, csession);
     }
     dispatch_async(dispatch_get_main_queue(), ^(void){
         [self.cTableServiceList reloadData];
@@ -771,7 +861,7 @@
     ccChatViewCtrl.cdicPeerInfoFrom = @{k_peer_id:self.cpeerId, k_peer_id_name:[self.cpeerId displayName]};
     ccChatViewCtrl.cdicPeerInfoTo = ccItemCell.cdicInfo;
 
-    ccChatViewCtrl.cMulPeerSession = _csession;
+    ccChatViewCtrl.cMulPeerSession = [self findRemoteSession:[ccItemCell.cdicInfo objectForKey:k_peer_id]];
     [self.navigationController pushViewController:ccChatViewCtrl animated:YES];
     
 
@@ -811,7 +901,9 @@
      [self.ctProgressHud show:YES];
     NSString* cstrLastName = [[acUrl absoluteString] lastPathComponent];
     
-     self.cprogressCurrentSender = [_csession sendResourceAtURL:acUrl withName:cstrLastName toPeer:acdicPeerId[k_peer_id] withCompletionHandler:^(NSError* cError) {
+    MCSession* csession = [self findRemoteSession:[acdicPeerId objectForKey:k_peer_id]];
+
+     self.cprogressCurrentSender = [csession sendResourceAtURL:acUrl withName:cstrLastName toPeer:acdicPeerId[k_peer_id] withCompletionHandler:^(NSError* cError) {
      if (cError) {
      NSLog(@"tranfer complete error %@", [cError description]);
      }else {
@@ -820,16 +912,33 @@
      u_int32_t uiSessionId = (u_int32_t)lround([[NSDate date] timeIntervalSince1970]);
 
      NSData* cdataMedia = [NSData dataWithContentsOfURL:acUrl];
-      NSDictionary*  cdicChatItem = @{
+     NSString* cstrType = [cstrLastName lowercaseString];
+     NSDictionary*  cdicChatItem = nil;
+     if ([cstrType hasSuffix:@"jpg"] || [cstrLastName hasSuffix:@"png"]) {
+         cdicChatItem = @{
                           k_chat_from:self.cpeerId,
                           k_chat_to:acdicPeerId[k_peer_id],
                           k_chat_msg:cdataMedia,
                           k_chat_msg_id:@(uiSessionId),
-                          k_chat_msg_type:@(enum_package_type_other),
+                          k_chat_msg_type:@(enum_package_type_image),
                           k_chat_date: @([[NSDate date] timeIntervalSince1970]),
-                          k_chat_msg_media_url:[acUrl absoluteString]
+                          k_chat_msg_media_url:[acUrl absoluteString],
+                          k_chat_msg_finished:@(1)
                           };
-    
+     }else if([cstrLastName hasSuffix:@"mov"]) {
+         cdicChatItem = @{
+                          k_chat_from:self.cpeerId,
+                          k_chat_to:acdicPeerId[k_peer_id],
+                          k_chat_msg:cdataMedia,
+                          k_chat_msg_id:@(uiSessionId),
+                          k_chat_msg_type:@(enum_package_type_video),
+                          k_chat_date: @([[NSDate date] timeIntervalSince1970]),
+                          k_chat_msg_media_url:[acUrl absoluteString],
+                          k_chat_msg_finished:@(1)
+                          };
+     }
+      
+    [DLModel SaveMsgItem:cdicChatItem];
     [[NSNotificationCenter defaultCenter] postNotificationName:k_noti_chat_msg_increase object:nil userInfo:cdicChatItem];
     [[NSNotificationCenter defaultCenter] postNotificationName:k_noti_chat_msg object:nil userInfo:cdicChatItem];
 
@@ -849,21 +958,27 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    DLItemTableViewCell* ccItemTableviewCell = (DLItemTableViewCell*)[tableView cellForRowAtIndexPath:indexPath];
+   
+}
+-(void)shouldConnectToPeer:(UITableViewCell*)acTableviewCell {
+    DLItemTableViewCell* ccItemTableviewCell = (DLItemTableViewCell*)acTableviewCell;
     
-    NSMutableDictionary* cmutdicPeerItem = (NSMutableDictionary*)[self.cmutarrRemtoePeerIdsConnected objectAtIndex:[indexPath row]];
+    NSMutableDictionary* cmutdicPeerItem = (NSMutableDictionary*)ccItemTableviewCell.cdicInfo;
     MCPeerID* cPeerId = cmutdicPeerItem[k_peer_id];
     NSNumber* cnumberStatus = [cmutdicPeerItem objectForKey:k_peer_status];
-    
     
     if ([cnumberStatus unsignedIntValue] == enum_peer_status_not_connected ) {
         self.cpeerIdGoingtoConnect = cPeerId;
         
         [cmutdicPeerItem setObject:@(enum_peer_status_try_connecting) forKey:k_peer_status];
-        [ccItemTableviewCell setNeedsDisplay];
-
-        
-        [_cnearbyServiceBrowser invitePeer: self.cpeerIdGoingtoConnect toSession:_csession withContext:nil timeout:30.0f];
+        [cmutdicPeerItem setObject:[NSNumber numberWithBool:NO] forKey:k_show_action];
+        [self.cTableServiceList reloadData];
+        MCSession* csession = [self findRemoteSession:self.cpeerIdGoingtoConnect];
+        if(csession){
+          [_cnearbyServiceBrowser invitePeer: self.cpeerIdGoingtoConnect toSession:csession withContext:nil timeout:30.0f];
+        }else {
+            NSLog(@"lost connect session");
+        }
         
     }else {
         self.cpeerIdGoingtoConnect = nil;

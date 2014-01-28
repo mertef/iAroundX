@@ -42,6 +42,7 @@
         self.clablePageNumber.backgroundColor = [UIColor colorWithRed:161.0f/255.0f green:204.0/255.0f blue:58.0f/255.0f alpha:1.0f];
         self.clablePageNumber.textColor = [UIColor whiteColor];
         self.clablePageNumber.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+        self.clablePageNumber.hidden = YES;
         [self addSubview:self.clablePageNumber];
     }
     return self;

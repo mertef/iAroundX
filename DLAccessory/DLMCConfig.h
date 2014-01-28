@@ -114,6 +114,9 @@
 
 #define k_table_name_msg_item @"MsgItem"
 
+#define k_session  @"k_session"
+#define k_session_left_peer_id  @"left_peer_id"
+#define k_session_right_peer_id @"right_peer_id"
 typedef NS_ENUM(int32_t, T_PACKAGE_TYPE) {
     enum_package_type_short_msg = 0x300,
     enum_package_type_image,
