@@ -124,18 +124,20 @@
 - (UIStatusBarAnimation)preferredStatusBarUpdateAnimation {
     return UIStatusBarAnimationFade;
 }
+-(void)addUIAdvertisementBanner {
+    [super addUIAdvertisementBanner];
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     [self setNeedsStatusBarAppearanceUpdate];
     
-    self.edgesForExtendedLayout = UIRectEdgeAll;
-    
         
     
     
-    self.cTableServiceList = [[UITableView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.view.frame), CGRectGetHeight(self.view.frame)) style:UITableViewStylePlain];
-    [self.view addSubview:_cTableServiceList];
+    self.cTableServiceList = [[UITableView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.view.frame), CGRectGetHeight(self.cviewContent.frame)) style:UITableViewStylePlain];
+    [self.cviewContent addSubview:_cTableServiceList];
     [_cTableServiceList registerClass:[UITableViewHeaderFooterView class] forHeaderFooterViewReuseIdentifier:id_table_header];
 
 //    [_cTableServiceList registerClass:[UIView class] forHeaderFooterViewReuseIdentifier:id_table_footer];
@@ -147,7 +149,8 @@
     self.cviewTableHeader = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.view.frame), 68.0f)];
     _cTableServiceList.tableHeaderView = self.cviewTableHeader;
 
-    
+    _cTableServiceList.tableFooterView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.view.frame), 2.0f)];
+    _cTableServiceList.tableFooterView.backgroundColor = [UIColor whiteColor];
     /*
     UIImage* cimageScan0 = [UIImage imageNamed:@"scan_0"];
 
@@ -814,7 +817,7 @@
 -(void)didGallerySelected:(UITableViewCell*)acTableviewCell {
     DLItemTableViewCell* ccItemCell = (DLItemTableViewCell*)acTableviewCell;
     self.cdicSelectedPeer = ccItemCell.cdicInfo;
-    NSLog(@"gallery selected %@", ccItemCell.cdicInfo);
+    //NSLog(@"gallery selected %@", ccItemCell.cdicInfo);
     
     if( ![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary] ) {
         UIAlertView* cAlertMsg = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"k_error_camera", nil) message:NSLocalizedString(@"k_error_camera_not_availale", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"k_ok", nil) otherButtonTitles:nil, nil];
@@ -832,7 +835,7 @@
 
 -(void)didCameraSelected:(UITableViewCell*)acTableviewCell {
     DLItemTableViewCell* ccItemCell = (DLItemTableViewCell*)acTableviewCell;
-    NSLog(@"gallery selected %@", ccItemCell.cdicInfo);
+//    NSLog(@"gallery selected %@", ccItemCell.cdicInfo);
     self.cdicSelectedPeer = ccItemCell.cdicInfo;
     
     
@@ -856,7 +859,7 @@
 
 -(void)didChatSelected:(UITableViewCell*)acTableviewCell {
     DLItemTableViewCell* ccItemCell = (DLItemTableViewCell*)acTableviewCell;
-    NSLog(@"gallery selected %@", ccItemCell.cdicInfo);
+//    NSLog(@"gallery selected %@", ccItemCell.cdicInfo);
     
     DLChatTableViewCtrl* ccChatViewCtrl = [[DLChatTableViewCtrl alloc] init];
     ccChatViewCtrl.cdicPeerInfoFrom = @{k_peer_id:self.cpeerId, k_peer_id_name:[self.cpeerId displayName]};
@@ -974,12 +977,18 @@
         [cmutdicPeerItem setObject:@(enum_peer_status_try_connecting) forKey:k_peer_status];
         [cmutdicPeerItem setObject:[NSNumber numberWithBool:NO] forKey:k_show_action];
         [self.cTableServiceList reloadData];
+        /*
         MCSession* csession = [self findRemoteSession:self.cpeerIdGoingtoConnect];
         if(csession){
-          [_cnearbyServiceBrowser invitePeer: self.cpeerIdGoingtoConnect toSession:csession withContext:nil timeout:30.0f];
+            @try {
+                [_cnearbyServiceBrowser invitePeer: self.cpeerIdGoingtoConnect toSession:csession withContext:nil timeout:30.0f];
+            }
+            @catch (NSException *exception) {
+                NSLog(@"%@", [exception description]);
+            }
         }else {
             NSLog(@"lost connect session");
-        }
+        }*/
         
     }else {
         self.cpeerIdGoingtoConnect = nil;

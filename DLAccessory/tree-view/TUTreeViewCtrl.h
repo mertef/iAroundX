@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface TUTreeViewCtrl : UIViewController <UITableViewDataSource, UITableViewDelegate>{
+@interface TUTreeViewCtrl : DLRootViewCtrl <UITableViewDataSource, UITableViewDelegate>{
     NSMutableArray* m_c_mut_arr_data;
 }
 @property(strong,nonatomic) NSMutableArray* cmutarrData;

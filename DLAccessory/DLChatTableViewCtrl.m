@@ -244,12 +244,21 @@
     }
    
 }
+-(void)initLayouConfig {
+    self.tabBarController.tabBar.hidden = YES;
+    self.edgesForExtendedLayout = UIRectEdgeBottom;
+//    self.edgesForExtendedLayout = UIRectEdgeAll;
+    self.view.backgroundColor = [UIColor whiteColor];
+    self.extendedLayoutIncludesOpaqueBars = NO;
+}
+-(void)addUIAdvertisementBanner {
+    
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     [self performSelectorInBackground:@selector(initAvAudioRecroder) withObject:nil];
-    self.edgesForExtendedLayout = UIRectEdgeBottom;
-    self.tabBarController.tabBar.hidden = YES;
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didKeyBoardAppear:) name:UIKeyboardWillShowNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didKeyBoardHide:) name:UIKeyboardWillHideNotification object:nil];
@@ -257,8 +266,9 @@
 
     
     self.title = NSLocalizedString(@"k_chat_room", nil);
-    self.view.backgroundColor = [UIColor whiteColor];
-    self.extendedLayoutIncludesOpaqueBars = NO;
+//    NSLog(@"---%@", NSStringFromCGRect(self.cviewContent.frame));
+    CGRect srectViewFrame = self.cviewContent.bounds;
+     /*
     CGRect srectViewFrame = CGRectMake(0.0f,0.0f, CGRectGetWidth(self.view.bounds),CGRectGetHeight(self.view.bounds) - 20.0f);
     if (!self.navigationController.navigationBarHidden) {
         srectViewFrame.size.height-= self.navigationController.navigationBar.frame.size.height;
@@ -266,10 +276,11 @@
     if (!self.tabBarController.tabBar.isHidden) {
         srectViewFrame.size.height-= self.tabBarController.tabBar.frame.size.height;
     }
-    NSLog(@"view frame is %@", NSStringFromCGRect(self.view.frame));
+//    NSLog(@"view frame is %@", NSStringFromCGRect(self.view.frame));
     self.view.frame  = srectViewFrame;
-    NSLog(@"view frame after is %@", NSStringFromCGRect(self.view.frame));
-
+      
+//    NSLog(@"view frame after is %@", NSStringFromCGRect(self.view.frame));
+    */
     srectViewFrame.size.height-= k_height_input;
     _ctableViewChat = [[UITableView alloc] initWithFrame:srectViewFrame];
 //    NSLog(@"view frame is %@", NSStringFromCGRect(_ctableViewChat.frame));
@@ -277,24 +288,35 @@
     _ctableViewChat.dataSource = self;
     _ctableViewChat.backgroundColor = [UIColor colorWithRed:0.9098 green:0.9098 blue:0.9098 alpha:1.0f];
     _ctableViewChat.separatorStyle = UITableViewCellSeparatorStyleNone;
+    
+    NSNumber* cnumberSupportAds = [[NSUserDefaults standardUserDefaults] objectForKey:k_no_ads];
+    if (!cnumberSupportAds && ![cnumberSupportAds boolValue]) {
+        self.cBannerView = [[ADBannerView alloc] initWithAdType: ADAdTypeBanner];
+        self.cBannerView.backgroundColor = [UIColor whiteColor];
+        self.cBannerView.delegate = self;
+        _ctableViewChat.tableHeaderView = self.cBannerView;
+    }
+    _ctableViewChat.tableFooterView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(_ctableViewChat.frame), 1.0f)];
+    _ctableViewChat.tableFooterView.backgroundColor = [UIColor clearColor];
+    
 
     UITapGestureRecognizer* ctapGes = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyBoard:)];
     ctapGes.delegate = self;
     [self.ctableViewChat addGestureRecognizer:ctapGes];
     
-    [self.view addSubview:_ctableViewChat];
+    [self.cviewContent addSubview:_ctableViewChat];
     
     self.ccViewChatInput = [[DLViewChatInput alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.ctableViewChat.frame), CGRectGetWidth(self.view.bounds),k_height_input)];
     _ccViewChatInput.idProtoViewChat = self;
     _ccViewChatInput.backgroundColor = [UIColor whiteColor];
 //    [_ccViewChatInput.ctextViewInput addObserver:self forKeyPath:@"sRectBoundContent" options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:nil];
-    [self.view addSubview:_ccViewChatInput];
+    [self.cviewContent addSubview:_ccViewChatInput];
     
      UIView* cviewBg = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.view.bounds), 1.0f)];
     [cviewBg setBackgroundColor:[UIColor clearColor]];
     self.ctableViewChat.tableFooterView = cviewBg;
 	// Do any additional setup after loading the view.
-    
+//    NSLog(@"%@ to %@", [self.cdicPeerInfoFrom description], [self.cdicPeerInfoTo description]);
     NSMutableArray* cmutArrlist = [DLModel GetChatListFrom:self.cdicPeerInfoFrom[k_peer_id] to:self.cdicPeerInfoTo[k_peer_id]];
     if ([cmutArrlist count] > 0) {
         [self.cmutarrChatList addObjectsFromArray:cmutArrlist];
@@ -425,13 +447,13 @@
         tPackageHeader._u_l_package_length = (int32_t)uiUsedLength;
         tPackageHeader._u_l_current_offset = (int32_t)sizeof(T_PACKAGE_HEADER);
         tPackageHeader._u_l_msg_id = uiMsgId;
-        
+        tPackageHeader._i8_msg_finished = 1;
         NSData* cdataHeader = [NSData dataWithBytes:&tPackageHeader length:sizeof(tPackageHeader)];
         
         NSMutableData* cmutDataPackage = [[NSMutableData alloc] init];
         [cmutDataPackage appendData:cdataHeader];
         [cmutDataPackage appendData:cdataTxt];
-        NSLog(@"send sizie is %lu", (u_long)[cmutDataPackage length]);
+//        NSLog(@"send sizie is %lu", (u_long)[cmutDataPackage length]);
         
         NSError* cError = nil;
         [self.cMulPeerSession sendData:cmutDataPackage toPeers:@[self.cdicPeerInfoTo[k_peer_id]] withMode:MCSessionSendDataReliable error:&cError];
@@ -441,8 +463,9 @@
         }else {
             [accViewChatInput ctextViewInput].text = @"";
             NSDate* cdateNow = [NSDate date];
-            NSMutableDictionary* cmutdicItem = [[NSMutableDictionary alloc] initWithObjectsAndKeys:self.cdicPeerInfoTo[k_peer_id], k_chat_to, self.cdicPeerInfoFrom[k_peer_id], k_chat_from, cdataTxt, k_chat_msg, [NSNumber numberWithDouble:[cdateNow timeIntervalSince1970]], k_chat_date, @(enum_package_type_short_msg), k_chat_msg_type, nil];
-            
+
+            NSMutableDictionary* cmutdicItem = [[NSMutableDictionary alloc] initWithObjectsAndKeys:self.cdicPeerInfoTo[k_peer_id], k_chat_to, self.cdicPeerInfoFrom[k_peer_id], k_chat_from, cdataTxt, k_chat_msg, [NSNumber numberWithDouble:[cdateNow timeIntervalSince1970]], k_chat_date, @(enum_package_type_short_msg), k_chat_msg_type, @"", k_chat_msg_media_url,[NSNumber numberWithInt:tPackageHeader._u_l_msg_id],k_chat_msg_id, [NSNumber numberWithInt:1],k_chat_msg_finished, nil];
+            [DLModel SaveMsgItem:cmutdicItem];
             [self.cmutarrChatList addObject:cmutdicItem];
             dispatch_async(dispatch_get_main_queue(), ^(void){
                 [self.ctableViewChat reloadData];
@@ -576,7 +599,7 @@
 -(void)didStopRecording:(DLViewChatInput*)accViewChatInput {
     //send
     [_c_audio_recorder stop];
-    NSLog(@"---%@", [[_c_audio_recorder url] absoluteString]);
+//    NSLog(@"---%@", [[_c_audio_recorder url] absoluteString]);
     NSData* cdataAudio = [[NSData alloc] initWithContentsOfURL:_c_audio_recorder.url];
 
     NSUInteger uiUsedLength = [cdataAudio length];
@@ -937,7 +960,7 @@
             break;
         }
         CGFloat fProgress = (tPackageHeader._u_l_current_offset + tPackageHeader._u_l_package_length) / (CGFloat)uiLength;
-        NSLog(@"percent is %.2f", fProgress);
+//        NSLog(@"percent is %.2f", fProgress);
         self.ctProgressView.progress = fProgress;
         
     }
@@ -955,7 +978,7 @@
         [cmutdata appendData:cdataHeader];
 
         [cmutdata appendData:[aData subdataWithRange:NSMakeRange(tPackageHeader._u_l_current_offset, tPackageHeader._u_l_package_length)]];
-        NSLog(@"percent is %.2f", (tPackageHeader._u_l_current_offset + tPackageHeader._u_l_package_length) / (CGFloat)uiLength);
+//        NSLog(@"percent is %.2f", (tPackageHeader._u_l_current_offset + tPackageHeader._u_l_package_length) / (CGFloat)uiLength);
         [self.cMulPeerSession sendData:cmutdata toPeers:@[acPeerId] withMode:MCSessionSendDataReliable error:&cError];
         if (cError) {
             NSLog(@"%@", [cError description]);
@@ -996,6 +1019,7 @@
 
 
     [self.cmutarrChatList addObject:cmutdicItem];
+    [DLModel SaveMsgItem:cmutdicItem];
     dispatch_async(dispatch_get_main_queue(), ^(void){
         [self.ctableViewChat reloadData];
         [self scrollChatToBottom];
@@ -1053,7 +1077,7 @@
     self.cLocationCurrent = [locations lastObject];
     CLLocationCoordinate2D tLocationCoordinate = [self.cLocationCurrent coordinate];
     NSString* cstrLocation = [[NSString alloc] initWithFormat:@"%f,%f",tLocationCoordinate.latitude, tLocationCoordinate.longitude];
-    NSLog(@"coordinate is %@", cstrLocation);
+//    NSLog(@"coordinate is %@", cstrLocation);
     
     NSData* cdataLocation = [[NSData alloc] initWithBytes:[cstrLocation UTF8String] length:[cstrLocation length]];
     [self sendData:cdataLocation toPeer:self.cdicPeerInfoTo[k_peer_id] withType:enum_package_type_location mediaPath:k_url_invliad];

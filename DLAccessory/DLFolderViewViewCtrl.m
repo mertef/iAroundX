@@ -349,7 +349,11 @@
     }else {
         [cell selectCell:NO];
     }
-    [cell setModelCell];
+    if (_b_is_modal) {
+        [cell setModelCell];
+    }else {
+        cell.cbtnSaveToPhone.hidden = NO;
+    }
     [cell feedInfo:ccFileItem];
     return cell;
 }

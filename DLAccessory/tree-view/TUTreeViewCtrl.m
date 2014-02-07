@@ -25,27 +25,29 @@
 }
 -(void)viewWillLayoutSubviews {
     [super viewWillLayoutSubviews];
-    
-    
+}
+
+-(void)initLayouConfig {
+//    self.edgesForExtendedLayout = UIRectEdgeNone;
+    self.automaticallyAdjustsScrollViewInsets = NO;
 }
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     self.title = @"Tree view Test";
-    self.edgesForExtendedLayout = UIRectEdgeNone;
-    self.automaticallyAdjustsScrollViewInsets = NO;
-    
+   
+    /*
      CGRect srectViewFrame  = self.view.frame;
     if (!self.navigationController) {
         srectViewFrame.origin.y = 20.0f;
     }
      srectViewFrame.size.height -= (CGRectGetHeight(self.navigationController.navigationBar.frame) + CGRectGetHeight(self.tabBarController.tabBar.frame) + 20.0f);
      self.view.frame = srectViewFrame;
-
+    */
 //    NSLog(@"before frame is %@", NSStringFromCGRect(self.view.frame));
     
 //    NSLog(@"end frame is %@", NSStringFromCGRect(self.view.frame));
-    self.cTableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStylePlain];
+    self.cTableView = [[UITableView alloc] initWithFrame:self.cviewContent.bounds style:UITableViewStylePlain];
     [self addUIPage];
     [self registerTableviewCells];
     
@@ -53,7 +55,7 @@
     self.cTableView.delegate = self;
     self.cTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     self.cTableView.dataSource = self;
-    [self.view addSubview:self.cTableView];
+    [self.cviewContent addSubview:self.cTableView];
     
  
 //    [self emulateData];

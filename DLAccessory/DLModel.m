@@ -98,7 +98,7 @@ static NSManagedObjectContext* g_c_managed_obj_ctx = nil;
     NSString* cstrFrom = [acPeerIdFrom displayName];
     NSString* cstrTo = [acPeerIdTo displayName];
     
-    NSPredicate* cpredate = [NSPredicate predicateWithFormat:@"(%K = %@ and %K = %@)", k_chat_from, cstrFrom, k_chat_to, cstrTo];
+    NSPredicate* cpredate = [NSPredicate predicateWithFormat:@"((%K == %@ and %K == %@) || (%K == %@ and %K == %@))", k_chat_from, cstrFrom, k_chat_to, cstrTo, k_chat_from, cstrTo, k_chat_to, cstrFrom];
     NSSortDescriptor* cSortDescriptor = [NSSortDescriptor sortDescriptorWithKey:k_chat_date ascending:YES];
     cfetchReq.predicate = cpredate;
     cfetchReq.sortDescriptors = @[cSortDescriptor];
@@ -108,14 +108,23 @@ static NSManagedObjectContext* g_c_managed_obj_ctx = nil;
         NSLog(@"GetChatListFrom %@", [cError description]);
     }else {
         for (MsgItem* cmsgItem in carrMsgs) {
+//            NSLog(@"%@", [cmsgItem description]);
+            if (!cmsgItem.msg_id) {
+                continue;
+            }
             NSMutableDictionary* cmutdicInfo = [[NSMutableDictionary alloc] init];
             [cmutdicInfo setObject:[[MCPeerID alloc] initWithDisplayName:cmsgItem.chat_from] forKey:k_chat_from];
             [cmutdicInfo setObject:[[MCPeerID alloc] initWithDisplayName:cmsgItem.chat_to] forKey:k_chat_to];
             [cmutdicInfo setObject:cmsgItem.chat_msg forKey:k_chat_msg];
             [cmutdicInfo setObject:cmsgItem.chat_msg_type forKey:k_chat_msg_type];
             [cmutdicInfo setObject:cmsgItem.chat_date forKey:k_chat_date];
-            [cmutdicInfo setObject:cmsgItem.chat_media_url forKey:k_chat_msg_media_url];
+            if (!cmsgItem.chat_media_url) {
+                [cmutdicInfo setObject:@"" forKey:k_chat_msg_media_url];
+            }else {
+                [cmutdicInfo setObject:cmsgItem.chat_media_url forKey:k_chat_msg_media_url];
+            }
             [cmutdicInfo setObject:cmsgItem.msg_id forKey:k_chat_msg_id];
+            
             [cmutdicInfo setObject:cmsgItem.chat_msg_finished forKey:k_chat_msg_finished];
 
             [cmutArrlist addObject:cmutdicInfo];
@@ -131,7 +140,7 @@ static NSManagedObjectContext* g_c_managed_obj_ctx = nil;
     //    NSEntityDescription* centityDescription = [[[cPersistentStoreCoordinate managedObjectModel] entitiesByName] objectForKey:k_table_name_msg_item];
     NSError* cError = nil;
     NSFetchRequest* cfetchReq = [[NSFetchRequest alloc] initWithEntityName:k_table_name_msg_item];
-    NSPredicate* cpredate = [NSPredicate predicateWithFormat:@"(%K = %@)", @"chat_media_url", acstrMediaPath];
+    NSPredicate* cpredate = [NSPredicate predicateWithFormat:@"(%K == %@)", @"chat_media_url", acstrMediaPath];
     cfetchReq.predicate = cpredate;
     NSArray* carrMsgs = [cmanagedObjCtx executeFetchRequest:cfetchReq error:&cError];
     if (cError) {
@@ -153,5 +162,13 @@ static NSManagedObjectContext* g_c_managed_obj_ctx = nil;
     return bFlag;
 }
 
-
++(NSString*)CreateUUID
+{
+    CFUUIDRef newUniqueID = CFUUIDCreate(kCFAllocatorDefault);
+    CFStringRef newUniqueIDString = CFUUIDCreateString(kCFAllocatorDefault, newUniqueID);
+    NSString *guid = (__bridge NSString *)newUniqueIDString;
+    CFRelease(newUniqueIDString);
+    CFRelease(newUniqueID);
+    return([guid lowercaseString]);
+}
 @end

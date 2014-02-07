@@ -42,10 +42,19 @@
         [self showRegisterUI];
     }
     */
+    
     [self.window makeKeyAndVisible];
     return YES;
 }
 
+-(void)initAdIdentifier {
+    _as_id_manager = [ASIdentifierManager sharedManager];
+    if ([_as_id_manager isAdvertisingTrackingEnabled]) {
+        
+    }else {
+        
+    }
+}
 -(void)showLoginUI {
     
     DLLoginViewCtrl* ccViewCtrlLogin = [[DLLoginViewCtrl alloc] init];

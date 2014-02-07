@@ -121,6 +121,7 @@
 
 #define k_noti_disable_me @"noti_disable_me"
 
+#define k_no_ads @"k_no_ads"
 typedef NS_ENUM(int32_t, T_PACKAGE_TYPE) {
     enum_package_type_short_msg = 0x300,
     enum_package_type_image,

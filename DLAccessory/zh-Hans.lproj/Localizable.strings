@@ -6,8 +6,8 @@
   Copyright (c) 2013 Zhang Mertef. All rights reserved.
 */
 "k_send_file_tile"="附近";
-"k_connected_service" = "连接的调和";
-"k_disconnected_service" = "发现的调和";
+"k_connected_service" = "连接的设备";
+"k_disconnected_service" = "发现的设备";
 "k_sending_file" = "发送中";
 "k_sending_file_finished" = "发送完成!";
 "k_receiving_file" = "接收中!";

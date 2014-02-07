@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 @class DLViewLoginFooter;
-@interface DLLoginViewCtrl : UIViewController<UITableViewDataSource, UITableViewDelegate>
+@interface DLLoginViewCtrl : DLRootViewCtrl<UITableViewDataSource, UITableViewDelegate>
 @property(strong, nonatomic) UITableView* cTableview;
 @property(strong, nonatomic) NSMutableArray* cmutarrModel;
 @property(strong, nonatomic) DLViewLoginFooter* ccViewLoginFooter;

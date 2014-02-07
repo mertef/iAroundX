@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 
 @class DLViewRegister;
-@interface DLViewCtrlRegister : UIViewController<UITextViewDelegate, UIPickerViewDataSource, UIPickerViewDelegate, UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIActionSheetDelegate>
+@interface DLViewCtrlRegister : DLRootViewCtrl<UITextViewDelegate, UIPickerViewDataSource, UIPickerViewDelegate, UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIActionSheetDelegate>
 @property(strong, nonatomic) DLViewRegister* ccviewRegister;
 @property(strong, nonatomic) UIImage* cimageAvator;
 @property(strong, nonatomic) UIActionSheet* cactionSheet;

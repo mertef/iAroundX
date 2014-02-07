@@ -16,7 +16,7 @@
 @class MBProgressHUD;
 @class PulsingHaloLayer;
 
-@interface DLMPViewCtrl : UIViewController<MCSessionDelegate, MCNearbyServiceBrowserDelegate,MCNearbyServiceAdvertiserDelegate, UITableViewDataSource, UITableViewDelegate,DLCellPopoutProto, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIAlertViewDelegate, UIViewControllerTransitioningDelegate>
+@interface DLMPViewCtrl : DLRootViewCtrl<MCSessionDelegate, MCNearbyServiceBrowserDelegate,MCNearbyServiceAdvertiserDelegate, UITableViewDataSource, UITableViewDelegate,DLCellPopoutProto, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIAlertViewDelegate, UIViewControllerTransitioningDelegate>
 //@property(nonatomic, strong) MCSession* csession;
 @property(nonatomic, strong) MCPeerID* cpeerId;
 

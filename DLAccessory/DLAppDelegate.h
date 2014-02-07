@@ -7,10 +7,13 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <AdSupport/AdSupport.h>
 
 @class DLMPViewCtrl;
 @class DLConversationListTableViewCtrl;
-@interface DLAppDelegate : UIResponder <UIApplicationDelegate>
+@interface DLAppDelegate : UIResponder <UIApplicationDelegate> {
+    ASIdentifierManager* _as_id_manager;
+}
 
 @property (strong, nonatomic) UIWindow *window;
 @property(strong, nonatomic) UINavigationController* cNaviCtrl;
@@ -24,5 +27,6 @@
 -(void)showMainUI;
 -(void)actionNotiLogin:(NSNotification*)acNoti;
 -(void)actionNotiRegister:(NSNotification*)acNoti;
+-(void)initAdIdentifier;
 
 @end

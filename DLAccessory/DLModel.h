@@ -14,4 +14,6 @@
 +(void)SaveMsgItem:(NSDictionary*)acdicMsgItem;
 +(NSMutableArray*)GetChatListFrom:(MCPeerID*)acPeerIdFrom to:(MCPeerID*)acPeerIdTo;
 +(BOOL)DeleteMsgItemByMediaPath:(NSString*)acstrMediaPath;
++(NSString*)CreateUUID;
+
 @end

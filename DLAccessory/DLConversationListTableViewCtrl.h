@@ -10,7 +10,7 @@
 
 @class MCSession;
 @class MCPeerID;
-@interface DLConversationListTableViewCtrl : UIViewController<UITableViewDataSource, UITableViewDelegate>
+@interface DLConversationListTableViewCtrl : DLRootViewCtrl<UITableViewDataSource, UITableViewDelegate>
 @property(strong, nonatomic) NSMutableArray* cmutarrConversations;
 @property(strong, nonatomic) UITableView* ctableView;
 @property(strong, nonatomic) MCSession* cSession;

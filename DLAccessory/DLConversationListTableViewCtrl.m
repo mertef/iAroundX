@@ -79,14 +79,14 @@
 {
     [super viewDidLoad];
     
-    self.edgesForExtendedLayout = UIRectEdgeAll;
-    self.view.backgroundColor = [UIColor whiteColor];
+//    self.edgesForExtendedLayout = UIRectEdgeAll;
+//    self.view.backgroundColor = [UIColor whiteColor];
     
     self.title = NSLocalizedString(@"k_conversation_title", nil);
-    self.ctableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStylePlain];
+    self.ctableView = [[UITableView alloc] initWithFrame:self.cviewContent.bounds style:UITableViewStylePlain];
     self.ctableView.delegate = self;
     self.ctableView.dataSource = self;
-    [self.view addSubview:self.ctableView];
+    [self.cviewContent addSubview:self.ctableView];
     self.ctableView.separatorStyle = UITableViewCellSeparatorStyleSingleLineEtched;
     self.ctableView.separatorColor = k_colore_gradient_blue;
     self.ctableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.ctableView.bounds), 2.0f)];
